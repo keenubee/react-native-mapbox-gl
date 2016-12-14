@@ -29,6 +29,8 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.UiSettings;
+import com.mapbox.mapboxsdk.style.layers.Layer;
+import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.services.commons.geojson.Feature;
 
 import java.util.ArrayList;
@@ -679,6 +681,28 @@ public class ReactNativeMapboxGLView extends RelativeLayout implements
         Marker marker = (Marker)annotation;
         _map.selectMarker(marker);
     }
+
+    // Runtime styling
+
+    public void addLayer(Layer layer, String before) {
+        if (_map == null) { return; }
+        _map.addLayer(layer, before);
+    }
+
+    // public void removeLayer(Layer layer) {
+    //     if (_map == null) { return; }
+    //     _map.removeLayer(layer);
+    // }
+
+    public void addSource(Source source) {
+        if (_map == null) { return; }
+        _map.addSource(source);
+    }
+
+    // public void removeSource(Source source) {
+    //     if (_map == null) { return; }
+    //     _map.removeSource(source);
+    // }
 
     // Feature querying
     public java.util.List<Feature> queryRenderedFeatures(android.graphics.PointF point, java.lang.String... layerIds) {

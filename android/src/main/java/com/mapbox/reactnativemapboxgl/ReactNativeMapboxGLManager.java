@@ -7,6 +7,7 @@ import com.facebook.react.bridge.JSApplicationIllegalArgumentException;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.MapBuilder;
@@ -20,9 +21,12 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.style.layers.*;
+import com.mapbox.mapboxsdk.style.sources.*;
 import com.mapbox.services.commons.geojson.Feature;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -187,6 +191,8 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
     public static final int COMMAND_SELECT_ANNOTATION = 7;
     public static final int COMMAND_SPLICE_ANNOTATIONS = 8;
     public static final int COMMAND_QUERY_RENDERED_FEATURES = 9;
+    public static final int COMMAND_ADD_LAYER = 10;
+    public static final int COMMAND_ADD_SOURCE = 11;
 
     @Override
     public
@@ -202,6 +208,8 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
                 .put("selectAnnotation", COMMAND_SELECT_ANNOTATION)
                 .put("spliceAnnotations", COMMAND_SPLICE_ANNOTATIONS)
                 .put("queryRenderedFeatures", COMMAND_QUERY_RENDERED_FEATURES)
+                .put("addLayer", COMMAND_ADD_LAYER)
+                .put("addSource", COMMAND_ADD_SOURCE)
                 .build();
     }
 
@@ -248,6 +256,12 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
                 break;
             case COMMAND_QUERY_RENDERED_FEATURES:
                 queryRenderedFeatures(view, args.getMap(0), args.getInt(1));
+                break;
+            case COMMAND_ADD_LAYER:
+                addLayer(view, args.getMap(0), args.getString(1), args.getInt(2));
+                break;
+            case COMMAND_ADD_SOURCE:
+                addSource(view, args.getString(0), args.getMap(1), args.getBoolean(2), args.getInt(3));
                 break;
             default:
                 throw new JSApplicationIllegalArgumentException("Invalid commandId " + commandId + " sent to " + getClass().getSimpleName());
@@ -384,6 +398,80 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
 
     public void selectAnnotation(ReactNativeMapboxGLView view, String annotationId, boolean animated) {
         view.selectAnnotation(annotationId, animated);
+    }
+
+    // Runtime styling
+
+    private Function functionize(ReadableMap map) {
+        ReadableArray stops = map.getArray("stops");
+        Function.Stop[] stopsArray = new Function.Stop[stops.size()];
+        for (int i = 0; i < stops.size(); i++) {
+            stopsArray[i] = Function.stop(
+                (float)stops.getArray(i).getDouble(0),
+                PropertyFactory.backgroundOpacity((float)stops.getArray(i).getDouble(1))
+            );
+        }
+        return Function.zoom((float)map.getDouble("base"), stopsArray);
+    }
+
+    public void addLayer(ReactNativeMapboxGLView view, ReadableMap layerJson, String before, int callbackId) {
+        WritableArray callbackArgs = Arguments.createArray();
+        if (!layerJson.hasKey("type") || !layerJson.hasKey("id")) {
+            callbackArgs.pushString("addLayer(): layer must have valid 'id' and 'type' attributes.");
+            fireCallback(callbackId, callbackArgs);
+            return;
+        }
+
+        String layerType = layerJson.getString("type");
+        ReadableMap paintProperties = layerJson.getMap("paint");
+        if (new String("background").equals(layerType)) {
+            ArrayList<Property> properties = new ArrayList<Property>();
+            if (paintProperties.hasKey("background-color") && paintProperties.getType("background-color") == ReadableType.String) {
+              properties.add(PropertyFactory.backgroundColor(paintProperties.getString("background-color")));
+            }
+            if (paintProperties.hasKey("background-opacity") && paintProperties.getType("background-opacity") == ReadableType.Map) {
+              properties.add(PropertyFactory.backgroundOpacity(functionize(paintProperties.getMap("background-opacity"))));
+            }
+
+            BackgroundLayer layer = new BackgroundLayer(layerJson.getString("id"))
+                .withProperties(properties.toArray(new Property[0]));
+            view.addLayer(layer, before);
+        }
+
+        callbackArgs.pushString(null); // push null error message
+        fireCallback(callbackId, callbackArgs);
+    }
+
+    public void removeLayer() {
+
+    }
+
+    public void addSource(ReactNativeMapboxGLView view, String id, ReadableMap sourceJson, boolean dataIsUrl, int callbackId) {
+        WritableArray callbackArgs = Arguments.createArray();
+        if (!sourceJson.hasKey("type")) {
+          callbackArgs.pushString("addSource(): source must have a valid 'type' attribute.");
+          fireCallback(callbackId, callbackArgs);
+          return;
+        }
+
+        String sourceType = sourceJson.getString("type");
+        if (new String("geojson").equals(sourceType)) {
+            if (!sourceJson.hasKey("data")) {
+                callbackArgs.pushString("addSource(): source of type 'geojson' must have a valid 'data' attribute.");
+                fireCallback(callbackId, callbackArgs);
+                return;
+            }
+            if (dataIsUrl == false) {
+                view.addSource(new GeoJsonSource(id, sourceJson.getString("data")));
+            }
+        }
+
+        callbackArgs.pushString(null); // push null error message
+        fireCallback(callbackId, callbackArgs);
+    }
+
+    public void removeSource() {
+
     }
 
     // Feature querying
