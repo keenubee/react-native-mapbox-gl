@@ -598,6 +598,125 @@ RCT_EXPORT_METHOD(setVisibleCoordinateBounds:(nonnull NSNumber *)reactTag
     }];
 }
 
+- (UIColor *)colorFromHexString:(NSString *)hexString
+{
+    unsigned rgbValue = 0;
+    NSScanner *scanner = [NSScanner scannerWithString:hexString];
+    if ( [hexString rangeOfString:@"#"].location == 0 ) {
+      [scanner setScanLocation:1]; // bypass '#' character
+    }
+    [scanner scanHexInt:&rgbValue];
+    return [UIColor colorWithRed:((rgbValue & 0xFF0000) >> 16)/255.0
+                    green:((rgbValue & 0xFF00) >> 8)/255.0
+                    blue:(rgbValue & 0xFF)/255.0
+                    alpha:1.0
+    ];
+}
+
+RCT_EXPORT_METHOD(addLayer:(nonnull NSNumber *)reactTag
+                  layerJson:(nonnull NSDictionary*)layerJson
+                  before:(nonnull NSString*)previousLayerId)
+{
+  [_bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *, RCTMapboxGL *> *viewRegistry) {
+      RCTMapboxGL *mapView = viewRegistry[reactTag];
+      if ([mapView isKindOfClass:[RCTMapboxGL class]]) {
+          NSString *idString = layerJson[@"id"];
+          NSString *typeString = layerJson[@"type"];
+          if (!idString || !typeString) {
+              return;
+          }
+          if([typeString isEqualToString:@"circle"]) {
+              NSString *sourceString = layerJson[@"source"];
+              NSDictionary *paintProperties = layerJson[@"paint"];
+              if (!sourceString || !paintProperties) {
+                  return;
+              }
+              MGLSource *source = [mapView styleSourceWithIdentifier:sourceString];
+              MGLCircleStyleLayer *layer = [[MGLCircleStyleLayer alloc] initWithIdentifier:idString source:source];
+              if ([[paintProperties valueForKey:@"circle-radius"] isKindOfClass:[NSNumber class]]) {
+                  MGLStyleValue *circleRadiusValue = [MGLStyleValue valueWithRawValue:paintProperties[@"circle-radius"]];
+                  [layer setCircleRadius:circleRadiusValue];
+              }
+              if ([[paintProperties valueForKey:@"circle-color"] isKindOfClass:[NSString class]]) {
+                  UIColor *color = [self colorFromHexString:paintProperties[@"circle-color"]];
+                  MGLStyleValue *circleColorValue = [MGLStyleValue valueWithRawValue:color];
+                  [layer setCircleColor:circleColorValue];
+              }
+              if ([[paintProperties valueForKey:@"circle-blur"] isKindOfClass:[NSNumber class]]) {
+                  MGLStyleValue *circleBlurValue = [MGLStyleValue valueWithRawValue:paintProperties[@"circle-blur"]];
+                  [layer setCircleBlur:circleBlurValue];
+              }
+              MGLStyleLayer *previousLayer = [mapView styleLayerWithIdentifier:previousLayerId];
+              if (!previousLayer) {
+                  return;
+              }
+              [mapView insertLayer:layer belowLayer:previousLayer];
+          }
+          else if([typeString isEqualToString:@"background"]) {
+              NSDictionary *paintProperties = layerJson[@"paint"];
+              if (!paintProperties) {
+                  return;
+              }
+              MGLBackgroundStyleLayer *layer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:idString];
+              if ([[paintProperties valueForKey:@"background-color"] isKindOfClass:[NSString class]]) {
+                  UIColor *color = [self colorFromHexString:paintProperties[@"background-color"]];
+                  MGLStyleValue *backgroundColorValue = [MGLStyleValue valueWithRawValue:color];
+                  [layer setBackgroundColor:backgroundColorValue];
+              }
+              if ([[paintProperties valueForKey:@"background-opacity"] isKindOfClass:[NSDictionary class]]) {
+                  NSArray *stops = paintProperties[@"background-opacity"][@"stops"];
+                  NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
+                  for (id stop in stops) {
+                      [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                  }
+                  MGLStyleValue *backgroundOpacityValue;
+                  NSNumber *baseNumber = paintProperties[@"background-opacity"][@"base"];
+                  if (baseNumber) {
+                      backgroundOpacityValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                  }
+                  else {
+                      backgroundOpacityValue = [MGLStyleValue valueWithStops:stopsDict];
+                  }
+                  [layer setBackgroundOpacity:backgroundOpacityValue];
+              }
+               MGLStyleLayer *previousLayer = [mapView styleLayerWithIdentifier:previousLayerId];
+               if (!previousLayer) {
+                   return;
+               }
+              [mapView insertLayer:layer belowLayer:previousLayer];
+          }
+      }
+  }];
+}
+
+RCT_EXPORT_METHOD(addSource:(nonnull NSNumber *)reactTag
+                  id:(nonnull NSString*)id
+                  sourceJson:(nonnull NSDictionary*)sourceJson
+                  dataIsUrl:(BOOL) dataIsUrl)
+{
+  [_bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *, RCTMapboxGL *> *viewRegistry) {
+      RCTMapboxGL *mapView = viewRegistry[reactTag];
+      if ([mapView isKindOfClass:[RCTMapboxGL class]]) {
+          NSString *typeString = sourceJson[@"type"];
+          if (!typeString) {
+              return;
+          }
+          if([typeString isEqualToString:@"geojson"]) {
+              NSData *data = [sourceJson[@"data"] dataUsingEncoding:NSUTF8StringEncoding];
+              if (!data) {
+                  return;
+              }
+              if (!dataIsUrl) {
+                  NSError *encodeError;
+                  MGLShape *sourceShape = [MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:&encodeError];
+                  MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:id shape:sourceShape options:nil];
+                  [mapView addSource:source];
+              }
+          }
+      }
+  }];
+}
+
 RCT_EXPORT_METHOD(selectAnnotation:(nonnull NSNumber *) reactTag
                   selectedIdentifier:(NSString*)selectedIdentifier
                   animated:(BOOL)animated)
