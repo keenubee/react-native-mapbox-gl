@@ -212,6 +212,9 @@ class MapView extends Component {
   addLayer(layer, before, callback) {
     MapboxGLManager.addLayer(findNodeHandle(this), layer, before, callback)
   }
+  removeLayer(id, callback) {
+    MapboxGLManager.removeLayer(findNodeHandle(this), id, callback)
+  }
   addSource(id, source, callback) {
     let newSource = source
     let dataIsUrl = true
@@ -222,6 +225,9 @@ class MapView extends Component {
       dataIsUrl = false
     }
     MapboxGLManager.addSource(findNodeHandle(this), id, newSource, dataIsUrl, callback)
+  }
+  removeSource(id, callback) {
+    MapboxGLManager.removeSource(findNodeHandle(this), id, callback)
   }
   selectAnnotation(annotationId, animated = true) {
     MapboxGLManager.selectAnnotation(findNodeHandle(this), annotationId, animated);

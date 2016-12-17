@@ -194,6 +194,8 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
     public static final int COMMAND_QUERY_RENDERED_FEATURES = 9;
     public static final int COMMAND_ADD_LAYER = 10;
     public static final int COMMAND_ADD_SOURCE = 11;
+    public static final int COMMAND_REMOVE_LAYER = 12;
+    public static final int COMMAND_REMOVE_SOURCE = 13;
 
     @Override
     public
@@ -211,6 +213,8 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
                 .put("queryRenderedFeatures", COMMAND_QUERY_RENDERED_FEATURES)
                 .put("addLayer", COMMAND_ADD_LAYER)
                 .put("addSource", COMMAND_ADD_SOURCE)
+                .put("removeLayer", COMMAND_REMOVE_LAYER)
+                .put("removeSource", COMMAND_REMOVE_SOURCE)
                 .build();
     }
 
@@ -263,6 +267,12 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
                 break;
             case COMMAND_ADD_SOURCE:
                 addSource(view, args.getString(0), args.getMap(1), args.getBoolean(2), args.getInt(3));
+                break;
+            case COMMAND_REMOVE_LAYER:
+                removeLayer(view, args.getString(0), args.getInt(1));
+                break;
+            case COMMAND_REMOVE_SOURCE:
+                removeSource(view, args.getString(0), args.getInt(1));
                 break;
             default:
                 throw new JSApplicationIllegalArgumentException("Invalid commandId " + commandId + " sent to " + getClass().getSimpleName());
@@ -516,8 +526,11 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
 
             if (layerJson.hasKey("filter")) {
                 ReadableArray filterJson = layerJson.getArray("filter");
-                if (new String("=").equals(filterJson.getString(0))) {
+                if (new String("==").equals(filterJson.getString(0)) && filterJson.getType(2) == ReadableType.Number) {
                     layer.setFilter(Filter.eq(filterJson.getString(1), filterJson.getInt(2)));
+                }
+                else if (new String("==").equals(filterJson.getString(0)) && filterJson.getType(2) == ReadableType.String) {
+                    layer.setFilter(Filter.eq(filterJson.getString(1), filterJson.getString(2)));
                 }
             }
 
@@ -528,8 +541,16 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
         fireCallback(callbackId, callbackArgs);
     }
 
-    public void removeLayer() {
-
+    public void removeLayer(ReactNativeMapboxGLView view, String id, int callbackId) {
+        WritableArray callbackArgs = Arguments.createArray();
+        try {
+          view.removeLayer(id);
+        } catch (NoSuchLayerException e) {
+          callbackArgs.pushString(String.format("removeLayer(): layer '%s' does not exist.", id));
+          fireCallback(callbackId, callbackArgs);
+        }
+        callbackArgs.pushString(null); // push null error message
+        fireCallback(callbackId, callbackArgs);
     }
 
     public void addSource(ReactNativeMapboxGLView view, String id, ReadableMap sourceJson, boolean dataIsUrl, int callbackId) {
@@ -556,8 +577,16 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
         fireCallback(callbackId, callbackArgs);
     }
 
-    public void removeSource() {
-
+    public void removeSource(ReactNativeMapboxGLView view, String id, int callbackId) {
+        WritableArray callbackArgs = Arguments.createArray();
+        try {
+          view.removeSource(id);
+        } catch (NoSuchSourceException e) {
+          callbackArgs.pushString(String.format("removeSource(): layer '%s' does not exist.", id));
+          fireCallback(callbackId, callbackArgs);
+        }
+        callbackArgs.pushString(null); // push null error message
+        fireCallback(callbackId, callbackArgs);
     }
 
     // Feature querying
