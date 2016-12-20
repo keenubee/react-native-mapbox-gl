@@ -39,6 +39,27 @@
     boolean: '',
     array: '',
   }
+
+  const compFilterNames = {
+    '==': 'eq',
+    '!=': 'neq',
+    '>': 'gt',
+    '>=': 'gte',
+    '<': 'lt',
+    '<=': 'lte',
+  }
+
+  const existFilterNames = {
+    'has': 'has',
+    '!has': 'notHas',
+  }
+
+  const membFilterNames = {
+    'in': 'in',
+    '!in': 'notIn',
+  }
+
+  const combinationFilterNames = ['all', 'any', 'none']
 -%>
 // This file is generated. See scripts/generate-layer-factory.js
 package com.mapbox.reactnativemapboxgl;
@@ -89,6 +110,39 @@ public class RNMGLLayerFactory {
         return arr;
     }
 
+    static Filter.Statement filterJsonToFilter(ReadableArray filterJson) {
+        String filterType = filterJson.getString(0);
+<% for (const filterName of combinationFilterNames) { -%>
+        if (filterType.equals("<%- filterName %>")) {
+            Filter.Statement[] filters = new Filter.Statement[filterJson.size() - 1];
+            for (int i = 1; i < filterJson.size(); i++) {
+                filters[i] = filterJsonToFilter(filterJson.getArray(i));
+            }
+            return Filter.<%- filterName %>(filters);
+        }
+<% } -%>
+<% for (const filterName in existFilterNames) { -%>
+        if (filterType.equals("<%- filterName %>")) {
+            return Filter.<%- existFilterNames[filterName] %>(filterJson.getString(1));
+
+        }
+<% } -%>
+<% for (const filterName in compFilterNames) { -%>
+        if (filterType.equals("<%- filterName %>")) {
+            if (filterJson.getType(2) == ReadableType.Number) {
+                return Filter.<%- compFilterNames[filterName] %>(filterJson.getString(1), (float)filterJson.getDouble(2));
+            }
+            if (filterJson.getType(2) == ReadableType.String) {
+                return Filter.<%- compFilterNames[filterName] %>(filterJson.getString(1), filterJson.getString(2));
+            }
+            if (filterJson.getType(2) == ReadableType.Boolean) {
+                return Filter.<%- compFilterNames[filterName] %>(filterJson.getString(1), filterJson.getBoolean(2));
+            }
+        }
+<% } -%>
+        return null;
+    }
+
 <% for (const layer of layers) { -%>
     static <%- upperCamelize(layer.type) %>Layer <%- camelize(layer.type) %>LayerFromJson(ReadableMap layerJson) {
         ReadableMap paintProperties = layerJson.getMap("paint");
@@ -97,7 +151,7 @@ public class RNMGLLayerFactory {
 <% } -%>
         ArrayList<Property> properties = new ArrayList<Property>();
 
-<% for (const prop of layer.paintProperties.concat(layer.layoutProperties)) { -%>
+<% for (const prop of layer.properties) { -%>
 <% if (typeToReadableType.hasOwnProperty(prop.type)) { -%>
         if (<%- prop.propertyType %>Properties.hasKey("<%- prop.name %>")) {
             if (<%- prop.propertyType %>Properties.getType("<%- prop.name %>") == ReadableType.<%- typeToReadableType[prop.type] %>) {
@@ -144,6 +198,13 @@ public class RNMGLLayerFactory {
 <% } else { -%>
         <%- upperCamelize(layer.type) %>Layer layer = new <%- upperCamelize(layer.type) %>Layer(layerJson.getString("id"), layerJson.getString("source"))
             .withProperties(properties.toArray(new Property[0]));
+<% } -%>
+
+<% if (layer.type !== 'background' && layer.type !== 'raster') { -%>
+        if (layerJson.hasKey("filter")) {
+            ReadableArray filterJson = layerJson.getArray("filter");
+            layer.setFilter(filterJsonToFilter(filterJson));
+        }
 <% } -%>
 
         return layer;
