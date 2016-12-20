@@ -378,6 +378,18 @@ class MapView extends Component {
   };
 
   componentWillReceiveProps(newProps) {
+    if (newProps.style) {
+      // if (!this.props.style) {
+      //   // write style to disk and load as a file
+      // } else {
+      //   // check to see if anything has changed that is not a layer or source.
+      //   // if so, reload the whole style
+      //
+      //   // otherwise, run diff styles
+      //   const {sourcesDiff, layersDiff} = diffStyles(this.props.style, newProps.style)
+      // }
+    }
+
     const oldKeys = clone(this._annotations);
     const itemsToAdd = [];
     const itemsToRemove = [];
