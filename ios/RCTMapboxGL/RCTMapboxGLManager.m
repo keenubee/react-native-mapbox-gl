@@ -18,6 +18,7 @@
 #import "RCTMapboxGLConversions.h"
 #import "MGLPolygon+RCTAdditions.h"
 #import "MGLPolyline+RCTAdditions.h"
+#import "MGLStyleLayer+RCTAdditions.h"
 
 @implementation RCTMapboxGLManager
 
