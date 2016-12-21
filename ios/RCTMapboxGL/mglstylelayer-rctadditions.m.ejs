@@ -1,0 +1,134 @@
+<%
+  const layers = locals.layers;
+
+  function camelize (str) {
+    return str.replace(/-(.)/g, function (_, x) {
+      return x.toUpperCase();
+    });
+  }
+
+  function upperCamelize (str) {
+    return str.replace(/(?:^|-)(.)/g, function (_, x) {
+      return x.toUpperCase();
+    });
+  }
+-%>
+//
+// Copyright (c) 2016 Mapbox. All rights reserved.
+//
+// This file is generated. See scripts/generate-layer-factory.js
+
+#import "MGLStyleLayer+RCTAdditions.h"
+
+
+@implementation MGLStyleLayer (RCTAdditions)
+
++ (MGLStyleLayer *)fromJson:(nonnull NSDictionary *)layerJson
+{
+    NSString *idString = layerJson[@"id"];
+    NSString *typeString = layerJson[@"type"];
+    if (!idString || !typeString) {
+        return;
+    }
+<% for (const layer of layers) { -%>
+    if([typeString isEqualToString:@"<%- layer.type %>"]) {
+        NSDictionary *paintProperties = layerJson[@"paint"];
+<% if (layer.layoutProperties.length) { -%>
+        NSDictionary *layoutProperties = layerJson[@"layout"];
+<% } -%>
+<% if (layer.type === 'background') { -%>
+        MGL<%- upperCamelize(layer.type) %>StyleLayer *layer = [[MGL<%- upperCamelize(layer.type) %>StyleLayer alloc] initWithIdentifier:idString];
+<% } else { -%>
+        NSString *sourceString = layerJson[@"source"];
+        MGLSource *source = [mapView styleSourceWithIdentifier:sourceString];
+        MGL<%- upperCamelize(layer.type) %>StyleLayer *layer = [[MGL<%- upperCamelize(layer.type) %>StyleLayer alloc] initWithIdentifier:idString source:source];
+<% } -%>
+<% for (const prop of layer.properties) { -%>
+        if ([[<%- prop.propertyType %>Properties valueForKey:@"<%- prop.name %>"] isKindOfClass:[NSNumber class]]) {
+            MGLStyleValue *<%- camelize(prop.name) %>Value = [MGLStyleValue valueWithRawValue:<%- prop.propertyType %>Properties[@"<%- prop.name %>"]];
+            [layer set<%- upperCamelize(prop.name) %>:<%- camelize(prop.name) %>Value];
+        }
+        else if ([[<%- prop.propertyType %>Properties valueForKey:@"<%- prop.name %>"] isKindOfClass:[NSDictionary class]]) {
+            NSArray *stops = <%- prop.propertyType %>Properties[@"<%- prop.name %>"][@"stops"];
+            NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
+            for (id stop in stops) {
+                [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+            }
+            MGLStyleValue *<%- camelize(prop.name) %>Value;
+            NSNumber *baseNumber = <%- prop.propertyType %>Properties[@"<%- prop.name %>"][@"base"];
+            if (baseNumber) {
+                <%- camelize(prop.name) %>Value = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+            }
+            else {
+                <%- camelize(prop.name) %>Value = [MGLStyleValue valueWithStops:stopsDict];
+            }
+            [layer set<%- upperCamelize(prop.name) %>:<%- camelize(prop.name) %>Value];
+        }
+<% } -%>
+        return layer;
+    }
+<% } -%>
+    if([typeString isEqualToString:@"circle"]) {
+        NSString *sourceString = layerJson[@"source"];
+        NSDictionary *paintProperties = layerJson[@"paint"];
+        NSDictionary *layoutProperties = layerJson[@"layout"];
+        if (!sourceString || !paintProperties) {
+            return;
+        }
+        MGLSource *source = [mapView styleSourceWithIdentifier:sourceString];
+        MGLCircleStyleLayer *layer = [[MGLCircleStyleLayer alloc] initWithIdentifier:idString source:source];
+        if ([[paintProperties valueForKey:@"circle-radius"] isKindOfClass:[NSNumber class]]) {
+            MGLStyleValue *circleRadiusValue = [MGLStyleValue valueWithRawValue:paintProperties[@"circle-radius"]];
+            [layer setCircleRadius:circleRadiusValue];
+        }
+        if ([[paintProperties valueForKey:@"circle-color"] isKindOfClass:[NSString class]]) {
+            UIColor *color = [self colorFromHexString:paintProperties[@"circle-color"]];
+            MGLStyleValue *circleColorValue = [MGLStyleValue valueWithRawValue:color];
+            [layer setCircleColor:circleColorValue];
+        }
+        if ([[paintProperties valueForKey:@"circle-blur"] isKindOfClass:[NSNumber class]]) {
+            MGLStyleValue *circleBlurValue = [MGLStyleValue valueWithRawValue:paintProperties[@"circle-blur"]];
+            [layer setCircleBlur:circleBlurValue];
+        }
+        MGLStyleLayer *previousLayer = [mapView styleLayerWithIdentifier:previousLayerId];
+        if (!previousLayer) {
+            return;
+        }
+        return layer;
+    }
+    else if([typeString isEqualToString:@"background"]) {
+        NSDictionary *paintProperties = layerJson[@"paint"];
+        if (!paintProperties) {
+            return;
+        }
+        MGLBackgroundStyleLayer *layer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:idString];
+        if ([[paintProperties valueForKey:@"background-color"] isKindOfClass:[NSString class]]) {
+            UIColor *color = [self colorFromHexString:paintProperties[@"background-color"]];
+            MGLStyleValue *backgroundColorValue = [MGLStyleValue valueWithRawValue:color];
+            [layer setBackgroundColor:backgroundColorValue];
+        }
+        if ([[paintProperties valueForKey:@"background-opacity"] isKindOfClass:[NSDictionary class]]) {
+            NSArray *stops = paintProperties[@"background-opacity"][@"stops"];
+            NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
+            for (id stop in stops) {
+                [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+            }
+            MGLStyleValue *backgroundOpacityValue;
+            NSNumber *baseNumber = paintProperties[@"background-opacity"][@"base"];
+            if (baseNumber) {
+                backgroundOpacityValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+            }
+            else {
+                backgroundOpacityValue = [MGLStyleValue valueWithStops:stopsDict];
+            }
+            [layer setBackgroundOpacity:backgroundOpacityValue];
+        }
+         MGLStyleLayer *previousLayer = [mapView styleLayerWithIdentifier:previousLayerId];
+         if (!previousLayer) {
+             return;
+         }
+        return layer;
+    }
+}
+
+@end
