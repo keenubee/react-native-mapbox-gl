@@ -4,6 +4,7 @@
 // This file is generated. See scripts/generate-layer-factory.js
 
 #import "MGLStyleLayer+RCTAdditions.h"
+#import "UIColor+RCTAdditions.h"
 
 
 @implementation MGLStyleLayer (RCTAdditions)
