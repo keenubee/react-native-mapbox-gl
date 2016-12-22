@@ -29,6 +29,9 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.UiSettings;
+import com.mapbox.mapboxsdk.style.layers.Layer;
+import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.services.commons.geojson.Feature;
 
 import java.util.ArrayList;
@@ -708,6 +711,17 @@ public class ReactNativeMapboxGLView extends RelativeLayout implements
     public void deselectAnnotation() {
         if (_map == null) { return; }
         _map.deselectMarkers();
+    }
+
+    // Runtime styling
+
+    public void setLayerVisibility(String id, String value) throws NoSuchLayerException {
+        if (_map == null) { return; }
+        Layer layer = _map.getLayer(id);
+        if (layer == null) {
+            throw new NoSuchLayerException(String.format("Cannot set visibility of non-existent layer '%s'", id));
+        }
+        layer.setProperties(PropertyFactory.visibility(value));
     }
 
     // Feature querying

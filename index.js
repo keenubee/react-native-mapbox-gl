@@ -227,6 +227,32 @@ class MapView extends Component {
   }
 
   // Others
+  setLayerVisibility(id, visibility, callback) {
+    // convert possible boolean to the value that the component expects
+    const value = (visibility && visibility !== 'none') ? 'visible' : 'none'
+
+    // the Android bridge uses a callback, so wrap it in a promise
+    if (Platform.OS === 'android') {
+      const promise = new Promise((resolve, reject) => {
+        MapboxGLManager.setLayerVisibility(findNodeHandle(this), id, value, (err) => {
+          // cast error string to Error like on iOS
+          const _err = err && new Error(err)
+          callback && callback(_err);
+          if (_err) {
+            reject(_err);
+          } else {
+            resolve();
+          }
+        });
+      })
+      return promise;
+    }
+
+    // // the iOS bridge returns a promise, so bind callback to it
+    // MapboxGLManager.setLayerVisibility(findNodeHandle(this), id, value)
+    // bindCallbackToPromise(callback, promise);
+    // return promise;
+  }
   selectAnnotation(annotationId, animated = true) {
     MapboxGLManager.selectAnnotation(findNodeHandle(this), annotationId, animated);
   }

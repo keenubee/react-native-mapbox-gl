@@ -20,6 +20,8 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.style.layers.*;
+import com.mapbox.mapboxsdk.style.sources.*;
 import com.mapbox.services.commons.geojson.Feature;
 
 import java.util.List;
@@ -203,6 +205,7 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
     public static final int COMMAND_SPLICE_ANNOTATIONS = 8;
     public static final int COMMAND_DESELECT_ANNOTATION = 9;
     public static final int COMMAND_QUERY_RENDERED_FEATURES = 10;
+    public static final int COMMAND_SET_LAYER_VISIBILITY = 11;
 
     @Override
     public
@@ -219,6 +222,7 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
                 .put("spliceAnnotations", COMMAND_SPLICE_ANNOTATIONS)
                 .put("deselectAnnotation", COMMAND_DESELECT_ANNOTATION)
                 .put("queryRenderedFeatures", COMMAND_QUERY_RENDERED_FEATURES)
+                .put("setLayerVisibility", COMMAND_SET_LAYER_VISIBILITY)
                 .build();
     }
 
@@ -268,6 +272,9 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
                 break;
             case COMMAND_QUERY_RENDERED_FEATURES:
                 queryRenderedFeatures(view, args.getMap(0), args.getInt(1));
+                break;
+            case COMMAND_SET_LAYER_VISIBILITY:
+                setLayerVisibility(view, args.getString(0), args.getString(1), args.getInt(2));
                 break;
             default:
                 throw new JSApplicationIllegalArgumentException("Invalid commandId " + commandId + " sent to " + getClass().getSimpleName());
@@ -408,6 +415,21 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
 
     public void deselectAnnotation(ReactNativeMapboxGLView view) {
         view.deselectAnnotation();
+    }
+
+    // Runtime styling
+
+    public void setLayerVisibility(ReactNativeMapboxGLView view, String id, String value, int callbackId) {
+        WritableArray callbackArgs = Arguments.createArray();
+        try {
+            view.setLayerVisibility(id, value);
+        } catch (NoSuchLayerException e) {
+            callbackArgs.pushString(String.format("setLayerVisibility(): layer '%s' does not exist.", id));
+            fireCallback(callbackId, callbackArgs);
+            return;
+        }
+        callbackArgs.pushString(null); // push null error message
+        fireCallback(callbackId, callbackArgs);
     }
 
     // Feature querying
