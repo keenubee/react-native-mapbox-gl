@@ -12,6 +12,8 @@
       return x.toUpperCase();
     });
   }
+
+  const compFilterNames = ['==', '!=', '<', '<=', '>', '>=']
 -%>
 //
 // Copyright (c) 2016 Mapbox. All rights reserved.
@@ -25,12 +27,13 @@
 @implementation MGLStyleLayer (RCTAdditions)
 
 + (MGLStyleLayer *)fromJson:(nonnull NSDictionary *)layerJson
+                   withMap:(RCTMapboxGL *)mapView
 {
     NSString *idString = layerJson[@"id"];
     NSString *typeString = layerJson[@"type"];
-    if (!idString || !typeString) {
-        return;
-    }
+    // if (!idString || !typeString) {
+    //     return;
+    // }
 <% for (const layer of layers) { -%>
     if([typeString isEqualToString:@"<%- layer.type %>"]) {
         NSDictionary *paintProperties = layerJson[@"paint"];
@@ -45,91 +48,111 @@
         MGL<%- upperCamelize(layer.type) %>StyleLayer *layer = [[MGL<%- upperCamelize(layer.type) %>StyleLayer alloc] initWithIdentifier:idString source:source];
 <% } -%>
 <% for (const prop of layer.properties) { -%>
-        if ([[<%- prop.propertyType %>Properties valueForKey:@"<%- prop.name %>"] isKindOfClass:[NSNumber class]]) {
-            MGLStyleValue *<%- camelize(prop.name) %>Value = [MGLStyleValue valueWithRawValue:<%- prop.propertyType %>Properties[@"<%- prop.name %>"]];
-            [layer set<%- upperCamelize(prop.name) %>:<%- camelize(prop.name) %>Value];
+        if ([<%- prop.propertyType %>Properties valueForKey:@"<%- prop.name %>"]) {
+<% if (prop['zoom-function'] === true) { -%>
+            if ([[<%- prop.propertyType %>Properties valueForKey:@"<%- prop.name %>"] isKindOfClass:[NSDictionary class]]) {
+                NSArray *stops = <%- prop.propertyType %>Properties[@"<%- prop.name %>"][@"stops"];
+                NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
+                for (id stop in stops) {
+<% if (prop.type === 'color') { -%>
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromHexString:stop[1]]] forKey:stop[0]];
+<% } else { -%>
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+<% } -%>
+                }
+                MGLStyleValue *<%- camelize(prop.name) %>Value;
+                NSNumber *baseNumber = <%- prop.propertyType %>Properties[@"<%- prop.name %>"][@"base"];
+                if (baseNumber) {
+                    <%- camelize(prop.name) %>Value = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                } else {
+                    <%- camelize(prop.name) %>Value = [MGLStyleValue valueWithStops:stopsDict];
+                }
+                [layer set<%- upperCamelize(prop.setterName || prop.name) %>:<%- camelize(prop.name) %>Value];
+            } else {
+<% } -%>
+<% if (prop.type === 'color') { -%>
+                UIColor *color = [UIColor colorFromHexString:<%- prop.propertyType %>Properties[@"<%- prop.name %>"]];
+                MGLStyleValue *<%- camelize(prop.name) %>Value = [MGLStyleValue valueWithRawValue:color];
+<% } else { -%>
+                MGLStyleValue *<%- camelize(prop.name) %>Value = [MGLStyleValue valueWithRawValue:<%- prop.propertyType %>Properties[@"<%- prop.name %>"]];
+<% } -%>
+                [layer set<%- upperCamelize(prop.setterName || prop.name) %>:<%- camelize(prop.name) %>Value];
+<% if (prop['zoom-function'] === true) { -%>
+            }
+<% } -%>
         }
-        else if ([[<%- prop.propertyType %>Properties valueForKey:@"<%- prop.name %>"] isKindOfClass:[NSDictionary class]]) {
-            NSArray *stops = <%- prop.propertyType %>Properties[@"<%- prop.name %>"][@"stops"];
-            NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
-            for (id stop in stops) {
-                [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
-            }
-            MGLStyleValue *<%- camelize(prop.name) %>Value;
-            NSNumber *baseNumber = <%- prop.propertyType %>Properties[@"<%- prop.name %>"][@"base"];
-            if (baseNumber) {
-                <%- camelize(prop.name) %>Value = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
-            }
-            else {
-                <%- camelize(prop.name) %>Value = [MGLStyleValue valueWithStops:stopsDict];
-            }
-            [layer set<%- upperCamelize(prop.name) %>:<%- camelize(prop.name) %>Value];
+<% } -%>
+<% if (layer.type !== 'background' && layer.type !== 'raster') { -%>
+        NSString *sourceLayer = layerJson[@"source-layer"];
+        NSArray *filter = layerJson[@"filter"];
+
+        if (sourceLayer) {
+            [layer setSourceLayerIdentifier:sourceLayer];
+        }
+        if (filter) {
+            [layer setPredicateFromJson:filter];
         }
 <% } -%>
         return layer;
     }
 <% } -%>
-    if([typeString isEqualToString:@"circle"]) {
-        NSString *sourceString = layerJson[@"source"];
-        NSDictionary *paintProperties = layerJson[@"paint"];
-        NSDictionary *layoutProperties = layerJson[@"layout"];
-        if (!sourceString || !paintProperties) {
-            return;
-        }
-        MGLSource *source = [mapView styleSourceWithIdentifier:sourceString];
-        MGLCircleStyleLayer *layer = [[MGLCircleStyleLayer alloc] initWithIdentifier:idString source:source];
-        if ([[paintProperties valueForKey:@"circle-radius"] isKindOfClass:[NSNumber class]]) {
-            MGLStyleValue *circleRadiusValue = [MGLStyleValue valueWithRawValue:paintProperties[@"circle-radius"]];
-            [layer setCircleRadius:circleRadiusValue];
-        }
-        if ([[paintProperties valueForKey:@"circle-color"] isKindOfClass:[NSString class]]) {
-            UIColor *color = [self colorFromHexString:paintProperties[@"circle-color"]];
-            MGLStyleValue *circleColorValue = [MGLStyleValue valueWithRawValue:color];
-            [layer setCircleColor:circleColorValue];
-        }
-        if ([[paintProperties valueForKey:@"circle-blur"] isKindOfClass:[NSNumber class]]) {
-            MGLStyleValue *circleBlurValue = [MGLStyleValue valueWithRawValue:paintProperties[@"circle-blur"]];
-            [layer setCircleBlur:circleBlurValue];
-        }
-        MGLStyleLayer *previousLayer = [mapView styleLayerWithIdentifier:previousLayerId];
-        if (!previousLayer) {
-            return;
-        }
-        return layer;
+    return nil;
+}
+
+- (NSPredicate *)setPredicateFromJson:(nonnull NSArray *)filterJson
+{
+    NSString *filterType = filterJson[0];
+<% for (const filterName of compFilterNames) { -%>
+    if ([filterType isEqualToString:@"<%- filterName %>"]) {
+        return [NSPredicate predicateWithFormat:@"%K <%- filterName %> %@", filterJson[1], filterJson[2]];
     }
-    else if([typeString isEqualToString:@"background"]) {
-        NSDictionary *paintProperties = layerJson[@"paint"];
-        if (!paintProperties) {
-            return;
-        }
-        MGLBackgroundStyleLayer *layer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:idString];
-        if ([[paintProperties valueForKey:@"background-color"] isKindOfClass:[NSString class]]) {
-            UIColor *color = [self colorFromHexString:paintProperties[@"background-color"]];
-            MGLStyleValue *backgroundColorValue = [MGLStyleValue valueWithRawValue:color];
-            [layer setBackgroundColor:backgroundColorValue];
-        }
-        if ([[paintProperties valueForKey:@"background-opacity"] isKindOfClass:[NSDictionary class]]) {
-            NSArray *stops = paintProperties[@"background-opacity"][@"stops"];
-            NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
-            for (id stop in stops) {
-                [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
-            }
-            MGLStyleValue *backgroundOpacityValue;
-            NSNumber *baseNumber = paintProperties[@"background-opacity"][@"base"];
-            if (baseNumber) {
-                backgroundOpacityValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
-            }
-            else {
-                backgroundOpacityValue = [MGLStyleValue valueWithStops:stopsDict];
-            }
-            [layer setBackgroundOpacity:backgroundOpacityValue];
-        }
-         MGLStyleLayer *previousLayer = [mapView styleLayerWithIdentifier:previousLayerId];
-         if (!previousLayer) {
-             return;
-         }
-        return layer;
+<% } -%>
+    if ([filterType isEqualToString:@"has"]) {
+        return [NSPredicate predicateWithFormat:@"%K == %@", filterJson[1], nil];
     }
+    if ([filterType isEqualToString:@"!has"]) {
+        return [NSPredicate predicateWithFormat:@"%K != %@", filterJson[1], nil];
+    }
+    if ([filterType isEqualToString:@"in"]) {
+        NSMutableArray *elementsArray = [NSMutableArray arrayWithArray:filterJson];
+        [elementsArray removeObjectAtIndex:0];
+        [elementsArray removeObjectAtIndex:0];
+        return [NSPredicate predicateWithFormat:@"%K IN %@", filterJson[1], elementsArray];
+    }
+    if ([filterType isEqualToString:@"!in"]) {
+        NSMutableArray *elementsArray = [NSMutableArray arrayWithArray:filterJson];
+        [elementsArray removeObjectAtIndex:0];
+        [elementsArray removeObjectAtIndex:0];
+        return [NSPredicate predicateWithFormat:@"%K !IN %@", filterJson[1], elementsArray];
+    }
+    if ([filterType isEqualToString:@"all"]) {
+        NSMutableArray *filters = [NSMutableArray arrayWithArray:filterJson];
+        [filters removeObjectAtIndex:0];
+        NSMutableArray *predicates = [NSMutableArray arrayWithCapacity:[filters count]];
+        for (id filter in filters) {
+            [predicates addObject:[self setPredicateFromJson:filter]];
+        }
+        return [NSCompoundPredicate andPredicateWithSubpredicates:predicates];
+    }
+    if ([filterType isEqualToString:@"any"]) {
+        NSMutableArray *filters = [NSMutableArray arrayWithArray:filterJson];
+        [filters removeObjectAtIndex:0];
+        NSMutableArray *predicates = [NSMutableArray arrayWithCapacity:[filters count]];
+        for (id filter in filters) {
+            [predicates addObject:[self setPredicateFromJson:filter]];
+        }
+        return [NSCompoundPredicate orPredicateWithSubpredicates:predicates];
+    }
+    if ([filterType isEqualToString:@"none"]) {
+        NSMutableArray *filters = [NSMutableArray arrayWithArray:filterJson];
+        [filters removeObjectAtIndex:0];
+        NSMutableArray *predicates = [NSMutableArray arrayWithCapacity:[filters count]];
+        for (id filter in filters) {
+            [predicates addObject:[NSCompoundPredicate notPredicateWithSubpredicate:[self setPredicateFromJson:filter]]];
+        }
+        return [NSCompoundPredicate andPredicateWithSubpredicates:predicates];
+    }
+    return nil;
 }
 
 @end

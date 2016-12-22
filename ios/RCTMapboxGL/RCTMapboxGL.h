@@ -42,7 +42,7 @@
 - (void)deselectAnnotation;
 - (MGLSource*)styleSourceWithIdentifier:(nonnull NSString*)id;
 - (MGLStyleLayer*)styleLayerWithIdentifier:(nonnull NSString*)id;
-- (void)insertLayer:(nonnull MGLStyleLayer *)layer;
+- (void)addLayer:(nonnull MGLStyleLayer *)layer;
 - (void)insertLayer:(nonnull MGLStyleLayer *)layer belowLayer:(nonnull MGLStyleLayer *)belowLayer;
 - (void)addSource:(nonnull MGLSource *)source;
 - (nonnull NSArray<id<MGLFeature>> *)visibleFeaturesAtPoint:(CGPoint)point inStyleLayersWithIdentifiers:(nullable NSSet<NSString *> *)styleLayerIdentifiers;

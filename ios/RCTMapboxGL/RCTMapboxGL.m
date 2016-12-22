@@ -522,7 +522,7 @@
     return [[_map style] layerWithIdentifier:id];
 }
 
-- (void)insertLayer:(nonnull MGLStyleLayer *)layer
+- (void)addLayer:(nonnull MGLStyleLayer *)layer
 {
     [[_map style] addLayer:layer];
 }
