@@ -40,6 +40,7 @@
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)padding animated:(BOOL)animated;
 - (void)selectAnnotation:(NSString*)selectedId animated:(BOOL)animated;
 - (void)deselectAnnotation;
+- (BOOL)setLayerVisibility:(NSString *)layerId visibility:(BOOL)value;
 - (nonnull NSArray<id<MGLFeature>> *)visibleFeaturesAtPoint:(CGPoint)point inStyleLayersWithIdentifiers:(nullable NSSet<NSString *> *)styleLayerIdentifiers;
 - (nonnull NSArray<id<MGLFeature>> *)visibleFeaturesInRect:(CGRect)rect inStyleLayersWithIdentifiers:(nullable NSSet<NSString *> *)identifiers;
 

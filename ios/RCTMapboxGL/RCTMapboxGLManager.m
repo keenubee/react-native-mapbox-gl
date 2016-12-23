@@ -622,6 +622,25 @@ RCT_EXPORT_METHOD(deselectAnnotation:(nonnull NSNumber *) reactTag)
     }];
 }
 
+RCT_EXPORT_METHOD(setLayerVisibility:(nonnull NSNumber *)reactTag
+                  layer:(nonnull NSString *)layerId
+                  visibility:(BOOL)value
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+    [_bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *, RCTMapboxGL *> *viewRegistry) {
+        RCTMapboxGL *mapView = viewRegistry[reactTag];
+        if ([mapView isKindOfClass:[RCTMapboxGL class]]) {
+            BOOL visibilityIsSet = [mapView setLayerVisibility:layerId visibility:value];
+            if (!visibilityIsSet) {
+                reject(@"invalid_arguments", @"setLayerVisibility(): layer does not exist.", nil);
+                return;
+            }
+            resolve(nil);
+        }
+    }];
+}
+
 RCT_EXPORT_METHOD(queryRenderedFeatures:(nonnull NSNumber *)reactTag
                   options:(NSDictionary *)options
                   resolver:(RCTPromiseResolveBlock)resolve

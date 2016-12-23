@@ -627,6 +627,16 @@
                                @"screenCoordX": @(screenCoord.x) } });
 }
 
+- (BOOL)setLayerVisibility:(NSString *)layerId visibility:(BOOL)value
+{
+    MGLStyleLayer *layer = [[_map style] layerWithIdentifier:layerId];
+    if (!layer) {
+        return nil;
+    }
+    [layer setVisible:value];
+    return true;
+}
+
 - (nonnull NSArray<id<MGLFeature>> *)visibleFeaturesAtPoint:(CGPoint)point
                                inStyleLayersWithIdentifiers:(nullable NSSet<NSString *> *)styleLayerIdentifiers
 {
