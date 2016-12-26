@@ -13,7 +13,7 @@ const layers = Object.keys(spec.layer.type.values).filter((type) => type !== 'fi
     if (name !== 'visibility') {
       spec[`layout_${type}`][name].name = name;
       spec[`layout_${type}`][name].propertyType = 'layout';
-      spec[`layout_${type}`][name].setterName = overrides[`layout_${type}`] && overrides[`layout_${type}`][name];
+      spec[`layout_${type}`][name].setterName = overrides[`layout_${type}`] && overrides[`layout_${type}`][name] && overrides[`layout_${type}`][name].replace(/^is-/, '');
       memo.push(spec[`layout_${type}`][name]);
     }
     return memo;
@@ -22,7 +22,7 @@ const layers = Object.keys(spec.layer.type.values).filter((type) => type !== 'fi
   const paintProperties = Object.keys(spec[`paint_${type}`]).reduce((memo, name) => {
     spec[`paint_${type}`][name].name = name;
     spec[`paint_${type}`][name].propertyType = 'paint';
-    spec[`paint_${type}`][name].setterName = overrides[`paint_${type}`] && overrides[`paint_${type}`][name];
+    spec[`paint_${type}`][name].setterName = overrides[`paint_${type}`] && overrides[`paint_${type}`][name] && overrides[`paint_${type}`][name].replace(/^is-/, '');
     memo.push(spec[`paint_${type}`][name]);
     return memo;
   }, []);
