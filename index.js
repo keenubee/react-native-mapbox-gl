@@ -253,6 +253,19 @@ class MapView extends Component {
     bindCallbackToPromise(callback, promise);
     return promise;
   }
+  addLayer(layer, before, callback) {
+    MapboxGLManager.addLayer(findNodeHandle(this), layer, before)
+  }
+  addSource(id, source) {
+    let newSource = source
+    let dataIsUrl = true
+    if (source.type && source.type === 'geojson' && typeof source.data !== 'string') {
+      // stringify geojson object before passing to Java
+      newSource.data = JSON.stringify(source.data)
+      dataIsUrl = false
+    }
+    MapboxGLManager.addSource(findNodeHandle(this), id, newSource, dataIsUrl)
+  }
   selectAnnotation(annotationId, animated = true) {
     MapboxGLManager.selectAnnotation(findNodeHandle(this), annotationId, animated);
   }
