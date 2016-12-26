@@ -39,6 +39,11 @@
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)padding animated:(BOOL)animated;
 - (void)selectAnnotation:(NSString*)selectedId animated:(BOOL)animated;
 - (BOOL)setLayerVisibility:(NSString *)layerId visibility:(BOOL)value;
+- (MGLSource*)styleSourceWithIdentifier:(nonnull NSString*)id;
+- (MGLStyleLayer*)styleLayerWithIdentifier:(nonnull NSString*)id;
+- (void)addLayer:(nonnull MGLStyleLayer *)layer;
+- (void)insertLayer:(nonnull MGLStyleLayer *)layer belowLayer:(nonnull MGLStyleLayer *)belowLayer;
+- (void)addSource:(nonnull MGLSource *)source;
 - (nonnull NSArray<id<MGLFeature>> *)visibleFeaturesAtPoint:(CGPoint)point inStyleLayersWithIdentifiers:(nullable NSSet<NSString *> *)styleLayerIdentifiers;
 - (nonnull NSArray<id<MGLFeature>> *)visibleFeaturesInRect:(CGRect)rect inStyleLayersWithIdentifiers:(nullable NSSet<NSString *> *)identifiers;
 
