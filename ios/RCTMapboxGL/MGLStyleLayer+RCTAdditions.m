@@ -32,14 +32,14 @@
                 MGLStyleValue *fillAntialiasValue;
                 NSNumber *baseNumber = paintProperties[@"fill-antialias"][@"base"];
                 if (baseNumber) {
-                    fillAntialiasValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    fillAntialiasValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     fillAntialiasValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
-                [layer setIsFillAntialiased:fillAntialiasValue];
+                [layer setFillAntialiased:fillAntialiasValue];
             } else {
                 MGLStyleValue *fillAntialiasValue = [MGLStyleValue valueWithRawValue:paintProperties[@"fill-antialias"]];
-                [layer setIsFillAntialiased:fillAntialiasValue];
+                [layer setFillAntialiased:fillAntialiasValue];
             }
         }
         if ([paintProperties valueForKey:@"fill-opacity"]) {
@@ -52,7 +52,7 @@
                 MGLStyleValue *fillOpacityValue;
                 NSNumber *baseNumber = paintProperties[@"fill-opacity"][@"base"];
                 if (baseNumber) {
-                    fillOpacityValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    fillOpacityValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     fillOpacityValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -72,7 +72,7 @@
                 MGLStyleValue *fillColorValue;
                 NSNumber *baseNumber = paintProperties[@"fill-color"][@"base"];
                 if (baseNumber) {
-                    fillColorValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    fillColorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     fillColorValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -93,7 +93,7 @@
                 MGLStyleValue *fillOutlineColorValue;
                 NSNumber *baseNumber = paintProperties[@"fill-outline-color"][@"base"];
                 if (baseNumber) {
-                    fillOutlineColorValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    fillOutlineColorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     fillOutlineColorValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -114,7 +114,7 @@
                 MGLStyleValue *fillTranslateValue;
                 NSNumber *baseNumber = paintProperties[@"fill-translate"][@"base"];
                 if (baseNumber) {
-                    fillTranslateValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    fillTranslateValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     fillTranslateValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -134,7 +134,7 @@
                 MGLStyleValue *fillTranslateAnchorValue;
                 NSNumber *baseNumber = paintProperties[@"fill-translate-anchor"][@"base"];
                 if (baseNumber) {
-                    fillTranslateAnchorValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    fillTranslateAnchorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     fillTranslateAnchorValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -154,7 +154,7 @@
                 MGLStyleValue *fillPatternValue;
                 NSNumber *baseNumber = paintProperties[@"fill-pattern"][@"base"];
                 if (baseNumber) {
-                    fillPatternValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    fillPatternValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     fillPatternValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -191,7 +191,7 @@
                 MGLStyleValue *lineCapValue;
                 NSNumber *baseNumber = layoutProperties[@"line-cap"][@"base"];
                 if (baseNumber) {
-                    lineCapValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    lineCapValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     lineCapValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -211,7 +211,7 @@
                 MGLStyleValue *lineJoinValue;
                 NSNumber *baseNumber = layoutProperties[@"line-join"][@"base"];
                 if (baseNumber) {
-                    lineJoinValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    lineJoinValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     lineJoinValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -231,7 +231,7 @@
                 MGLStyleValue *lineMiterLimitValue;
                 NSNumber *baseNumber = layoutProperties[@"line-miter-limit"][@"base"];
                 if (baseNumber) {
-                    lineMiterLimitValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    lineMiterLimitValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     lineMiterLimitValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -251,7 +251,7 @@
                 MGLStyleValue *lineRoundLimitValue;
                 NSNumber *baseNumber = layoutProperties[@"line-round-limit"][@"base"];
                 if (baseNumber) {
-                    lineRoundLimitValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    lineRoundLimitValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     lineRoundLimitValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -271,7 +271,7 @@
                 MGLStyleValue *lineOpacityValue;
                 NSNumber *baseNumber = paintProperties[@"line-opacity"][@"base"];
                 if (baseNumber) {
-                    lineOpacityValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    lineOpacityValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     lineOpacityValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -291,7 +291,7 @@
                 MGLStyleValue *lineColorValue;
                 NSNumber *baseNumber = paintProperties[@"line-color"][@"base"];
                 if (baseNumber) {
-                    lineColorValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    lineColorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     lineColorValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -312,7 +312,7 @@
                 MGLStyleValue *lineTranslateValue;
                 NSNumber *baseNumber = paintProperties[@"line-translate"][@"base"];
                 if (baseNumber) {
-                    lineTranslateValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    lineTranslateValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     lineTranslateValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -332,7 +332,7 @@
                 MGLStyleValue *lineTranslateAnchorValue;
                 NSNumber *baseNumber = paintProperties[@"line-translate-anchor"][@"base"];
                 if (baseNumber) {
-                    lineTranslateAnchorValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    lineTranslateAnchorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     lineTranslateAnchorValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -352,7 +352,7 @@
                 MGLStyleValue *lineWidthValue;
                 NSNumber *baseNumber = paintProperties[@"line-width"][@"base"];
                 if (baseNumber) {
-                    lineWidthValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    lineWidthValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     lineWidthValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -372,7 +372,7 @@
                 MGLStyleValue *lineGapWidthValue;
                 NSNumber *baseNumber = paintProperties[@"line-gap-width"][@"base"];
                 if (baseNumber) {
-                    lineGapWidthValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    lineGapWidthValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     lineGapWidthValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -392,7 +392,7 @@
                 MGLStyleValue *lineOffsetValue;
                 NSNumber *baseNumber = paintProperties[@"line-offset"][@"base"];
                 if (baseNumber) {
-                    lineOffsetValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    lineOffsetValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     lineOffsetValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -412,7 +412,7 @@
                 MGLStyleValue *lineBlurValue;
                 NSNumber *baseNumber = paintProperties[@"line-blur"][@"base"];
                 if (baseNumber) {
-                    lineBlurValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    lineBlurValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     lineBlurValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -432,7 +432,7 @@
                 MGLStyleValue *lineDasharrayValue;
                 NSNumber *baseNumber = paintProperties[@"line-dasharray"][@"base"];
                 if (baseNumber) {
-                    lineDasharrayValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    lineDasharrayValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     lineDasharrayValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -452,7 +452,7 @@
                 MGLStyleValue *linePatternValue;
                 NSNumber *baseNumber = paintProperties[@"line-pattern"][@"base"];
                 if (baseNumber) {
-                    linePatternValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    linePatternValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     linePatternValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -489,7 +489,7 @@
                 MGLStyleValue *symbolPlacementValue;
                 NSNumber *baseNumber = layoutProperties[@"symbol-placement"][@"base"];
                 if (baseNumber) {
-                    symbolPlacementValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    symbolPlacementValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     symbolPlacementValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -509,7 +509,7 @@
                 MGLStyleValue *symbolSpacingValue;
                 NSNumber *baseNumber = layoutProperties[@"symbol-spacing"][@"base"];
                 if (baseNumber) {
-                    symbolSpacingValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    symbolSpacingValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     symbolSpacingValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -529,7 +529,7 @@
                 MGLStyleValue *symbolAvoidEdgesValue;
                 NSNumber *baseNumber = layoutProperties[@"symbol-avoid-edges"][@"base"];
                 if (baseNumber) {
-                    symbolAvoidEdgesValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    symbolAvoidEdgesValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     symbolAvoidEdgesValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -549,7 +549,7 @@
                 MGLStyleValue *iconAllowOverlapValue;
                 NSNumber *baseNumber = layoutProperties[@"icon-allow-overlap"][@"base"];
                 if (baseNumber) {
-                    iconAllowOverlapValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    iconAllowOverlapValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     iconAllowOverlapValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -569,7 +569,7 @@
                 MGLStyleValue *iconIgnorePlacementValue;
                 NSNumber *baseNumber = layoutProperties[@"icon-ignore-placement"][@"base"];
                 if (baseNumber) {
-                    iconIgnorePlacementValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    iconIgnorePlacementValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     iconIgnorePlacementValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -589,14 +589,14 @@
                 MGLStyleValue *iconOptionalValue;
                 NSNumber *baseNumber = layoutProperties[@"icon-optional"][@"base"];
                 if (baseNumber) {
-                    iconOptionalValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    iconOptionalValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     iconOptionalValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
-                [layer setIsIconOptional:iconOptionalValue];
+                [layer setIconOptional:iconOptionalValue];
             } else {
                 MGLStyleValue *iconOptionalValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"icon-optional"]];
-                [layer setIsIconOptional:iconOptionalValue];
+                [layer setIconOptional:iconOptionalValue];
             }
         }
         if ([layoutProperties valueForKey:@"icon-rotation-alignment"]) {
@@ -609,7 +609,7 @@
                 MGLStyleValue *iconRotationAlignmentValue;
                 NSNumber *baseNumber = layoutProperties[@"icon-rotation-alignment"][@"base"];
                 if (baseNumber) {
-                    iconRotationAlignmentValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    iconRotationAlignmentValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     iconRotationAlignmentValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -629,7 +629,7 @@
                 MGLStyleValue *iconSizeValue;
                 NSNumber *baseNumber = layoutProperties[@"icon-size"][@"base"];
                 if (baseNumber) {
-                    iconSizeValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    iconSizeValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     iconSizeValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -649,7 +649,7 @@
                 MGLStyleValue *iconTextFitValue;
                 NSNumber *baseNumber = layoutProperties[@"icon-text-fit"][@"base"];
                 if (baseNumber) {
-                    iconTextFitValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    iconTextFitValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     iconTextFitValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -669,7 +669,7 @@
                 MGLStyleValue *iconTextFitPaddingValue;
                 NSNumber *baseNumber = layoutProperties[@"icon-text-fit-padding"][@"base"];
                 if (baseNumber) {
-                    iconTextFitPaddingValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    iconTextFitPaddingValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     iconTextFitPaddingValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -689,7 +689,7 @@
                 MGLStyleValue *iconImageValue;
                 NSNumber *baseNumber = layoutProperties[@"icon-image"][@"base"];
                 if (baseNumber) {
-                    iconImageValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    iconImageValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     iconImageValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -709,7 +709,7 @@
                 MGLStyleValue *iconRotateValue;
                 NSNumber *baseNumber = layoutProperties[@"icon-rotate"][@"base"];
                 if (baseNumber) {
-                    iconRotateValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    iconRotateValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     iconRotateValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -729,7 +729,7 @@
                 MGLStyleValue *iconPaddingValue;
                 NSNumber *baseNumber = layoutProperties[@"icon-padding"][@"base"];
                 if (baseNumber) {
-                    iconPaddingValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    iconPaddingValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     iconPaddingValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -749,7 +749,7 @@
                 MGLStyleValue *iconKeepUprightValue;
                 NSNumber *baseNumber = layoutProperties[@"icon-keep-upright"][@"base"];
                 if (baseNumber) {
-                    iconKeepUprightValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    iconKeepUprightValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     iconKeepUprightValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -769,7 +769,7 @@
                 MGLStyleValue *iconOffsetValue;
                 NSNumber *baseNumber = layoutProperties[@"icon-offset"][@"base"];
                 if (baseNumber) {
-                    iconOffsetValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    iconOffsetValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     iconOffsetValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -789,7 +789,7 @@
                 MGLStyleValue *textPitchAlignmentValue;
                 NSNumber *baseNumber = layoutProperties[@"text-pitch-alignment"][@"base"];
                 if (baseNumber) {
-                    textPitchAlignmentValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textPitchAlignmentValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textPitchAlignmentValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -809,7 +809,7 @@
                 MGLStyleValue *textRotationAlignmentValue;
                 NSNumber *baseNumber = layoutProperties[@"text-rotation-alignment"][@"base"];
                 if (baseNumber) {
-                    textRotationAlignmentValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textRotationAlignmentValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textRotationAlignmentValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -829,7 +829,7 @@
                 MGLStyleValue *textFieldValue;
                 NSNumber *baseNumber = layoutProperties[@"text-field"][@"base"];
                 if (baseNumber) {
-                    textFieldValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textFieldValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textFieldValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -849,7 +849,7 @@
                 MGLStyleValue *textFontValue;
                 NSNumber *baseNumber = layoutProperties[@"text-font"][@"base"];
                 if (baseNumber) {
-                    textFontValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textFontValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textFontValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -869,7 +869,7 @@
                 MGLStyleValue *textSizeValue;
                 NSNumber *baseNumber = layoutProperties[@"text-size"][@"base"];
                 if (baseNumber) {
-                    textSizeValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textSizeValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textSizeValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -889,7 +889,7 @@
                 MGLStyleValue *textMaxWidthValue;
                 NSNumber *baseNumber = layoutProperties[@"text-max-width"][@"base"];
                 if (baseNumber) {
-                    textMaxWidthValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textMaxWidthValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textMaxWidthValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -909,7 +909,7 @@
                 MGLStyleValue *textLineHeightValue;
                 NSNumber *baseNumber = layoutProperties[@"text-line-height"][@"base"];
                 if (baseNumber) {
-                    textLineHeightValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textLineHeightValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textLineHeightValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -929,7 +929,7 @@
                 MGLStyleValue *textLetterSpacingValue;
                 NSNumber *baseNumber = layoutProperties[@"text-letter-spacing"][@"base"];
                 if (baseNumber) {
-                    textLetterSpacingValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textLetterSpacingValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textLetterSpacingValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -949,7 +949,7 @@
                 MGLStyleValue *textJustifyValue;
                 NSNumber *baseNumber = layoutProperties[@"text-justify"][@"base"];
                 if (baseNumber) {
-                    textJustifyValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textJustifyValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textJustifyValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -969,7 +969,7 @@
                 MGLStyleValue *textAnchorValue;
                 NSNumber *baseNumber = layoutProperties[@"text-anchor"][@"base"];
                 if (baseNumber) {
-                    textAnchorValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textAnchorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textAnchorValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -989,7 +989,7 @@
                 MGLStyleValue *textMaxAngleValue;
                 NSNumber *baseNumber = layoutProperties[@"text-max-angle"][@"base"];
                 if (baseNumber) {
-                    textMaxAngleValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textMaxAngleValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textMaxAngleValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1009,7 +1009,7 @@
                 MGLStyleValue *textRotateValue;
                 NSNumber *baseNumber = layoutProperties[@"text-rotate"][@"base"];
                 if (baseNumber) {
-                    textRotateValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textRotateValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textRotateValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1029,7 +1029,7 @@
                 MGLStyleValue *textPaddingValue;
                 NSNumber *baseNumber = layoutProperties[@"text-padding"][@"base"];
                 if (baseNumber) {
-                    textPaddingValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textPaddingValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textPaddingValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1049,7 +1049,7 @@
                 MGLStyleValue *textKeepUprightValue;
                 NSNumber *baseNumber = layoutProperties[@"text-keep-upright"][@"base"];
                 if (baseNumber) {
-                    textKeepUprightValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textKeepUprightValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textKeepUprightValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1069,7 +1069,7 @@
                 MGLStyleValue *textTransformValue;
                 NSNumber *baseNumber = layoutProperties[@"text-transform"][@"base"];
                 if (baseNumber) {
-                    textTransformValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textTransformValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textTransformValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1089,7 +1089,7 @@
                 MGLStyleValue *textOffsetValue;
                 NSNumber *baseNumber = layoutProperties[@"text-offset"][@"base"];
                 if (baseNumber) {
-                    textOffsetValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textOffsetValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textOffsetValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1109,7 +1109,7 @@
                 MGLStyleValue *textAllowOverlapValue;
                 NSNumber *baseNumber = layoutProperties[@"text-allow-overlap"][@"base"];
                 if (baseNumber) {
-                    textAllowOverlapValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textAllowOverlapValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textAllowOverlapValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1129,7 +1129,7 @@
                 MGLStyleValue *textIgnorePlacementValue;
                 NSNumber *baseNumber = layoutProperties[@"text-ignore-placement"][@"base"];
                 if (baseNumber) {
-                    textIgnorePlacementValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textIgnorePlacementValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textIgnorePlacementValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1149,14 +1149,14 @@
                 MGLStyleValue *textOptionalValue;
                 NSNumber *baseNumber = layoutProperties[@"text-optional"][@"base"];
                 if (baseNumber) {
-                    textOptionalValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textOptionalValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textOptionalValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
-                [layer setIsTextOptional:textOptionalValue];
+                [layer setTextOptional:textOptionalValue];
             } else {
                 MGLStyleValue *textOptionalValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-optional"]];
-                [layer setIsTextOptional:textOptionalValue];
+                [layer setTextOptional:textOptionalValue];
             }
         }
         if ([paintProperties valueForKey:@"icon-opacity"]) {
@@ -1169,7 +1169,7 @@
                 MGLStyleValue *iconOpacityValue;
                 NSNumber *baseNumber = paintProperties[@"icon-opacity"][@"base"];
                 if (baseNumber) {
-                    iconOpacityValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    iconOpacityValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     iconOpacityValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1189,7 +1189,7 @@
                 MGLStyleValue *iconColorValue;
                 NSNumber *baseNumber = paintProperties[@"icon-color"][@"base"];
                 if (baseNumber) {
-                    iconColorValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    iconColorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     iconColorValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1210,7 +1210,7 @@
                 MGLStyleValue *iconHaloColorValue;
                 NSNumber *baseNumber = paintProperties[@"icon-halo-color"][@"base"];
                 if (baseNumber) {
-                    iconHaloColorValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    iconHaloColorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     iconHaloColorValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1231,7 +1231,7 @@
                 MGLStyleValue *iconHaloWidthValue;
                 NSNumber *baseNumber = paintProperties[@"icon-halo-width"][@"base"];
                 if (baseNumber) {
-                    iconHaloWidthValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    iconHaloWidthValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     iconHaloWidthValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1251,7 +1251,7 @@
                 MGLStyleValue *iconHaloBlurValue;
                 NSNumber *baseNumber = paintProperties[@"icon-halo-blur"][@"base"];
                 if (baseNumber) {
-                    iconHaloBlurValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    iconHaloBlurValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     iconHaloBlurValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1271,7 +1271,7 @@
                 MGLStyleValue *iconTranslateValue;
                 NSNumber *baseNumber = paintProperties[@"icon-translate"][@"base"];
                 if (baseNumber) {
-                    iconTranslateValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    iconTranslateValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     iconTranslateValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1291,7 +1291,7 @@
                 MGLStyleValue *iconTranslateAnchorValue;
                 NSNumber *baseNumber = paintProperties[@"icon-translate-anchor"][@"base"];
                 if (baseNumber) {
-                    iconTranslateAnchorValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    iconTranslateAnchorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     iconTranslateAnchorValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1311,7 +1311,7 @@
                 MGLStyleValue *textOpacityValue;
                 NSNumber *baseNumber = paintProperties[@"text-opacity"][@"base"];
                 if (baseNumber) {
-                    textOpacityValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textOpacityValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textOpacityValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1331,7 +1331,7 @@
                 MGLStyleValue *textColorValue;
                 NSNumber *baseNumber = paintProperties[@"text-color"][@"base"];
                 if (baseNumber) {
-                    textColorValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textColorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textColorValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1352,7 +1352,7 @@
                 MGLStyleValue *textHaloColorValue;
                 NSNumber *baseNumber = paintProperties[@"text-halo-color"][@"base"];
                 if (baseNumber) {
-                    textHaloColorValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textHaloColorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textHaloColorValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1373,7 +1373,7 @@
                 MGLStyleValue *textHaloWidthValue;
                 NSNumber *baseNumber = paintProperties[@"text-halo-width"][@"base"];
                 if (baseNumber) {
-                    textHaloWidthValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textHaloWidthValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textHaloWidthValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1393,7 +1393,7 @@
                 MGLStyleValue *textHaloBlurValue;
                 NSNumber *baseNumber = paintProperties[@"text-halo-blur"][@"base"];
                 if (baseNumber) {
-                    textHaloBlurValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textHaloBlurValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textHaloBlurValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1413,7 +1413,7 @@
                 MGLStyleValue *textTranslateValue;
                 NSNumber *baseNumber = paintProperties[@"text-translate"][@"base"];
                 if (baseNumber) {
-                    textTranslateValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textTranslateValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textTranslateValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1433,7 +1433,7 @@
                 MGLStyleValue *textTranslateAnchorValue;
                 NSNumber *baseNumber = paintProperties[@"text-translate-anchor"][@"base"];
                 if (baseNumber) {
-                    textTranslateAnchorValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    textTranslateAnchorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     textTranslateAnchorValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1469,7 +1469,7 @@
                 MGLStyleValue *circleRadiusValue;
                 NSNumber *baseNumber = paintProperties[@"circle-radius"][@"base"];
                 if (baseNumber) {
-                    circleRadiusValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    circleRadiusValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     circleRadiusValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1489,7 +1489,7 @@
                 MGLStyleValue *circleColorValue;
                 NSNumber *baseNumber = paintProperties[@"circle-color"][@"base"];
                 if (baseNumber) {
-                    circleColorValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    circleColorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     circleColorValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1510,7 +1510,7 @@
                 MGLStyleValue *circleBlurValue;
                 NSNumber *baseNumber = paintProperties[@"circle-blur"][@"base"];
                 if (baseNumber) {
-                    circleBlurValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    circleBlurValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     circleBlurValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1530,7 +1530,7 @@
                 MGLStyleValue *circleOpacityValue;
                 NSNumber *baseNumber = paintProperties[@"circle-opacity"][@"base"];
                 if (baseNumber) {
-                    circleOpacityValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    circleOpacityValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     circleOpacityValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1550,7 +1550,7 @@
                 MGLStyleValue *circleTranslateValue;
                 NSNumber *baseNumber = paintProperties[@"circle-translate"][@"base"];
                 if (baseNumber) {
-                    circleTranslateValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    circleTranslateValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     circleTranslateValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1570,7 +1570,7 @@
                 MGLStyleValue *circleTranslateAnchorValue;
                 NSNumber *baseNumber = paintProperties[@"circle-translate-anchor"][@"base"];
                 if (baseNumber) {
-                    circleTranslateAnchorValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    circleTranslateAnchorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     circleTranslateAnchorValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1590,7 +1590,7 @@
                 MGLStyleValue *circlePitchScaleValue;
                 NSNumber *baseNumber = paintProperties[@"circle-pitch-scale"][@"base"];
                 if (baseNumber) {
-                    circlePitchScaleValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    circlePitchScaleValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     circlePitchScaleValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1626,7 +1626,7 @@
                 MGLStyleValue *rasterOpacityValue;
                 NSNumber *baseNumber = paintProperties[@"raster-opacity"][@"base"];
                 if (baseNumber) {
-                    rasterOpacityValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    rasterOpacityValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     rasterOpacityValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1646,7 +1646,7 @@
                 MGLStyleValue *rasterHueRotateValue;
                 NSNumber *baseNumber = paintProperties[@"raster-hue-rotate"][@"base"];
                 if (baseNumber) {
-                    rasterHueRotateValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    rasterHueRotateValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     rasterHueRotateValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1666,7 +1666,7 @@
                 MGLStyleValue *rasterBrightnessMinValue;
                 NSNumber *baseNumber = paintProperties[@"raster-brightness-min"][@"base"];
                 if (baseNumber) {
-                    rasterBrightnessMinValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    rasterBrightnessMinValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     rasterBrightnessMinValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1686,7 +1686,7 @@
                 MGLStyleValue *rasterBrightnessMaxValue;
                 NSNumber *baseNumber = paintProperties[@"raster-brightness-max"][@"base"];
                 if (baseNumber) {
-                    rasterBrightnessMaxValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    rasterBrightnessMaxValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     rasterBrightnessMaxValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1706,7 +1706,7 @@
                 MGLStyleValue *rasterSaturationValue;
                 NSNumber *baseNumber = paintProperties[@"raster-saturation"][@"base"];
                 if (baseNumber) {
-                    rasterSaturationValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    rasterSaturationValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     rasterSaturationValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1726,7 +1726,7 @@
                 MGLStyleValue *rasterContrastValue;
                 NSNumber *baseNumber = paintProperties[@"raster-contrast"][@"base"];
                 if (baseNumber) {
-                    rasterContrastValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    rasterContrastValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     rasterContrastValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1746,7 +1746,7 @@
                 MGLStyleValue *rasterFadeDurationValue;
                 NSNumber *baseNumber = paintProperties[@"raster-fade-duration"][@"base"];
                 if (baseNumber) {
-                    rasterFadeDurationValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    rasterFadeDurationValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     rasterFadeDurationValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1771,7 +1771,7 @@
                 MGLStyleValue *backgroundColorValue;
                 NSNumber *baseNumber = paintProperties[@"background-color"][@"base"];
                 if (baseNumber) {
-                    backgroundColorValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    backgroundColorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     backgroundColorValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1792,7 +1792,7 @@
                 MGLStyleValue *backgroundPatternValue;
                 NSNumber *baseNumber = paintProperties[@"background-pattern"][@"base"];
                 if (baseNumber) {
-                    backgroundPatternValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    backgroundPatternValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     backgroundPatternValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
@@ -1812,7 +1812,7 @@
                 MGLStyleValue *backgroundOpacityValue;
                 NSNumber *baseNumber = paintProperties[@"background-opacity"][@"base"];
                 if (baseNumber) {
-                    backgroundOpacityValue = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    backgroundOpacityValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     backgroundOpacityValue = [MGLStyleValue valueWithStops:stopsDict];
                 }

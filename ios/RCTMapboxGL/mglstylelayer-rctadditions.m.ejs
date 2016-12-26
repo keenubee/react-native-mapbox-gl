@@ -63,7 +63,7 @@
                 MGLStyleValue *<%- camelize(prop.name) %>Value;
                 NSNumber *baseNumber = <%- prop.propertyType %>Properties[@"<%- prop.name %>"][@"base"];
                 if (baseNumber) {
-                    <%- camelize(prop.name) %>Value = [MGLStyleValue valueWithBase:[baseNumber floatValue] stops:stopsDict];
+                    <%- camelize(prop.name) %>Value = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
                 } else {
                     <%- camelize(prop.name) %>Value = [MGLStyleValue valueWithStops:stopsDict];
                 }

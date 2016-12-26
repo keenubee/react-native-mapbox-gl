@@ -3,6 +3,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "UIView+React.h"
 
 @interface UIColor (RCTAdditions)
 + (UIColor *)colorFromHexString:(NSString *)hexString;
