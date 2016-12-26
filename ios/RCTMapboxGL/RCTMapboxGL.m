@@ -626,6 +626,31 @@
     return true;
 }
 
+- (MGLSource*)styleSourceWithIdentifier:(NSString*)id
+{
+    return [[_map style] sourceWithIdentifier:id];
+}
+
+- (MGLStyleLayer*)styleLayerWithIdentifier:(NSString*)id
+{
+    return [[_map style] layerWithIdentifier:id];
+}
+
+- (void)addLayer:(nonnull MGLStyleLayer *)layer
+{
+    [[_map style] addLayer:layer];
+}
+
+- (void)insertLayer:(nonnull MGLStyleLayer *)layer belowLayer:(nonnull MGLStyleLayer *)belowLayer
+{
+    [[_map style] insertLayer:layer belowLayer:belowLayer];
+}
+
+- (void)addSource:(nonnull MGLSource *)source
+{
+    [[_map style] addSource:source];
+}
+
 - (nonnull NSArray<id<MGLFeature>> *)visibleFeaturesAtPoint:(CGPoint)point
                                inStyleLayersWithIdentifiers:(nullable NSSet<NSString *> *)styleLayerIdentifiers
 {

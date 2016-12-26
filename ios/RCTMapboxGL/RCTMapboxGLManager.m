@@ -18,6 +18,7 @@
 #import "RCTMapboxGLConversions.h"
 #import "MGLPolygon+RCTAdditions.h"
 #import "MGLPolyline+RCTAdditions.h"
+#import "MGLStyleLayer+RCTAdditions.h"
 
 @implementation RCTMapboxGLManager
 
@@ -638,6 +639,51 @@ RCT_EXPORT_METHOD(setLayerVisibility:(nonnull NSNumber *)reactTag
             resolve(nil);
         }
     }];
+}
+
+RCT_EXPORT_METHOD(addLayer:(nonnull NSNumber *)reactTag
+                  layerJson:(nonnull NSDictionary*)layerJson
+                  before:(nonnull NSString*)previousLayerId)
+{
+  [_bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *, RCTMapboxGL *> *viewRegistry) {
+      RCTMapboxGL *mapView = viewRegistry[reactTag];
+      if ([mapView isKindOfClass:[RCTMapboxGL class]]) {
+          MGLStyleLayer *layer = [MGLStyleLayer fromJson:layerJson withMap:mapView];
+          MGLStyleLayer *previousLayer = [mapView styleLayerWithIdentifier:previousLayerId];
+          if (!previousLayer) {
+              [mapView addLayer:layer];
+          }
+         [mapView insertLayer:layer belowLayer:previousLayer];
+      }
+  }];
+}
+
+RCT_EXPORT_METHOD(addSource:(nonnull NSNumber *)reactTag
+                  id:(nonnull NSString*)id
+                  sourceJson:(nonnull NSDictionary*)sourceJson
+                  dataIsUrl:(BOOL) dataIsUrl)
+{
+  [_bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *, RCTMapboxGL *> *viewRegistry) {
+      RCTMapboxGL *mapView = viewRegistry[reactTag];
+      if ([mapView isKindOfClass:[RCTMapboxGL class]]) {
+          NSString *typeString = sourceJson[@"type"];
+          if (!typeString) {
+              return;
+          }
+          if([typeString isEqualToString:@"geojson"]) {
+              NSData *data = [sourceJson[@"data"] dataUsingEncoding:NSUTF8StringEncoding];
+              if (!data) {
+                  return;
+              }
+              if (!dataIsUrl) {
+                  NSError *encodeError;
+                  MGLShape *sourceShape = [MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:&encodeError];
+                  MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:id shape:sourceShape options:nil];
+                  [mapView addSource:source];
+              }
+          }
+      }
+  }];
 }
 
 RCT_EXPORT_METHOD(queryRenderedFeatures:(nonnull NSNumber *)reactTag
