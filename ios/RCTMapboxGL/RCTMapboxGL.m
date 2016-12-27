@@ -646,9 +646,19 @@
     [[_map style] insertLayer:layer belowLayer:belowLayer];
 }
 
+- (void)removeLayer:(nonnull MGLStyleLayer *)layer
+{
+    [[_map style] removeLayer:layer];
+}
+
 - (void)addSource:(nonnull MGLSource *)source
 {
     [[_map style] addSource:source];
+}
+
+- (void)removeSource:(nonnull MGLSource *)source
+{
+    [[_map style] removeSource:source];
 }
 
 - (nonnull NSArray<id<MGLFeature>> *)visibleFeaturesAtPoint:(CGPoint)point
