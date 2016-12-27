@@ -22,6 +22,7 @@
 
 #import "MGLStyleLayer+RCTAdditions.h"
 #import "UIColor+RCTAdditions.h"
+#import <CoreGraphics/CGGeometry.h>
 
 
 @implementation MGLStyleLayer (RCTAdditions)
@@ -55,7 +56,10 @@
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
 <% if (prop.type === 'color') { -%>
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromHexString:stop[1]]] forKey:stop[0]];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
+<% } else if (prop.name.includes('offset') || prop.name.includes('translate')) { -%>
+                    CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
 <% } else { -%>
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
 <% } -%>
@@ -71,8 +75,11 @@
             } else {
 <% } -%>
 <% if (prop.type === 'color') { -%>
-                UIColor *color = [UIColor colorFromHexString:<%- prop.propertyType %>Properties[@"<%- prop.name %>"]];
+                UIColor *color = [UIColor colorFromString:<%- prop.propertyType %>Properties[@"<%- prop.name %>"]];
                 MGLStyleValue *<%- camelize(prop.name) %>Value = [MGLStyleValue valueWithRawValue:color];
+<% } else if (prop.name.includes('offset') || prop.name.includes('translate')) { -%>
+                CGVector vector = CGVectorMake([<%- prop.propertyType %>Properties[@"<%- prop.name %>"][0] floatValue], [<%- prop.propertyType %>Properties[@"<%- prop.name %>"][1] floatValue]);
+                MGLStyleValue *<%- camelize(prop.name) %>Value = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
 <% } else { -%>
                 MGLStyleValue *<%- camelize(prop.name) %>Value = [MGLStyleValue valueWithRawValue:<%- prop.propertyType %>Properties[@"<%- prop.name %>"]];
 <% } -%>
@@ -90,7 +97,7 @@
             [layer setSourceLayerIdentifier:sourceLayer];
         }
         if (filter) {
-            [layer setPredicateFromJson:filter];
+            [layer setPredicate:[layer predicateFromJson:filter]];
         }
 <% } -%>
         return layer;
@@ -99,7 +106,7 @@
     return nil;
 }
 
-- (NSPredicate *)setPredicateFromJson:(nonnull NSArray *)filterJson
+- (NSPredicate *)predicateFromJson:(nonnull NSArray *)filterJson
 {
     NSString *filterType = filterJson[0];
 <% for (const filterName of compFilterNames) { -%>
@@ -130,7 +137,7 @@
         [filters removeObjectAtIndex:0];
         NSMutableArray *predicates = [NSMutableArray arrayWithCapacity:[filters count]];
         for (id filter in filters) {
-            [predicates addObject:[self setPredicateFromJson:filter]];
+            [predicates addObject:[self predicateFromJson:filter]];
         }
         return [NSCompoundPredicate andPredicateWithSubpredicates:predicates];
     }
@@ -139,7 +146,7 @@
         [filters removeObjectAtIndex:0];
         NSMutableArray *predicates = [NSMutableArray arrayWithCapacity:[filters count]];
         for (id filter in filters) {
-            [predicates addObject:[self setPredicateFromJson:filter]];
+            [predicates addObject:[self predicateFromJson:filter]];
         }
         return [NSCompoundPredicate orPredicateWithSubpredicates:predicates];
     }
@@ -148,7 +155,7 @@
         [filters removeObjectAtIndex:0];
         NSMutableArray *predicates = [NSMutableArray arrayWithCapacity:[filters count]];
         for (id filter in filters) {
-            [predicates addObject:[NSCompoundPredicate notPredicateWithSubpredicate:[self setPredicateFromJson:filter]]];
+            [predicates addObject:[NSCompoundPredicate notPredicateWithSubpredicate:[self predicateFromJson:filter]]];
         }
         return [NSCompoundPredicate andPredicateWithSubpredicates:predicates];
     }

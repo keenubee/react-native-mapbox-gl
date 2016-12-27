@@ -238,7 +238,7 @@ class MapView extends Component {
   addLayer(layer, before, callback) {
     MapboxGLManager.addLayer(findNodeHandle(this), layer, before)
   }
-  addSource(id, source) {
+  setSource(id, source, callback) {
     let newSource = source
     let dataIsUrl = true
     if (source.type && source.type === 'geojson' && typeof source.data !== 'string') {
@@ -246,7 +246,11 @@ class MapView extends Component {
       newSource.data = JSON.stringify(source.data)
       dataIsUrl = false
     }
-    MapboxGLManager.addSource(findNodeHandle(this), id, newSource, dataIsUrl)
+
+    // the iOS bridge returns a promise, so bind callback to it
+    const promise = MapboxGLManager.setSource(findNodeHandle(this), id, newSource, dataIsUrl)
+    bindCallbackToPromise(callback, promise);
+    return promise;
   }
   selectAnnotation(annotationId, animated = true) {
     MapboxGLManager.selectAnnotation(findNodeHandle(this), annotationId, animated);
