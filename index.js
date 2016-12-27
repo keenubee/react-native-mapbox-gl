@@ -259,6 +259,12 @@ class MapView extends Component {
     bindCallbackToPromise(callback, promise);
     return promise;
   }
+  removeLayer(id, callback) {
+    // the iOS bridge returns a promise, so bind callback to it
+    const promise = MapboxGLManager.removeLayer(findNodeHandle(this), id)
+    bindCallbackToPromise(callback, promise);
+    return promise;
+  }
   setSource(id, source, callback) {
     let newSource = source
     let dataIsUrl = true
@@ -270,6 +276,12 @@ class MapView extends Component {
 
     // the iOS bridge returns a promise, so bind callback to it
     const promise = MapboxGLManager.setSource(findNodeHandle(this), id, newSource, dataIsUrl)
+    bindCallbackToPromise(callback, promise);
+    return promise;
+  }
+  removeSource(id, callback) {
+    // the iOS bridge returns a promise, so bind callback to it
+    const promise = MapboxGLManager.removeSource(findNodeHandle(this), id)
     bindCallbackToPromise(callback, promise);
     return promise;
   }

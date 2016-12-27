@@ -658,9 +658,27 @@ RCT_EXPORT_METHOD(addLayer:(nonnull NSNumber *)reactTag
               resolve(nil);
               return;
           }
-         [mapView insertLayer:layer belowLayer:previousLayer];
-         resolve(nil);
-         return;
+          [mapView insertLayer:layer belowLayer:previousLayer];
+          resolve(nil);
+      }
+  }];
+}
+
+RCT_EXPORT_METHOD(removeLayer:(nonnull NSNumber *)reactTag
+                  id:(nonnull NSString*)layerId
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+  [_bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *, RCTMapboxGL *> *viewRegistry) {
+      RCTMapboxGL *mapView = viewRegistry[reactTag];
+      if ([mapView isKindOfClass:[RCTMapboxGL class]]) {
+          MGLStyleLayer *layer = [mapView styleLayerWithIdentifier:layerId];
+          if (!layer) {
+              reject(@"invalid_arguments", @"removeLayer(): cannot remove a layer that does not exist", nil);
+              return;
+          }
+          [mapView removeLayer:layer];
+          resolve(nil);
       }
   }];
 }
@@ -703,6 +721,25 @@ RCT_EXPORT_METHOD(setSource:(nonnull NSNumber *)reactTag
                   }
               }
           }
+      }
+  }];
+}
+
+RCT_EXPORT_METHOD(removeSource:(nonnull NSNumber *)reactTag
+                  id:(nonnull NSString*)sourceId
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+  [_bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *, RCTMapboxGL *> *viewRegistry) {
+      RCTMapboxGL *mapView = viewRegistry[reactTag];
+      if ([mapView isKindOfClass:[RCTMapboxGL class]]) {
+          MGLStyleLayer *source = [mapView styleSourceWithIdentifier:sourceId];
+          if (!source) {
+              reject(@"invalid_arguments", @"removeSource(): cannot remove a source that does not exist", nil);
+              return;
+          }
+          [mapView removeSource:source];
+          resolve(nil);
       }
   }];
 }
