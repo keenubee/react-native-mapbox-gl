@@ -5,6 +5,7 @@
 
 #import "MGLStyleLayer+RCTAdditions.h"
 #import "UIColor+RCTAdditions.h"
+#import <CoreGraphics/CGGeometry.h>
 
 
 @implementation MGLStyleLayer (RCTAdditions)
@@ -67,7 +68,7 @@
                 NSArray *stops = paintProperties[@"fill-color"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromHexString:stop[1]]] forKey:stop[0]];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
                 }
                 MGLStyleValue *fillColorValue;
                 NSNumber *baseNumber = paintProperties[@"fill-color"][@"base"];
@@ -78,7 +79,7 @@
                 }
                 [layer setFillColor:fillColorValue];
             } else {
-                UIColor *color = [UIColor colorFromHexString:paintProperties[@"fill-color"]];
+                UIColor *color = [UIColor colorFromString:paintProperties[@"fill-color"]];
                 MGLStyleValue *fillColorValue = [MGLStyleValue valueWithRawValue:color];
                 [layer setFillColor:fillColorValue];
             }
@@ -88,7 +89,7 @@
                 NSArray *stops = paintProperties[@"fill-outline-color"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromHexString:stop[1]]] forKey:stop[0]];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
                 }
                 MGLStyleValue *fillOutlineColorValue;
                 NSNumber *baseNumber = paintProperties[@"fill-outline-color"][@"base"];
@@ -99,7 +100,7 @@
                 }
                 [layer setFillOutlineColor:fillOutlineColorValue];
             } else {
-                UIColor *color = [UIColor colorFromHexString:paintProperties[@"fill-outline-color"]];
+                UIColor *color = [UIColor colorFromString:paintProperties[@"fill-outline-color"]];
                 MGLStyleValue *fillOutlineColorValue = [MGLStyleValue valueWithRawValue:color];
                 [layer setFillOutlineColor:fillOutlineColorValue];
             }
@@ -109,7 +110,8 @@
                 NSArray *stops = paintProperties[@"fill-translate"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
                 MGLStyleValue *fillTranslateValue;
                 NSNumber *baseNumber = paintProperties[@"fill-translate"][@"base"];
@@ -120,7 +122,8 @@
                 }
                 [layer setFillTranslate:fillTranslateValue];
             } else {
-                MGLStyleValue *fillTranslateValue = [MGLStyleValue valueWithRawValue:paintProperties[@"fill-translate"]];
+                CGVector vector = CGVectorMake([paintProperties[@"fill-translate"][0] floatValue], [paintProperties[@"fill-translate"][1] floatValue]);
+                MGLStyleValue *fillTranslateValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
                 [layer setFillTranslate:fillTranslateValue];
             }
         }
@@ -129,7 +132,8 @@
                 NSArray *stops = paintProperties[@"fill-translate-anchor"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
                 MGLStyleValue *fillTranslateAnchorValue;
                 NSNumber *baseNumber = paintProperties[@"fill-translate-anchor"][@"base"];
@@ -140,7 +144,8 @@
                 }
                 [layer setFillTranslateAnchor:fillTranslateAnchorValue];
             } else {
-                MGLStyleValue *fillTranslateAnchorValue = [MGLStyleValue valueWithRawValue:paintProperties[@"fill-translate-anchor"]];
+                CGVector vector = CGVectorMake([paintProperties[@"fill-translate-anchor"][0] floatValue], [paintProperties[@"fill-translate-anchor"][1] floatValue]);
+                MGLStyleValue *fillTranslateAnchorValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
                 [layer setFillTranslateAnchor:fillTranslateAnchorValue];
             }
         }
@@ -171,7 +176,7 @@
             [layer setSourceLayerIdentifier:sourceLayer];
         }
         if (filter) {
-            [layer setPredicateFromJson:filter];
+            [layer setPredicate:[layer predicateFromJson:filter]];
         }
         return layer;
     }
@@ -286,7 +291,7 @@
                 NSArray *stops = paintProperties[@"line-color"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromHexString:stop[1]]] forKey:stop[0]];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
                 }
                 MGLStyleValue *lineColorValue;
                 NSNumber *baseNumber = paintProperties[@"line-color"][@"base"];
@@ -297,7 +302,7 @@
                 }
                 [layer setLineColor:lineColorValue];
             } else {
-                UIColor *color = [UIColor colorFromHexString:paintProperties[@"line-color"]];
+                UIColor *color = [UIColor colorFromString:paintProperties[@"line-color"]];
                 MGLStyleValue *lineColorValue = [MGLStyleValue valueWithRawValue:color];
                 [layer setLineColor:lineColorValue];
             }
@@ -307,7 +312,8 @@
                 NSArray *stops = paintProperties[@"line-translate"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
                 MGLStyleValue *lineTranslateValue;
                 NSNumber *baseNumber = paintProperties[@"line-translate"][@"base"];
@@ -318,7 +324,8 @@
                 }
                 [layer setLineTranslate:lineTranslateValue];
             } else {
-                MGLStyleValue *lineTranslateValue = [MGLStyleValue valueWithRawValue:paintProperties[@"line-translate"]];
+                CGVector vector = CGVectorMake([paintProperties[@"line-translate"][0] floatValue], [paintProperties[@"line-translate"][1] floatValue]);
+                MGLStyleValue *lineTranslateValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
                 [layer setLineTranslate:lineTranslateValue];
             }
         }
@@ -327,7 +334,8 @@
                 NSArray *stops = paintProperties[@"line-translate-anchor"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
                 MGLStyleValue *lineTranslateAnchorValue;
                 NSNumber *baseNumber = paintProperties[@"line-translate-anchor"][@"base"];
@@ -338,7 +346,8 @@
                 }
                 [layer setLineTranslateAnchor:lineTranslateAnchorValue];
             } else {
-                MGLStyleValue *lineTranslateAnchorValue = [MGLStyleValue valueWithRawValue:paintProperties[@"line-translate-anchor"]];
+                CGVector vector = CGVectorMake([paintProperties[@"line-translate-anchor"][0] floatValue], [paintProperties[@"line-translate-anchor"][1] floatValue]);
+                MGLStyleValue *lineTranslateAnchorValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
                 [layer setLineTranslateAnchor:lineTranslateAnchorValue];
             }
         }
@@ -387,7 +396,8 @@
                 NSArray *stops = paintProperties[@"line-offset"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
                 MGLStyleValue *lineOffsetValue;
                 NSNumber *baseNumber = paintProperties[@"line-offset"][@"base"];
@@ -398,7 +408,8 @@
                 }
                 [layer setLineOffset:lineOffsetValue];
             } else {
-                MGLStyleValue *lineOffsetValue = [MGLStyleValue valueWithRawValue:paintProperties[@"line-offset"]];
+                CGVector vector = CGVectorMake([paintProperties[@"line-offset"][0] floatValue], [paintProperties[@"line-offset"][1] floatValue]);
+                MGLStyleValue *lineOffsetValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
                 [layer setLineOffset:lineOffsetValue];
             }
         }
@@ -469,7 +480,7 @@
             [layer setSourceLayerIdentifier:sourceLayer];
         }
         if (filter) {
-            [layer setPredicateFromJson:filter];
+            [layer setPredicate:[layer predicateFromJson:filter]];
         }
         return layer;
     }
@@ -764,7 +775,8 @@
                 NSArray *stops = layoutProperties[@"icon-offset"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
                 MGLStyleValue *iconOffsetValue;
                 NSNumber *baseNumber = layoutProperties[@"icon-offset"][@"base"];
@@ -775,7 +787,8 @@
                 }
                 [layer setIconOffset:iconOffsetValue];
             } else {
-                MGLStyleValue *iconOffsetValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"icon-offset"]];
+                CGVector vector = CGVectorMake([layoutProperties[@"icon-offset"][0] floatValue], [layoutProperties[@"icon-offset"][1] floatValue]);
+                MGLStyleValue *iconOffsetValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
                 [layer setIconOffset:iconOffsetValue];
             }
         }
@@ -1084,7 +1097,8 @@
                 NSArray *stops = layoutProperties[@"text-offset"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
                 MGLStyleValue *textOffsetValue;
                 NSNumber *baseNumber = layoutProperties[@"text-offset"][@"base"];
@@ -1095,7 +1109,8 @@
                 }
                 [layer setTextOffset:textOffsetValue];
             } else {
-                MGLStyleValue *textOffsetValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-offset"]];
+                CGVector vector = CGVectorMake([layoutProperties[@"text-offset"][0] floatValue], [layoutProperties[@"text-offset"][1] floatValue]);
+                MGLStyleValue *textOffsetValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
                 [layer setTextOffset:textOffsetValue];
             }
         }
@@ -1184,7 +1199,7 @@
                 NSArray *stops = paintProperties[@"icon-color"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromHexString:stop[1]]] forKey:stop[0]];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
                 }
                 MGLStyleValue *iconColorValue;
                 NSNumber *baseNumber = paintProperties[@"icon-color"][@"base"];
@@ -1195,7 +1210,7 @@
                 }
                 [layer setIconColor:iconColorValue];
             } else {
-                UIColor *color = [UIColor colorFromHexString:paintProperties[@"icon-color"]];
+                UIColor *color = [UIColor colorFromString:paintProperties[@"icon-color"]];
                 MGLStyleValue *iconColorValue = [MGLStyleValue valueWithRawValue:color];
                 [layer setIconColor:iconColorValue];
             }
@@ -1205,7 +1220,7 @@
                 NSArray *stops = paintProperties[@"icon-halo-color"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromHexString:stop[1]]] forKey:stop[0]];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
                 }
                 MGLStyleValue *iconHaloColorValue;
                 NSNumber *baseNumber = paintProperties[@"icon-halo-color"][@"base"];
@@ -1216,7 +1231,7 @@
                 }
                 [layer setIconHaloColor:iconHaloColorValue];
             } else {
-                UIColor *color = [UIColor colorFromHexString:paintProperties[@"icon-halo-color"]];
+                UIColor *color = [UIColor colorFromString:paintProperties[@"icon-halo-color"]];
                 MGLStyleValue *iconHaloColorValue = [MGLStyleValue valueWithRawValue:color];
                 [layer setIconHaloColor:iconHaloColorValue];
             }
@@ -1266,7 +1281,8 @@
                 NSArray *stops = paintProperties[@"icon-translate"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
                 MGLStyleValue *iconTranslateValue;
                 NSNumber *baseNumber = paintProperties[@"icon-translate"][@"base"];
@@ -1277,7 +1293,8 @@
                 }
                 [layer setIconTranslate:iconTranslateValue];
             } else {
-                MGLStyleValue *iconTranslateValue = [MGLStyleValue valueWithRawValue:paintProperties[@"icon-translate"]];
+                CGVector vector = CGVectorMake([paintProperties[@"icon-translate"][0] floatValue], [paintProperties[@"icon-translate"][1] floatValue]);
+                MGLStyleValue *iconTranslateValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
                 [layer setIconTranslate:iconTranslateValue];
             }
         }
@@ -1286,7 +1303,8 @@
                 NSArray *stops = paintProperties[@"icon-translate-anchor"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
                 MGLStyleValue *iconTranslateAnchorValue;
                 NSNumber *baseNumber = paintProperties[@"icon-translate-anchor"][@"base"];
@@ -1297,7 +1315,8 @@
                 }
                 [layer setIconTranslateAnchor:iconTranslateAnchorValue];
             } else {
-                MGLStyleValue *iconTranslateAnchorValue = [MGLStyleValue valueWithRawValue:paintProperties[@"icon-translate-anchor"]];
+                CGVector vector = CGVectorMake([paintProperties[@"icon-translate-anchor"][0] floatValue], [paintProperties[@"icon-translate-anchor"][1] floatValue]);
+                MGLStyleValue *iconTranslateAnchorValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
                 [layer setIconTranslateAnchor:iconTranslateAnchorValue];
             }
         }
@@ -1326,7 +1345,7 @@
                 NSArray *stops = paintProperties[@"text-color"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromHexString:stop[1]]] forKey:stop[0]];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
                 }
                 MGLStyleValue *textColorValue;
                 NSNumber *baseNumber = paintProperties[@"text-color"][@"base"];
@@ -1337,7 +1356,7 @@
                 }
                 [layer setTextColor:textColorValue];
             } else {
-                UIColor *color = [UIColor colorFromHexString:paintProperties[@"text-color"]];
+                UIColor *color = [UIColor colorFromString:paintProperties[@"text-color"]];
                 MGLStyleValue *textColorValue = [MGLStyleValue valueWithRawValue:color];
                 [layer setTextColor:textColorValue];
             }
@@ -1347,7 +1366,7 @@
                 NSArray *stops = paintProperties[@"text-halo-color"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromHexString:stop[1]]] forKey:stop[0]];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
                 }
                 MGLStyleValue *textHaloColorValue;
                 NSNumber *baseNumber = paintProperties[@"text-halo-color"][@"base"];
@@ -1358,7 +1377,7 @@
                 }
                 [layer setTextHaloColor:textHaloColorValue];
             } else {
-                UIColor *color = [UIColor colorFromHexString:paintProperties[@"text-halo-color"]];
+                UIColor *color = [UIColor colorFromString:paintProperties[@"text-halo-color"]];
                 MGLStyleValue *textHaloColorValue = [MGLStyleValue valueWithRawValue:color];
                 [layer setTextHaloColor:textHaloColorValue];
             }
@@ -1408,7 +1427,8 @@
                 NSArray *stops = paintProperties[@"text-translate"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
                 MGLStyleValue *textTranslateValue;
                 NSNumber *baseNumber = paintProperties[@"text-translate"][@"base"];
@@ -1419,7 +1439,8 @@
                 }
                 [layer setTextTranslate:textTranslateValue];
             } else {
-                MGLStyleValue *textTranslateValue = [MGLStyleValue valueWithRawValue:paintProperties[@"text-translate"]];
+                CGVector vector = CGVectorMake([paintProperties[@"text-translate"][0] floatValue], [paintProperties[@"text-translate"][1] floatValue]);
+                MGLStyleValue *textTranslateValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
                 [layer setTextTranslate:textTranslateValue];
             }
         }
@@ -1428,7 +1449,8 @@
                 NSArray *stops = paintProperties[@"text-translate-anchor"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
                 MGLStyleValue *textTranslateAnchorValue;
                 NSNumber *baseNumber = paintProperties[@"text-translate-anchor"][@"base"];
@@ -1439,7 +1461,8 @@
                 }
                 [layer setTextTranslateAnchor:textTranslateAnchorValue];
             } else {
-                MGLStyleValue *textTranslateAnchorValue = [MGLStyleValue valueWithRawValue:paintProperties[@"text-translate-anchor"]];
+                CGVector vector = CGVectorMake([paintProperties[@"text-translate-anchor"][0] floatValue], [paintProperties[@"text-translate-anchor"][1] floatValue]);
+                MGLStyleValue *textTranslateAnchorValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
                 [layer setTextTranslateAnchor:textTranslateAnchorValue];
             }
         }
@@ -1450,7 +1473,7 @@
             [layer setSourceLayerIdentifier:sourceLayer];
         }
         if (filter) {
-            [layer setPredicateFromJson:filter];
+            [layer setPredicate:[layer predicateFromJson:filter]];
         }
         return layer;
     }
@@ -1484,7 +1507,7 @@
                 NSArray *stops = paintProperties[@"circle-color"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromHexString:stop[1]]] forKey:stop[0]];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
                 }
                 MGLStyleValue *circleColorValue;
                 NSNumber *baseNumber = paintProperties[@"circle-color"][@"base"];
@@ -1495,7 +1518,7 @@
                 }
                 [layer setCircleColor:circleColorValue];
             } else {
-                UIColor *color = [UIColor colorFromHexString:paintProperties[@"circle-color"]];
+                UIColor *color = [UIColor colorFromString:paintProperties[@"circle-color"]];
                 MGLStyleValue *circleColorValue = [MGLStyleValue valueWithRawValue:color];
                 [layer setCircleColor:circleColorValue];
             }
@@ -1545,7 +1568,8 @@
                 NSArray *stops = paintProperties[@"circle-translate"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
                 MGLStyleValue *circleTranslateValue;
                 NSNumber *baseNumber = paintProperties[@"circle-translate"][@"base"];
@@ -1556,7 +1580,8 @@
                 }
                 [layer setCircleTranslate:circleTranslateValue];
             } else {
-                MGLStyleValue *circleTranslateValue = [MGLStyleValue valueWithRawValue:paintProperties[@"circle-translate"]];
+                CGVector vector = CGVectorMake([paintProperties[@"circle-translate"][0] floatValue], [paintProperties[@"circle-translate"][1] floatValue]);
+                MGLStyleValue *circleTranslateValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
                 [layer setCircleTranslate:circleTranslateValue];
             }
         }
@@ -1565,7 +1590,8 @@
                 NSArray *stops = paintProperties[@"circle-translate-anchor"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
                 MGLStyleValue *circleTranslateAnchorValue;
                 NSNumber *baseNumber = paintProperties[@"circle-translate-anchor"][@"base"];
@@ -1576,7 +1602,8 @@
                 }
                 [layer setCircleTranslateAnchor:circleTranslateAnchorValue];
             } else {
-                MGLStyleValue *circleTranslateAnchorValue = [MGLStyleValue valueWithRawValue:paintProperties[@"circle-translate-anchor"]];
+                CGVector vector = CGVectorMake([paintProperties[@"circle-translate-anchor"][0] floatValue], [paintProperties[@"circle-translate-anchor"][1] floatValue]);
+                MGLStyleValue *circleTranslateAnchorValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
                 [layer setCircleTranslateAnchor:circleTranslateAnchorValue];
             }
         }
@@ -1607,7 +1634,7 @@
             [layer setSourceLayerIdentifier:sourceLayer];
         }
         if (filter) {
-            [layer setPredicateFromJson:filter];
+            [layer setPredicate:[layer predicateFromJson:filter]];
         }
         return layer;
     }
@@ -1766,7 +1793,7 @@
                 NSArray *stops = paintProperties[@"background-color"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromHexString:stop[1]]] forKey:stop[0]];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
                 }
                 MGLStyleValue *backgroundColorValue;
                 NSNumber *baseNumber = paintProperties[@"background-color"][@"base"];
@@ -1777,7 +1804,7 @@
                 }
                 [layer setBackgroundColor:backgroundColorValue];
             } else {
-                UIColor *color = [UIColor colorFromHexString:paintProperties[@"background-color"]];
+                UIColor *color = [UIColor colorFromString:paintProperties[@"background-color"]];
                 MGLStyleValue *backgroundColorValue = [MGLStyleValue valueWithRawValue:color];
                 [layer setBackgroundColor:backgroundColorValue];
             }
@@ -1827,7 +1854,7 @@
     return nil;
 }
 
-- (NSPredicate *)setPredicateFromJson:(nonnull NSArray *)filterJson
+- (NSPredicate *)predicateFromJson:(nonnull NSArray *)filterJson
 {
     NSString *filterType = filterJson[0];
     if ([filterType isEqualToString:@"=="]) {
@@ -1871,7 +1898,7 @@
         [filters removeObjectAtIndex:0];
         NSMutableArray *predicates = [NSMutableArray arrayWithCapacity:[filters count]];
         for (id filter in filters) {
-            [predicates addObject:[self setPredicateFromJson:filter]];
+            [predicates addObject:[self predicateFromJson:filter]];
         }
         return [NSCompoundPredicate andPredicateWithSubpredicates:predicates];
     }
@@ -1880,7 +1907,7 @@
         [filters removeObjectAtIndex:0];
         NSMutableArray *predicates = [NSMutableArray arrayWithCapacity:[filters count]];
         for (id filter in filters) {
-            [predicates addObject:[self setPredicateFromJson:filter]];
+            [predicates addObject:[self predicateFromJson:filter]];
         }
         return [NSCompoundPredicate orPredicateWithSubpredicates:predicates];
     }
@@ -1889,7 +1916,7 @@
         [filters removeObjectAtIndex:0];
         NSMutableArray *predicates = [NSMutableArray arrayWithCapacity:[filters count]];
         for (id filter in filters) {
-            [predicates addObject:[NSCompoundPredicate notPredicateWithSubpredicate:[self setPredicateFromJson:filter]]];
+            [predicates addObject:[NSCompoundPredicate notPredicateWithSubpredicate:[self predicateFromJson:filter]]];
         }
         return [NSCompoundPredicate andPredicateWithSubpredicates:predicates];
     }

@@ -8,5 +8,5 @@
 
 @interface MGLStyleLayer (RCTAdditions)
 + (MGLStyleLayer *)fromJson:(nonnull NSDictionary *)layerJson withMap:(RCTMapboxGL *)mapView;
-- (NSPredicate *)setPredicateFromJson:(nonnull NSArray *)filter;
+- (NSPredicate *)predicateFromJson:(nonnull NSArray *)filter;
 @end

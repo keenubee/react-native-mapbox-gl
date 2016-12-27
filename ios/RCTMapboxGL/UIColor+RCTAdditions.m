@@ -7,6 +7,15 @@
 
 @implementation UIColor (RCTAdditions)
 
++ (UIColor *)colorFromString:(NSString *)string
+{
+    SEL colorLabel = NSSelectorFromString([string stringByAppendingString:@"Color"]);
+    if ([UIColor respondsToSelector:colorLabel]) {
+        return [UIColor performSelector:colorLabel];
+    }
+    return [UIColor colorFromHexString:string];
+}
+
 + (UIColor *)colorFromHexString:(NSString *)hexString
 {
     unsigned rgbValue = 0;
