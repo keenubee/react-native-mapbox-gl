@@ -658,10 +658,12 @@ RCT_EXPORT_METHOD(addLayer:(nonnull NSNumber *)reactTag
   }];
 }
 
-RCT_EXPORT_METHOD(addSource:(nonnull NSNumber *)reactTag
+RCT_EXPORT_METHOD(setSource:(nonnull NSNumber *)reactTag
                   id:(nonnull NSString*)id
                   sourceJson:(nonnull NSDictionary*)sourceJson
-                  dataIsUrl:(BOOL) dataIsUrl)
+                  dataIsUrl:(BOOL) dataIsUrl
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
 {
   [_bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *, RCTMapboxGL *> *viewRegistry) {
       RCTMapboxGL *mapView = viewRegistry[reactTag];
@@ -678,8 +680,16 @@ RCT_EXPORT_METHOD(addSource:(nonnull NSNumber *)reactTag
               if (!dataIsUrl) {
                   NSError *encodeError;
                   MGLShape *sourceShape = [MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:&encodeError];
-                  MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:id shape:sourceShape options:nil];
-                  [mapView addSource:source];
+                  MGLSource *sourceFromMap = [mapView styleSourceWithIdentifier:id];
+                  if (!sourceFromMap) {
+                      MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:id shape:sourceShape options:nil];
+                      [mapView addSource:source];
+                      return;
+                  }
+                  if ([sourceFromMap respondsToSelector:@selector(setShape:)]) {
+                      [sourceFromMap performSelector:@selector(setShape:) withObject:sourceShape];
+                      return;
+                  }
               }
           }
       }

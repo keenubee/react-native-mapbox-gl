@@ -6,5 +6,6 @@
 #import "UIView+React.h"
 
 @interface UIColor (RCTAdditions)
++ (UIColor *)colorFromString:(NSString *)string;
 + (UIColor *)colorFromHexString:(NSString *)hexString;
 @end

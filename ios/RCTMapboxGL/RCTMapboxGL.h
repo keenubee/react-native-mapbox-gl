@@ -45,7 +45,7 @@
 - (MGLStyleLayer*)styleLayerWithIdentifier:(nonnull NSString*)id;
 - (void)addLayer:(nonnull MGLStyleLayer *)layer;
 - (void)insertLayer:(nonnull MGLStyleLayer *)layer belowLayer:(nonnull MGLStyleLayer *)belowLayer;
-- (void)addSource:(nonnull MGLSource *)source;
+- (void)upsertSource:(nonnull MGLSource *)source;
 - (nonnull NSArray<id<MGLFeature>> *)visibleFeaturesAtPoint:(CGPoint)point inStyleLayersWithIdentifiers:(nullable NSSet<NSString *> *)styleLayerIdentifiers;
 - (nonnull NSArray<id<MGLFeature>> *)visibleFeaturesInRect:(CGRect)rect inStyleLayersWithIdentifiers:(nullable NSSet<NSString *> *)identifiers;
 
