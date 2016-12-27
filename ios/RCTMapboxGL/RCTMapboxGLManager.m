@@ -644,7 +644,9 @@ RCT_EXPORT_METHOD(setLayerVisibility:(nonnull NSNumber *)reactTag
 
 RCT_EXPORT_METHOD(addLayer:(nonnull NSNumber *)reactTag
                   layerJson:(nonnull NSDictionary*)layerJson
-                  before:(nonnull NSString*)previousLayerId)
+                  before:(nonnull NSString*)previousLayerId
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
 {
   [_bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *, RCTMapboxGL *> *viewRegistry) {
       RCTMapboxGL *mapView = viewRegistry[reactTag];
@@ -653,8 +655,12 @@ RCT_EXPORT_METHOD(addLayer:(nonnull NSNumber *)reactTag
           MGLStyleLayer *previousLayer = [mapView styleLayerWithIdentifier:previousLayerId];
           if (!previousLayer) {
               [mapView addLayer:layer];
+              resolve(nil);
+              return;
           }
          [mapView insertLayer:layer belowLayer:previousLayer];
+         resolve(nil);
+         return;
       }
   }];
 }
@@ -671,11 +677,13 @@ RCT_EXPORT_METHOD(setSource:(nonnull NSNumber *)reactTag
       if ([mapView isKindOfClass:[RCTMapboxGL class]]) {
           NSString *typeString = sourceJson[@"type"];
           if (!typeString) {
+              reject(@"invalid_arguments", @"setSource(): 'type' is required", nil);
               return;
           }
           if([typeString isEqualToString:@"geojson"]) {
               NSData *data = [sourceJson[@"data"] dataUsingEncoding:NSUTF8StringEncoding];
               if (!data) {
+                  reject(@"invalid_arguments", @"setSource(): 'data' is required for type 'geojson'", nil);
                   return;
               }
               if (!dataIsUrl) {
@@ -685,10 +693,12 @@ RCT_EXPORT_METHOD(setSource:(nonnull NSNumber *)reactTag
                   if (!sourceFromMap) {
                       MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:id shape:sourceShape options:nil];
                       [mapView addSource:source];
+                      resolve(nil);
                       return;
                   }
                   if ([sourceFromMap respondsToSelector:@selector(setShape:)]) {
                       [sourceFromMap performSelector:@selector(setShape:) withObject:sourceShape];
+                      resolve(nil);
                       return;
                   }
               }
