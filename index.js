@@ -253,7 +253,10 @@ class MapView extends Component {
     return promise;
   }
   addLayer(layer, before, callback) {
-    MapboxGLManager.addLayer(findNodeHandle(this), layer, before)
+    // the iOS bridge returns a promise, so bind callback to it
+    const promise = MapboxGLManager.addLayer(findNodeHandle(this), layer, before)
+    bindCallbackToPromise(callback, promise);
+    return promise;
   }
   setSource(id, source, callback) {
     let newSource = source
