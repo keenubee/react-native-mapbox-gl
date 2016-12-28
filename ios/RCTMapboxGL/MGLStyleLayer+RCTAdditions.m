@@ -6,6 +6,12 @@
 #import "MGLStyleLayer+RCTAdditions.h"
 #import "UIColor+RCTAdditions.h"
 #import <CoreGraphics/CGGeometry.h>
+#import <Mapbox/MGLFillStyleLayer.h>
+#import <Mapbox/MGLLineStyleLayer.h>
+#import <Mapbox/MGLSymbolStyleLayer.h>
+#import <Mapbox/MGLCircleStyleLayer.h>
+#import <Mapbox/MGLRasterStyleLayer.h>
+#import <Mapbox/MGLBackgroundStyleLayer.h>
 
 
 @implementation MGLStyleLayer (RCTAdditions)
@@ -15,9 +21,7 @@
 {
     NSString *idString = layerJson[@"id"];
     NSString *typeString = layerJson[@"type"];
-    // if (!idString || !typeString) {
-    //     return;
-    // }
+
     if([typeString isEqualToString:@"fill"]) {
         NSDictionary *paintProperties = layerJson[@"paint"];
         NSString *sourceString = layerJson[@"source"];
@@ -128,12 +132,17 @@
             }
         }
         if ([paintProperties valueForKey:@"fill-translate-anchor"]) {
+            // create the NSString -> enum dictionary for later use
+            NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
+                @"map": @(MGLFillTranslateAnchorMap),
+                @"viewport": @(MGLFillTranslateAnchorViewport),
+            };
             if ([[paintProperties valueForKey:@"fill-translate-anchor"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = paintProperties[@"fill-translate-anchor"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
+                    NSValue *value = [NSValue valueWithMGLFillTranslateAnchor:enumDictionary[paintProperties[@"fill-translate-anchor"]].integerValue];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *fillTranslateAnchorValue;
                 NSNumber *baseNumber = paintProperties[@"fill-translate-anchor"][@"base"];
@@ -144,8 +153,8 @@
                 }
                 [layer setFillTranslateAnchor:fillTranslateAnchorValue];
             } else {
-                CGVector vector = CGVectorMake([paintProperties[@"fill-translate-anchor"][0] floatValue], [paintProperties[@"fill-translate-anchor"][1] floatValue]);
-                MGLStyleValue *fillTranslateAnchorValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
+                NSValue *value = [NSValue valueWithMGLFillTranslateAnchor:enumDictionary[paintProperties[@"fill-translate-anchor"]].integerValue];
+                MGLStyleValue *fillTranslateAnchorValue = [MGLStyleValue valueWithRawValue:value];
                 [layer setFillTranslateAnchor:fillTranslateAnchorValue];
             }
         }
@@ -187,11 +196,18 @@
         MGLSource *source = [mapView styleSourceWithIdentifier:sourceString];
         MGLLineStyleLayer *layer = [[MGLLineStyleLayer alloc] initWithIdentifier:idString source:source];
         if ([layoutProperties valueForKey:@"line-cap"]) {
+            // create the NSString -> enum dictionary for later use
+            NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
+                @"butt": @(MGLLineCapButt),
+                @"round": @(MGLLineCapRound),
+                @"square": @(MGLLineCapSquare),
+            };
             if ([[layoutProperties valueForKey:@"line-cap"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = layoutProperties[@"line-cap"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    NSValue *value = [NSValue valueWithMGLLineCap:enumDictionary[layoutProperties[@"line-cap"]].integerValue];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *lineCapValue;
                 NSNumber *baseNumber = layoutProperties[@"line-cap"][@"base"];
@@ -202,16 +218,24 @@
                 }
                 [layer setLineCap:lineCapValue];
             } else {
-                MGLStyleValue *lineCapValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"line-cap"]];
+                NSValue *value = [NSValue valueWithMGLLineCap:enumDictionary[layoutProperties[@"line-cap"]].integerValue];
+                MGLStyleValue *lineCapValue = [MGLStyleValue valueWithRawValue:value];
                 [layer setLineCap:lineCapValue];
             }
         }
         if ([layoutProperties valueForKey:@"line-join"]) {
+            // create the NSString -> enum dictionary for later use
+            NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
+                @"bevel": @(MGLLineJoinBevel),
+                @"round": @(MGLLineJoinRound),
+                @"miter": @(MGLLineJoinMiter),
+            };
             if ([[layoutProperties valueForKey:@"line-join"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = layoutProperties[@"line-join"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    NSValue *value = [NSValue valueWithMGLLineJoin:enumDictionary[layoutProperties[@"line-join"]].integerValue];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *lineJoinValue;
                 NSNumber *baseNumber = layoutProperties[@"line-join"][@"base"];
@@ -222,7 +246,8 @@
                 }
                 [layer setLineJoin:lineJoinValue];
             } else {
-                MGLStyleValue *lineJoinValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"line-join"]];
+                NSValue *value = [NSValue valueWithMGLLineJoin:enumDictionary[layoutProperties[@"line-join"]].integerValue];
+                MGLStyleValue *lineJoinValue = [MGLStyleValue valueWithRawValue:value];
                 [layer setLineJoin:lineJoinValue];
             }
         }
@@ -330,12 +355,17 @@
             }
         }
         if ([paintProperties valueForKey:@"line-translate-anchor"]) {
+            // create the NSString -> enum dictionary for later use
+            NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
+                @"map": @(MGLLineTranslateAnchorMap),
+                @"viewport": @(MGLLineTranslateAnchorViewport),
+            };
             if ([[paintProperties valueForKey:@"line-translate-anchor"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = paintProperties[@"line-translate-anchor"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
+                    NSValue *value = [NSValue valueWithMGLLineTranslateAnchor:enumDictionary[paintProperties[@"line-translate-anchor"]].integerValue];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *lineTranslateAnchorValue;
                 NSNumber *baseNumber = paintProperties[@"line-translate-anchor"][@"base"];
@@ -346,8 +376,8 @@
                 }
                 [layer setLineTranslateAnchor:lineTranslateAnchorValue];
             } else {
-                CGVector vector = CGVectorMake([paintProperties[@"line-translate-anchor"][0] floatValue], [paintProperties[@"line-translate-anchor"][1] floatValue]);
-                MGLStyleValue *lineTranslateAnchorValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
+                NSValue *value = [NSValue valueWithMGLLineTranslateAnchor:enumDictionary[paintProperties[@"line-translate-anchor"]].integerValue];
+                MGLStyleValue *lineTranslateAnchorValue = [MGLStyleValue valueWithRawValue:value];
                 [layer setLineTranslateAnchor:lineTranslateAnchorValue];
             }
         }
@@ -491,11 +521,17 @@
         MGLSource *source = [mapView styleSourceWithIdentifier:sourceString];
         MGLSymbolStyleLayer *layer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:idString source:source];
         if ([layoutProperties valueForKey:@"symbol-placement"]) {
+            // create the NSString -> enum dictionary for later use
+            NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
+                @"point": @(MGLSymbolPlacementPoint),
+                @"line": @(MGLSymbolPlacementLine),
+            };
             if ([[layoutProperties valueForKey:@"symbol-placement"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = layoutProperties[@"symbol-placement"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    NSValue *value = [NSValue valueWithMGLSymbolPlacement:enumDictionary[layoutProperties[@"symbol-placement"]].integerValue];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *symbolPlacementValue;
                 NSNumber *baseNumber = layoutProperties[@"symbol-placement"][@"base"];
@@ -506,7 +542,8 @@
                 }
                 [layer setSymbolPlacement:symbolPlacementValue];
             } else {
-                MGLStyleValue *symbolPlacementValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"symbol-placement"]];
+                NSValue *value = [NSValue valueWithMGLSymbolPlacement:enumDictionary[layoutProperties[@"symbol-placement"]].integerValue];
+                MGLStyleValue *symbolPlacementValue = [MGLStyleValue valueWithRawValue:value];
                 [layer setSymbolPlacement:symbolPlacementValue];
             }
         }
@@ -611,11 +648,18 @@
             }
         }
         if ([layoutProperties valueForKey:@"icon-rotation-alignment"]) {
+            // create the NSString -> enum dictionary for later use
+            NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
+                @"map": @(MGLIconRotationAlignmentMap),
+                @"viewport": @(MGLIconRotationAlignmentViewport),
+                @"auto": @(MGLIconRotationAlignmentAuto),
+            };
             if ([[layoutProperties valueForKey:@"icon-rotation-alignment"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = layoutProperties[@"icon-rotation-alignment"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    NSValue *value = [NSValue valueWithMGLIconRotationAlignment:enumDictionary[layoutProperties[@"icon-rotation-alignment"]].integerValue];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *iconRotationAlignmentValue;
                 NSNumber *baseNumber = layoutProperties[@"icon-rotation-alignment"][@"base"];
@@ -626,7 +670,8 @@
                 }
                 [layer setIconRotationAlignment:iconRotationAlignmentValue];
             } else {
-                MGLStyleValue *iconRotationAlignmentValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"icon-rotation-alignment"]];
+                NSValue *value = [NSValue valueWithMGLIconRotationAlignment:enumDictionary[layoutProperties[@"icon-rotation-alignment"]].integerValue];
+                MGLStyleValue *iconRotationAlignmentValue = [MGLStyleValue valueWithRawValue:value];
                 [layer setIconRotationAlignment:iconRotationAlignmentValue];
             }
         }
@@ -651,11 +696,19 @@
             }
         }
         if ([layoutProperties valueForKey:@"icon-text-fit"]) {
+            // create the NSString -> enum dictionary for later use
+            NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
+                @"none": @(MGLIconTextFitNone),
+                @"width": @(MGLIconTextFitWidth),
+                @"height": @(MGLIconTextFitHeight),
+                @"both": @(MGLIconTextFitBoth),
+            };
             if ([[layoutProperties valueForKey:@"icon-text-fit"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = layoutProperties[@"icon-text-fit"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    NSValue *value = [NSValue valueWithMGLIconTextFit:enumDictionary[layoutProperties[@"icon-text-fit"]].integerValue];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *iconTextFitValue;
                 NSNumber *baseNumber = layoutProperties[@"icon-text-fit"][@"base"];
@@ -666,7 +719,8 @@
                 }
                 [layer setIconTextFit:iconTextFitValue];
             } else {
-                MGLStyleValue *iconTextFitValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"icon-text-fit"]];
+                NSValue *value = [NSValue valueWithMGLIconTextFit:enumDictionary[layoutProperties[@"icon-text-fit"]].integerValue];
+                MGLStyleValue *iconTextFitValue = [MGLStyleValue valueWithRawValue:value];
                 [layer setIconTextFit:iconTextFitValue];
             }
         }
@@ -793,11 +847,18 @@
             }
         }
         if ([layoutProperties valueForKey:@"text-pitch-alignment"]) {
+            // create the NSString -> enum dictionary for later use
+            NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
+                @"map": @(MGLTextPitchAlignmentMap),
+                @"viewport": @(MGLTextPitchAlignmentViewport),
+                @"auto": @(MGLTextPitchAlignmentAuto),
+            };
             if ([[layoutProperties valueForKey:@"text-pitch-alignment"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = layoutProperties[@"text-pitch-alignment"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    NSValue *value = [NSValue valueWithMGLTextPitchAlignment:enumDictionary[layoutProperties[@"text-pitch-alignment"]].integerValue];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *textPitchAlignmentValue;
                 NSNumber *baseNumber = layoutProperties[@"text-pitch-alignment"][@"base"];
@@ -808,16 +869,24 @@
                 }
                 [layer setTextPitchAlignment:textPitchAlignmentValue];
             } else {
-                MGLStyleValue *textPitchAlignmentValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-pitch-alignment"]];
+                NSValue *value = [NSValue valueWithMGLTextPitchAlignment:enumDictionary[layoutProperties[@"text-pitch-alignment"]].integerValue];
+                MGLStyleValue *textPitchAlignmentValue = [MGLStyleValue valueWithRawValue:value];
                 [layer setTextPitchAlignment:textPitchAlignmentValue];
             }
         }
         if ([layoutProperties valueForKey:@"text-rotation-alignment"]) {
+            // create the NSString -> enum dictionary for later use
+            NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
+                @"map": @(MGLTextRotationAlignmentMap),
+                @"viewport": @(MGLTextRotationAlignmentViewport),
+                @"auto": @(MGLTextRotationAlignmentAuto),
+            };
             if ([[layoutProperties valueForKey:@"text-rotation-alignment"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = layoutProperties[@"text-rotation-alignment"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    NSValue *value = [NSValue valueWithMGLTextRotationAlignment:enumDictionary[layoutProperties[@"text-rotation-alignment"]].integerValue];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *textRotationAlignmentValue;
                 NSNumber *baseNumber = layoutProperties[@"text-rotation-alignment"][@"base"];
@@ -828,7 +897,8 @@
                 }
                 [layer setTextRotationAlignment:textRotationAlignmentValue];
             } else {
-                MGLStyleValue *textRotationAlignmentValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-rotation-alignment"]];
+                NSValue *value = [NSValue valueWithMGLTextRotationAlignment:enumDictionary[layoutProperties[@"text-rotation-alignment"]].integerValue];
+                MGLStyleValue *textRotationAlignmentValue = [MGLStyleValue valueWithRawValue:value];
                 [layer setTextRotationAlignment:textRotationAlignmentValue];
             }
         }
@@ -953,11 +1023,18 @@
             }
         }
         if ([layoutProperties valueForKey:@"text-justify"]) {
+            // create the NSString -> enum dictionary for later use
+            NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
+                @"left": @(MGLTextJustificationLeft),
+                @"center": @(MGLTextJustificationCenter),
+                @"right": @(MGLTextJustificationRight),
+            };
             if ([[layoutProperties valueForKey:@"text-justify"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = layoutProperties[@"text-justify"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    NSValue *value = [NSValue valueWithMGLTextJustification:enumDictionary[layoutProperties[@"text-justify"]].integerValue];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *textJustifyValue;
                 NSNumber *baseNumber = layoutProperties[@"text-justify"][@"base"];
@@ -968,16 +1045,30 @@
                 }
                 [layer setTextJustification:textJustifyValue];
             } else {
-                MGLStyleValue *textJustifyValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-justify"]];
+                NSValue *value = [NSValue valueWithMGLTextJustification:enumDictionary[layoutProperties[@"text-justify"]].integerValue];
+                MGLStyleValue *textJustifyValue = [MGLStyleValue valueWithRawValue:value];
                 [layer setTextJustification:textJustifyValue];
             }
         }
         if ([layoutProperties valueForKey:@"text-anchor"]) {
+            // create the NSString -> enum dictionary for later use
+            NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
+                @"center": @(MGLTextAnchorCenter),
+                @"left": @(MGLTextAnchorLeft),
+                @"right": @(MGLTextAnchorRight),
+                @"top": @(MGLTextAnchorTop),
+                @"bottom": @(MGLTextAnchorBottom),
+                @"top-left": @(MGLTextAnchorTopLeft),
+                @"top-right": @(MGLTextAnchorTopRight),
+                @"bottom-left": @(MGLTextAnchorBottomLeft),
+                @"bottom-right": @(MGLTextAnchorBottomRight),
+            };
             if ([[layoutProperties valueForKey:@"text-anchor"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = layoutProperties[@"text-anchor"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    NSValue *value = [NSValue valueWithMGLTextAnchor:enumDictionary[layoutProperties[@"text-anchor"]].integerValue];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *textAnchorValue;
                 NSNumber *baseNumber = layoutProperties[@"text-anchor"][@"base"];
@@ -988,7 +1079,8 @@
                 }
                 [layer setTextAnchor:textAnchorValue];
             } else {
-                MGLStyleValue *textAnchorValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-anchor"]];
+                NSValue *value = [NSValue valueWithMGLTextAnchor:enumDictionary[layoutProperties[@"text-anchor"]].integerValue];
+                MGLStyleValue *textAnchorValue = [MGLStyleValue valueWithRawValue:value];
                 [layer setTextAnchor:textAnchorValue];
             }
         }
@@ -1073,11 +1165,18 @@
             }
         }
         if ([layoutProperties valueForKey:@"text-transform"]) {
+            // create the NSString -> enum dictionary for later use
+            NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
+                @"none": @(MGLTextTransformNone),
+                @"uppercase": @(MGLTextTransformUppercase),
+                @"lowercase": @(MGLTextTransformLowercase),
+            };
             if ([[layoutProperties valueForKey:@"text-transform"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = layoutProperties[@"text-transform"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    NSValue *value = [NSValue valueWithMGLTextTransform:enumDictionary[layoutProperties[@"text-transform"]].integerValue];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *textTransformValue;
                 NSNumber *baseNumber = layoutProperties[@"text-transform"][@"base"];
@@ -1088,7 +1187,8 @@
                 }
                 [layer setTextTransform:textTransformValue];
             } else {
-                MGLStyleValue *textTransformValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-transform"]];
+                NSValue *value = [NSValue valueWithMGLTextTransform:enumDictionary[layoutProperties[@"text-transform"]].integerValue];
+                MGLStyleValue *textTransformValue = [MGLStyleValue valueWithRawValue:value];
                 [layer setTextTransform:textTransformValue];
             }
         }
@@ -1299,12 +1399,17 @@
             }
         }
         if ([paintProperties valueForKey:@"icon-translate-anchor"]) {
+            // create the NSString -> enum dictionary for later use
+            NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
+                @"map": @(MGLIconTranslateAnchorMap),
+                @"viewport": @(MGLIconTranslateAnchorViewport),
+            };
             if ([[paintProperties valueForKey:@"icon-translate-anchor"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = paintProperties[@"icon-translate-anchor"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
+                    NSValue *value = [NSValue valueWithMGLIconTranslateAnchor:enumDictionary[paintProperties[@"icon-translate-anchor"]].integerValue];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *iconTranslateAnchorValue;
                 NSNumber *baseNumber = paintProperties[@"icon-translate-anchor"][@"base"];
@@ -1315,8 +1420,8 @@
                 }
                 [layer setIconTranslateAnchor:iconTranslateAnchorValue];
             } else {
-                CGVector vector = CGVectorMake([paintProperties[@"icon-translate-anchor"][0] floatValue], [paintProperties[@"icon-translate-anchor"][1] floatValue]);
-                MGLStyleValue *iconTranslateAnchorValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
+                NSValue *value = [NSValue valueWithMGLIconTranslateAnchor:enumDictionary[paintProperties[@"icon-translate-anchor"]].integerValue];
+                MGLStyleValue *iconTranslateAnchorValue = [MGLStyleValue valueWithRawValue:value];
                 [layer setIconTranslateAnchor:iconTranslateAnchorValue];
             }
         }
@@ -1445,12 +1550,17 @@
             }
         }
         if ([paintProperties valueForKey:@"text-translate-anchor"]) {
+            // create the NSString -> enum dictionary for later use
+            NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
+                @"map": @(MGLTextTranslateAnchorMap),
+                @"viewport": @(MGLTextTranslateAnchorViewport),
+            };
             if ([[paintProperties valueForKey:@"text-translate-anchor"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = paintProperties[@"text-translate-anchor"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
+                    NSValue *value = [NSValue valueWithMGLTextTranslateAnchor:enumDictionary[paintProperties[@"text-translate-anchor"]].integerValue];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *textTranslateAnchorValue;
                 NSNumber *baseNumber = paintProperties[@"text-translate-anchor"][@"base"];
@@ -1461,8 +1571,8 @@
                 }
                 [layer setTextTranslateAnchor:textTranslateAnchorValue];
             } else {
-                CGVector vector = CGVectorMake([paintProperties[@"text-translate-anchor"][0] floatValue], [paintProperties[@"text-translate-anchor"][1] floatValue]);
-                MGLStyleValue *textTranslateAnchorValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
+                NSValue *value = [NSValue valueWithMGLTextTranslateAnchor:enumDictionary[paintProperties[@"text-translate-anchor"]].integerValue];
+                MGLStyleValue *textTranslateAnchorValue = [MGLStyleValue valueWithRawValue:value];
                 [layer setTextTranslateAnchor:textTranslateAnchorValue];
             }
         }
@@ -1586,12 +1696,17 @@
             }
         }
         if ([paintProperties valueForKey:@"circle-translate-anchor"]) {
+            // create the NSString -> enum dictionary for later use
+            NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
+                @"map": @(MGLCircleTranslateAnchorMap),
+                @"viewport": @(MGLCircleTranslateAnchorViewport),
+            };
             if ([[paintProperties valueForKey:@"circle-translate-anchor"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = paintProperties[@"circle-translate-anchor"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
+                    NSValue *value = [NSValue valueWithMGLCircleTranslateAnchor:enumDictionary[paintProperties[@"circle-translate-anchor"]].integerValue];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *circleTranslateAnchorValue;
                 NSNumber *baseNumber = paintProperties[@"circle-translate-anchor"][@"base"];
@@ -1602,17 +1717,23 @@
                 }
                 [layer setCircleTranslateAnchor:circleTranslateAnchorValue];
             } else {
-                CGVector vector = CGVectorMake([paintProperties[@"circle-translate-anchor"][0] floatValue], [paintProperties[@"circle-translate-anchor"][1] floatValue]);
-                MGLStyleValue *circleTranslateAnchorValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
+                NSValue *value = [NSValue valueWithMGLCircleTranslateAnchor:enumDictionary[paintProperties[@"circle-translate-anchor"]].integerValue];
+                MGLStyleValue *circleTranslateAnchorValue = [MGLStyleValue valueWithRawValue:value];
                 [layer setCircleTranslateAnchor:circleTranslateAnchorValue];
             }
         }
         if ([paintProperties valueForKey:@"circle-pitch-scale"]) {
+            // create the NSString -> enum dictionary for later use
+            NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
+                @"map": @(MGLCirclePitchScaleMap),
+                @"viewport": @(MGLCirclePitchScaleViewport),
+            };
             if ([[paintProperties valueForKey:@"circle-pitch-scale"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = paintProperties[@"circle-pitch-scale"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    NSValue *value = [NSValue valueWithMGLCirclePitchScale:enumDictionary[paintProperties[@"circle-pitch-scale"]].integerValue];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *circlePitchScaleValue;
                 NSNumber *baseNumber = paintProperties[@"circle-pitch-scale"][@"base"];
@@ -1623,7 +1744,8 @@
                 }
                 [layer setCirclePitchScale:circlePitchScaleValue];
             } else {
-                MGLStyleValue *circlePitchScaleValue = [MGLStyleValue valueWithRawValue:paintProperties[@"circle-pitch-scale"]];
+                NSValue *value = [NSValue valueWithMGLCirclePitchScale:enumDictionary[paintProperties[@"circle-pitch-scale"]].integerValue];
+                MGLStyleValue *circlePitchScaleValue = [MGLStyleValue valueWithRawValue:value];
                 [layer setCirclePitchScale:circlePitchScaleValue];
             }
         }
