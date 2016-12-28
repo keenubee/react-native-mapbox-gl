@@ -32,6 +32,8 @@ import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
+import com.mapbox.mapboxsdk.style.sources.Source;
+import com.mapbox.mapboxsdk.style.sources.NoSuchSourceException;
 import com.mapbox.services.commons.geojson.Feature;
 
 import java.util.ArrayList;
@@ -722,6 +724,26 @@ public class ReactNativeMapboxGLView extends RelativeLayout implements
             throw new NoSuchLayerException(String.format("Cannot set visibility of non-existent layer '%s'", id));
         }
         layer.setProperties(PropertyFactory.visibility(value));
+    }
+
+    public void addLayer(Layer layer, String before) {
+        if (_map == null) { return; }
+        _map.addLayer(layer, before);
+    }
+
+    public void removeLayer(String id) throws NoSuchLayerException {
+        if (_map == null) { return; }
+        _map.removeLayer(id);
+    }
+
+    public void addSource(Source source) {
+        if (_map == null) { return; }
+        _map.addSource(source);
+    }
+
+    public void removeSource(String id) throws NoSuchSourceException {
+        if (_map == null) { return; }
+        _map.removeSource(id);
     }
 
     // Feature querying
