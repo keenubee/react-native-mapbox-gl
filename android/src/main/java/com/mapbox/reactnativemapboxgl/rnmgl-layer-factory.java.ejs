@@ -157,51 +157,61 @@ public class RNMGLLayerFactory {
 
 <% for (const layer of layers) { -%>
     static <%- upperCamelize(layer.type) %>Layer <%- camelize(layer.type) %>LayerFromJson(ReadableMap layerJson) {
-        ReadableMap paintProperties = layerJson.getMap("paint");
-<% if (layer.layoutProperties.length) { -%>
-        ReadableMap layoutProperties = layerJson.getMap("layout");
-<% } -%>
         ArrayList<Property> properties = new ArrayList<Property>();
 
-<% for (const prop of layer.properties) { -%>
+<% const propToJava = (prop) => { -%>
 <% if (typeToReadableType.hasOwnProperty(prop.type)) { -%>
-        if (<%- prop.propertyType %>Properties.hasKey("<%- prop.name %>")) {
-            if (<%- prop.propertyType %>Properties.getType("<%- prop.name %>") == ReadableType.<%- typeToReadableType[prop.type] %>) {
-                properties.add(PropertyFactory.<%- camelize(prop.name) %>(
+            if (<%- prop.propertyType %>Properties.hasKey("<%- prop.name %>")) {
+                if (<%- prop.propertyType %>Properties.getType("<%- prop.name %>") == ReadableType.<%- typeToReadableType[prop.type] %>) {
+                    properties.add(PropertyFactory.<%- camelize(prop.name) %>(
 <% if (prop.type === 'array') { -%>
-                    ReadableArrTo<%- typeToReadableType[prop.value] %>Arr(<%- prop.propertyType %>Properties.getArray("<%- prop.name %>"), 0)
+                        ReadableArrTo<%- typeToReadableType[prop.value] %>Arr(<%- prop.propertyType %>Properties.getArray("<%- prop.name %>"), 0)
 <% } else { -%>
-                    <%- typecast[prop.type] %><%- prop.propertyType %>Properties.get<%- typeToReadableGetType[prop.type] %>("<%- prop.name %>")
+                        <%- typecast[prop.type] %><%- prop.propertyType %>Properties.get<%- typeToReadableGetType[prop.type] %>("<%- prop.name %>")
 <% } -%>
-                ));
-            }
+                    ));
+                }
 <% if (prop['zoom-function'] === true) { -%>
-            else if (<%- prop.propertyType %>Properties.getType("<%- prop.name %>") == ReadableType.Map) {
-                ReadableMap map = <%- prop.propertyType %>Properties.getMap("<%- prop.name %>");
-                ReadableArray stops = map.getArray("stops");
-                Function.Stop[] stopsArray = new Function.Stop[stops.size()];
-                for (int i = 0; i < stops.size(); i++) {
-                    stopsArray[i] = Function.stop(
-                        (float)stops.getArray(i).getDouble(0),
-                        PropertyFactory.<%- camelize(prop.name) %>(
+                else if (<%- prop.propertyType %>Properties.getType("<%- prop.name %>") == ReadableType.Map) {
+                    ReadableMap map = <%- prop.propertyType %>Properties.getMap("<%- prop.name %>");
+                    ReadableArray stops = map.getArray("stops");
+                    Function.Stop[] stopsArray = new Function.Stop[stops.size()];
+                    for (int i = 0; i < stops.size(); i++) {
+                        stopsArray[i] = Function.stop(
+                            (float)stops.getArray(i).getDouble(0),
+                            PropertyFactory.<%- camelize(prop.name) %>(
 <% if (prop.type === 'array') { -%>
-                            ReadableArrTo<%- typeToReadableType[prop.value] %>Arr(stops.getArray(i).getArray(1), 0)
+                                ReadableArrTo<%- typeToReadableType[prop.value] %>Arr(stops.getArray(i).getArray(1), 0)
 <% } else { -%>
-                            <%- typecast[prop.type] %>stops.getArray(i).get<%- typeToReadableGetType[prop.type] %>(1)
+                                <%- typecast[prop.type] %>stops.getArray(i).get<%- typeToReadableGetType[prop.type] %>(1)
 <% } -%>
-                        )
-                    );
+                            )
+                        );
+                    }
+                    if (map.hasKey("base")) {
+                        properties.add(PropertyFactory.<%- camelize(prop.name) %>(Function.zoom((float)map.getDouble("base"), stopsArray)));
+                    }
+                    else {
+                        properties.add(PropertyFactory.<%- camelize(prop.name) %>(Function.zoom(stopsArray)));
+                    }
                 }
-                if (map.hasKey("base")) {
-                    properties.add(PropertyFactory.<%- camelize(prop.name) %>(Function.zoom((float)map.getDouble("base"), stopsArray)));
-                }
-                else {
-                    properties.add(PropertyFactory.<%- camelize(prop.name) %>(Function.zoom(stopsArray)));
-                }
+<% } -%>
             }
 <% } -%>
-        }
 <% } -%>
+        if (layerJson.hasKey("paint")) {
+            ReadableMap paintProperties = layerJson.getMap("paint");
+<% for (const prop of layer.paintProperties) {
+  propToJava(prop)
+} -%>
+        }
+<% if (layer.layoutProperties.length) { -%>
+        if (layerJson.hasKey("layout")) {
+            ReadableMap layoutProperties = layerJson.getMap("layout");
+<% for (const prop of layer.layoutProperties) {
+  propToJava(prop)
+} -%>
+        }
 <% } -%>
 
 <% if (layer.type === 'background') { -%>
