@@ -23,6 +23,9 @@
 #import "MGLStyleLayer+RCTAdditions.h"
 #import "UIColor+RCTAdditions.h"
 #import <CoreGraphics/CGGeometry.h>
+<% for (const layer of layers) { -%>
+#import <Mapbox/MGL<%- upperCamelize(layer.type) -%>StyleLayer.h>
+<% } -%>
 
 
 @implementation MGLStyleLayer (RCTAdditions)
@@ -32,9 +35,7 @@
 {
     NSString *idString = layerJson[@"id"];
     NSString *typeString = layerJson[@"type"];
-    // if (!idString || !typeString) {
-    //     return;
-    // }
+
 <% for (const layer of layers) { -%>
     if([typeString isEqualToString:@"<%- layer.type %>"]) {
         NSDictionary *paintProperties = layerJson[@"paint"];
@@ -50,6 +51,14 @@
 <% } -%>
 <% for (const prop of layer.properties) { -%>
         if ([<%- prop.propertyType %>Properties valueForKey:@"<%- prop.name %>"]) {
+<% if (prop.type === 'enum') { -%>
+            // create the NSString -> enum dictionary for later use
+            NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
+<% for (const val in prop.values) { -%>
+                @"<%- val %>": @(MGL<%- upperCamelize(prop.setterName || prop.name) %><%- upperCamelize(val) %>),
+<% } -%>
+            };
+<% } -%>
 <% if (prop['zoom-function'] === true) { -%>
             if ([[<%- prop.propertyType %>Properties valueForKey:@"<%- prop.name %>"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = <%- prop.propertyType %>Properties[@"<%- prop.name %>"][@"stops"];
@@ -57,6 +66,9 @@
                 for (id stop in stops) {
 <% if (prop.type === 'color') { -%>
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
+<% } else if (prop.type === 'enum') { -%>
+                    NSValue *value = [NSValue valueWithMGL<%- upperCamelize(prop.setterName || prop.name) %>:enumDictionary[<%- prop.propertyType %>Properties[@"<%- prop.name %>"]].integerValue];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
 <% } else if (prop.name.includes('offset') || prop.name.includes('translate')) { -%>
                     CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
@@ -77,6 +89,9 @@
 <% if (prop.type === 'color') { -%>
                 UIColor *color = [UIColor colorFromString:<%- prop.propertyType %>Properties[@"<%- prop.name %>"]];
                 MGLStyleValue *<%- camelize(prop.name) %>Value = [MGLStyleValue valueWithRawValue:color];
+<% } else if (prop.type === 'enum') { -%>
+                NSValue *value = [NSValue valueWithMGL<%- upperCamelize(prop.setterName || prop.name) %>:enumDictionary[<%- prop.propertyType %>Properties[@"<%- prop.name %>"]].integerValue];
+                MGLStyleValue *<%- camelize(prop.name) %>Value = [MGLStyleValue valueWithRawValue:value];
 <% } else if (prop.name.includes('offset') || prop.name.includes('translate')) { -%>
                 CGVector vector = CGVectorMake([<%- prop.propertyType %>Properties[@"<%- prop.name %>"][0] floatValue], [<%- prop.propertyType %>Properties[@"<%- prop.name %>"][1] floatValue]);
                 MGLStyleValue *<%- camelize(prop.name) %>Value = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
