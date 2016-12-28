@@ -741,6 +741,11 @@ public class ReactNativeMapboxGLView extends RelativeLayout implements
         _map.addSource(source);
     }
 
+    public Source getSource(String id) throws NoSuchSourceException {
+        if (_map == null) { return null; }
+        return _map.getSource(id);
+    }
+
     public void removeSource(String id) throws NoSuchSourceException {
         if (_map == null) { return; }
         _map.removeSource(id);
