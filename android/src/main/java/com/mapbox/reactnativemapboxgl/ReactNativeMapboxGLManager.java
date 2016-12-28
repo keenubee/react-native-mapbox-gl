@@ -194,7 +194,7 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
     public static final int COMMAND_QUERY_RENDERED_FEATURES = 9;
     public static final int COMMAND_SET_LAYER_VISIBILITY = 10;
     public static final int COMMAND_ADD_LAYER = 11;
-    public static final int COMMAND_ADD_SOURCE = 12;
+    public static final int COMMAND_SET_SOURCE = 12;
     public static final int COMMAND_REMOVE_LAYER = 13;
     public static final int COMMAND_REMOVE_SOURCE = 14;
 
@@ -214,7 +214,7 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
                 .put("queryRenderedFeatures", COMMAND_QUERY_RENDERED_FEATURES)
                 .put("setLayerVisibility", COMMAND_SET_LAYER_VISIBILITY)
                 .put("addLayer", COMMAND_ADD_LAYER)
-                .put("addSource", COMMAND_ADD_SOURCE)
+                .put("setSource", COMMAND_SET_SOURCE)
                 .put("removeLayer", COMMAND_REMOVE_LAYER)
                 .put("removeSource", COMMAND_REMOVE_SOURCE)
                 .build();
@@ -270,8 +270,8 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
             case COMMAND_ADD_LAYER:
                 addLayer(view, args.getMap(0), args.getString(1), args.getInt(2));
                 break;
-            case COMMAND_ADD_SOURCE:
-                addSource(view, args.getString(0), args.getMap(1), args.getBoolean(2), args.getInt(3));
+            case COMMAND_SET_SOURCE:
+                setSource(view, args.getString(0), args.getMap(1), args.getBoolean(2), args.getInt(3));
                 break;
             case COMMAND_REMOVE_LAYER:
                 removeLayer(view, args.getString(0), args.getInt(1));
@@ -460,10 +460,10 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
         fireCallback(callbackId, callbackArgs);
     }
 
-    public void addSource(ReactNativeMapboxGLView view, String id, ReadableMap sourceJson, boolean dataIsUrl, int callbackId) {
+    public void setSource(ReactNativeMapboxGLView view, String id, ReadableMap sourceJson, boolean dataIsUrl, int callbackId) {
         WritableArray callbackArgs = Arguments.createArray();
         if (!sourceJson.hasKey("type")) {
-          callbackArgs.pushString("addSource(): source must have a valid 'type' attribute.");
+          callbackArgs.pushString("setSource(): source must have a valid 'type' attribute.");
           fireCallback(callbackId, callbackArgs);
           return;
         }
@@ -471,12 +471,25 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
         String sourceType = sourceJson.getString("type");
         if (new String("geojson").equals(sourceType)) {
             if (!sourceJson.hasKey("data")) {
-                callbackArgs.pushString("addSource(): source of type 'geojson' must have a valid 'data' attribute.");
+                callbackArgs.pushString("setSource(): source of type 'geojson' must have a valid 'data' attribute.");
                 fireCallback(callbackId, callbackArgs);
                 return;
             }
             if (dataIsUrl == false) {
-                view.addSource(new GeoJsonSource(id, sourceJson.getString("data")));
+                String data = sourceJson.getString("data");
+                try {
+                    Source sourceFromMap = view.getSource(id);
+                    if (sourceFromMap == null) throw new NoSuchSourceException("setSource(): source does not exist");
+                    GeoJsonSource typecastSource = (GeoJsonSource) sourceFromMap;
+                    typecastSource.setGeoJson(data);
+                } catch (ClassCastException exception) {
+                    try {
+                        view.removeSource(id);
+                    } catch (NoSuchSourceException e) {}
+                    view.addSource(new GeoJsonSource(id, data));
+                } catch (NoSuchSourceException exception) {
+                    view.addSource(new GeoJsonSource(id, data));
+                }
             }
         }
 

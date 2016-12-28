@@ -36,7 +36,7 @@ const layers = Object.keys(spec.layer.type.values).filter((type) => type !== 'fi
   };
 });
 
-// const layerFactoryJava = ejs.compile(fs.readFileSync('../android/src/main/java/com/mapbox/reactnativemapboxgl/rnmgl-layer-factory.java.ejs', 'utf8'), {strict: true});
+const layerFactoryJava = ejs.compile(fs.readFileSync('../android/src/main/java/com/mapbox/reactnativemapboxgl/rnmgl-layer-factory.java.ejs', 'utf8'), {strict: true});
 const mglStyleLayer = ejs.compile(fs.readFileSync('../ios/RCTMapboxGL/mglstylelayer-rctadditions.m.ejs', 'utf8'), {strict: true});
-// fs.writeFileSync('../android/src/main/java/com/mapbox/reactnativemapboxgl/RNMGLLayerFactory.java', layerFactoryJava({layers: layers}), 'utf8');
+fs.writeFileSync('../android/src/main/java/com/mapbox/reactnativemapboxgl/RNMGLLayerFactory.java', layerFactoryJava({layers: layers}), 'utf8');
 fs.writeFileSync('../ios/RCTMapboxGL/MGLStyleLayer+RCTAdditions.m', mglStyleLayer({layers: layers}), 'utf8');
