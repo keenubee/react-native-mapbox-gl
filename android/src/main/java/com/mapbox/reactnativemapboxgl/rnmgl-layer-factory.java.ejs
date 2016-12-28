@@ -1,0 +1,236 @@
+<%
+  const layers = locals.layers;
+
+  function camelize (str) {
+    return str.replace(/-(.)/g, function (_, x) {
+      return x.toUpperCase();
+    });
+  }
+
+  function upperCamelize (str) {
+    return str.replace(/(?:^|-)(.)/g, function (_, x) {
+      return x.toUpperCase();
+    });
+  }
+
+  const typeToReadableType = {
+    number: 'Number',
+    color: 'String',
+    enum: 'String',
+    string: 'String',
+    boolean: 'Boolean',
+    array: 'Array',
+  }
+
+  const typeToReadableGetType = {
+    number: 'Double',
+    color: 'String',
+    enum: 'String',
+    string: 'String',
+    boolean: 'Boolean',
+    array: 'Array',
+  }
+
+  const typecast = {
+    number: '(float)',
+    color: '',
+    enum: '',
+    string: '',
+    boolean: '',
+    array: '',
+  }
+
+  const compFilterNames = {
+    '==': 'eq',
+    '!=': 'neq',
+    '>': 'gt',
+    '>=': 'gte',
+    '<': 'lt',
+    '<=': 'lte',
+  }
+
+  const existFilterNames = {
+    'has': 'has',
+    '!has': 'notHas',
+  }
+
+  const membFilterNames = {
+    'in': 'in',
+    '!in': 'notIn',
+  }
+
+  const combinationFilterNames = ['all', 'any', 'none']
+-%>
+// This file is generated. See scripts/generate-layer-factory.js
+package com.mapbox.reactnativemapboxgl;
+
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableType;
+import com.mapbox.mapboxsdk.style.layers.*;
+import com.mapbox.mapboxsdk.style.sources.*;
+
+import java.lang.Float;
+import java.util.ArrayList;
+
+public class RNMGLLayerFactory {
+
+    public static Layer layerFromJson(ReadableMap layerJson) {
+        String layerType = layerJson.getString("type");
+
+<% for (const layer of layers) { -%>
+        if (layerType.equals("<%- layer.type %>")) {
+            return <%- camelize(layer.type) %>LayerFromJson(layerJson);
+        }
+<% } -%>
+        return null;
+    }
+
+    static Float[] ReadableArrToNumberArr(ReadableArray readArr, int startValue) {
+        Float[] arr = new Float[readArr.size()];
+        for (int i = startValue; i < readArr.size(); i++) {
+            arr[i] = (float)readArr.getDouble(i);
+        }
+        return arr;
+    }
+
+    static String[] ReadableArrToStringArr(ReadableArray readArr, int startValue) {
+        String[] arr = new String[readArr.size()];
+        for (int i = startValue; i < readArr.size(); i++) {
+            arr[i] = readArr.getString(i);
+        }
+        return arr;
+    }
+
+    static Boolean[] ReadableArrToBooleanArr(ReadableArray readArr, int startValue) {
+        Boolean[] arr = new Boolean[readArr.size()];
+        for (int i = startValue; i < readArr.size(); i++) {
+            arr[i] = readArr.getBoolean(i);
+        }
+        return arr;
+    }
+
+    static Filter.Statement filterJsonToFilter(ReadableArray filterJson) {
+        String filterType = filterJson.getString(0);
+<% for (const filterName of combinationFilterNames) { -%>
+        if (filterType.equals("<%- filterName %>")) {
+            Filter.Statement[] filters = new Filter.Statement[filterJson.size() - 1];
+            for (int i = 1; i < filterJson.size(); i++) {
+                filters[i] = filterJsonToFilter(filterJson.getArray(i));
+            }
+            return Filter.<%- filterName %>(filters);
+        }
+<% } -%>
+<% for (const filterName in existFilterNames) { -%>
+        if (filterType.equals("<%- filterName %>")) {
+            return Filter.<%- existFilterNames[filterName] %>(filterJson.getString(1));
+        }
+<% } -%>
+<% for (const filterName in membFilterNames) { -%>
+        if (filterType.equals("<%- filterName %>")) {
+            if (filterJson.getType(2) == ReadableType.Number) {
+                return Filter.<%- membFilterNames[filterName] %>(filterJson.getString(1), (Object[])ReadableArrToNumberArr(filterJson, 2));
+            }
+            if (filterJson.getType(2) == ReadableType.String) {
+                return Filter.<%- membFilterNames[filterName] %>(filterJson.getString(1), (Object[])ReadableArrToStringArr(filterJson, 2));
+            }
+            if (filterJson.getType(2) == ReadableType.Boolean) {
+                return Filter.<%- membFilterNames[filterName] %>(filterJson.getString(1), (Object[])ReadableArrToBooleanArr(filterJson, 2));
+            }
+        }
+<% } -%>
+<% for (const filterName in compFilterNames) { -%>
+        if (filterType.equals("<%- filterName %>")) {
+            if (filterJson.getType(2) == ReadableType.Number) {
+                return Filter.<%- compFilterNames[filterName] %>(filterJson.getString(1), (float)filterJson.getDouble(2));
+            }
+            if (filterJson.getType(2) == ReadableType.String) {
+                return Filter.<%- compFilterNames[filterName] %>(filterJson.getString(1), filterJson.getString(2));
+            }
+            if (filterJson.getType(2) == ReadableType.Boolean) {
+                return Filter.<%- compFilterNames[filterName] %>(filterJson.getString(1), filterJson.getBoolean(2));
+            }
+        }
+<% } -%>
+        return null;
+    }
+
+<% for (const layer of layers) { -%>
+    static <%- upperCamelize(layer.type) %>Layer <%- camelize(layer.type) %>LayerFromJson(ReadableMap layerJson) {
+        ReadableMap paintProperties = layerJson.getMap("paint");
+<% if (layer.layoutProperties.length) { -%>
+        ReadableMap layoutProperties = layerJson.getMap("layout");
+<% } -%>
+        ArrayList<Property> properties = new ArrayList<Property>();
+
+<% for (const prop of layer.properties) { -%>
+<% if (typeToReadableType.hasOwnProperty(prop.type)) { -%>
+        if (<%- prop.propertyType %>Properties.hasKey("<%- prop.name %>")) {
+            if (<%- prop.propertyType %>Properties.getType("<%- prop.name %>") == ReadableType.<%- typeToReadableType[prop.type] %>) {
+                properties.add(PropertyFactory.<%- camelize(prop.name) %>(
+<% if (prop.type === 'array') { -%>
+                    ReadableArrTo<%- typeToReadableType[prop.value] %>Arr(<%- prop.propertyType %>Properties.getArray("<%- prop.name %>"), 0)
+<% } else { -%>
+                    <%- typecast[prop.type] %><%- prop.propertyType %>Properties.get<%- typeToReadableGetType[prop.type] %>("<%- prop.name %>")
+<% } -%>
+                ));
+            }
+<% if (prop['zoom-function'] === true) { -%>
+            else if (<%- prop.propertyType %>Properties.getType("<%- prop.name %>") == ReadableType.Map) {
+                ReadableMap map = <%- prop.propertyType %>Properties.getMap("<%- prop.name %>");
+                ReadableArray stops = map.getArray("stops");
+                Function.Stop[] stopsArray = new Function.Stop[stops.size()];
+                for (int i = 0; i < stops.size(); i++) {
+                    stopsArray[i] = Function.stop(
+                        (float)stops.getArray(i).getDouble(0),
+                        PropertyFactory.<%- camelize(prop.name) %>(
+<% if (prop.type === 'array') { -%>
+                            ReadableArrTo<%- typeToReadableType[prop.value] %>Arr(stops.getArray(i).getArray(1), 0)
+<% } else { -%>
+                            <%- typecast[prop.type] %>stops.getArray(i).get<%- typeToReadableGetType[prop.type] %>(1)
+<% } -%>
+                        )
+                    );
+                }
+                if (map.hasKey("base")) {
+                    properties.add(PropertyFactory.<%- camelize(prop.name) %>(Function.zoom((float)map.getDouble("base"), stopsArray)));
+                }
+                else {
+                    properties.add(PropertyFactory.<%- camelize(prop.name) %>(Function.zoom(stopsArray)));
+                }
+            }
+<% } -%>
+        }
+<% } -%>
+<% } -%>
+
+<% if (layer.type === 'background') { -%>
+        <%- upperCamelize(layer.type) %>Layer layer = new <%- upperCamelize(layer.type) %>Layer(layerJson.getString("id"))
+            .withProperties(properties.toArray(new Property[0]));
+<% } else { -%>
+        <%- upperCamelize(layer.type) %>Layer layer = new <%- upperCamelize(layer.type) %>Layer(layerJson.getString("id"), layerJson.getString("source"))
+            .withProperties(properties.toArray(new Property[0]));
+
+        if (layerJson.hasKey("source-layer")) {
+            layer.setSourceLayer(layerJson.getString("source-layer"));
+        }
+<% } -%>
+<% if (layer.type !== 'background' && layer.type !== 'raster') { -%>
+        if (layerJson.hasKey("filter")) {
+            ReadableArray filterJson = layerJson.getArray("filter");
+            layer.setFilter(filterJsonToFilter(filterJson));
+        }
+<% } -%>
+        if (layerJson.hasKey("minzoom")) {
+            layer.setMinZoom((float)layerJson.getDouble("minzoom"));
+        }
+        if (layerJson.hasKey("maxzoom")) {
+            layer.setMaxZoom((float)layerJson.getDouble("maxzoom"));
+        }
+
+        return layer;
+    }
+
+<% } -%>
+
+}

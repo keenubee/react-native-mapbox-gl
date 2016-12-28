@@ -7,6 +7,7 @@ import com.facebook.react.bridge.JSApplicationIllegalArgumentException;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.MapBuilder;
@@ -24,7 +25,9 @@ import com.mapbox.mapboxsdk.style.layers.*;
 import com.mapbox.mapboxsdk.style.sources.*;
 import com.mapbox.services.commons.geojson.Feature;
 
+import java.lang.Float;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -190,6 +193,10 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
     public static final int COMMAND_SPLICE_ANNOTATIONS = 8;
     public static final int COMMAND_QUERY_RENDERED_FEATURES = 9;
     public static final int COMMAND_SET_LAYER_VISIBILITY = 10;
+    public static final int COMMAND_ADD_LAYER = 11;
+    public static final int COMMAND_ADD_SOURCE = 12;
+    public static final int COMMAND_REMOVE_LAYER = 13;
+    public static final int COMMAND_REMOVE_SOURCE = 14;
 
     @Override
     public
@@ -206,6 +213,10 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
                 .put("spliceAnnotations", COMMAND_SPLICE_ANNOTATIONS)
                 .put("queryRenderedFeatures", COMMAND_QUERY_RENDERED_FEATURES)
                 .put("setLayerVisibility", COMMAND_SET_LAYER_VISIBILITY)
+                .put("addLayer", COMMAND_ADD_LAYER)
+                .put("addSource", COMMAND_ADD_SOURCE)
+                .put("removeLayer", COMMAND_REMOVE_LAYER)
+                .put("removeSource", COMMAND_REMOVE_SOURCE)
                 .build();
     }
 
@@ -255,6 +266,18 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
                 break;
             case COMMAND_SET_LAYER_VISIBILITY:
                 setLayerVisibility(view, args.getString(0), args.getString(1), args.getInt(2));
+                break;
+            case COMMAND_ADD_LAYER:
+                addLayer(view, args.getMap(0), args.getString(1), args.getInt(2));
+                break;
+            case COMMAND_ADD_SOURCE:
+                addSource(view, args.getString(0), args.getMap(1), args.getBoolean(2), args.getInt(3));
+                break;
+            case COMMAND_REMOVE_LAYER:
+                removeLayer(view, args.getString(0), args.getInt(1));
+                break;
+            case COMMAND_REMOVE_SOURCE:
+                removeSource(view, args.getString(0), args.getInt(1));
                 break;
             default:
                 throw new JSApplicationIllegalArgumentException("Invalid commandId " + commandId + " sent to " + getClass().getSimpleName());
@@ -403,6 +426,72 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
             callbackArgs.pushString(String.format("setLayerVisibility(): layer '%s' does not exist.", id));
             fireCallback(callbackId, callbackArgs);
             return;
+        }
+        callbackArgs.pushString(null); // push null error message
+        fireCallback(callbackId, callbackArgs);
+    }
+
+    public void addLayer(ReactNativeMapboxGLView view, ReadableMap layerJson, String before, int callbackId) {
+        WritableArray callbackArgs = Arguments.createArray();
+        if (!layerJson.hasKey("type") || !layerJson.hasKey("id")) {
+            callbackArgs.pushString("addLayer(): layer must have valid 'id' and 'type' attributes.");
+            fireCallback(callbackId, callbackArgs);
+            return;
+        }
+
+        // TODO: more validation - e.g. check that all layers besides background have a valid source attribute
+        Layer layer = RNMGLLayerFactory.layerFromJson(layerJson);
+        view.addLayer(layer, before);
+
+        callbackArgs.pushString(null); // push null error message
+        fireCallback(callbackId, callbackArgs);
+    }
+
+    public void removeLayer(ReactNativeMapboxGLView view, String id, int callbackId) {
+        WritableArray callbackArgs = Arguments.createArray();
+        try {
+          view.removeLayer(id);
+        } catch (NoSuchLayerException e) {
+          callbackArgs.pushString(String.format("removeLayer(): layer '%s' does not exist.", id));
+          fireCallback(callbackId, callbackArgs);
+          return;
+        }
+        callbackArgs.pushString(null); // push null error message
+        fireCallback(callbackId, callbackArgs);
+    }
+
+    public void addSource(ReactNativeMapboxGLView view, String id, ReadableMap sourceJson, boolean dataIsUrl, int callbackId) {
+        WritableArray callbackArgs = Arguments.createArray();
+        if (!sourceJson.hasKey("type")) {
+          callbackArgs.pushString("addSource(): source must have a valid 'type' attribute.");
+          fireCallback(callbackId, callbackArgs);
+          return;
+        }
+
+        String sourceType = sourceJson.getString("type");
+        if (new String("geojson").equals(sourceType)) {
+            if (!sourceJson.hasKey("data")) {
+                callbackArgs.pushString("addSource(): source of type 'geojson' must have a valid 'data' attribute.");
+                fireCallback(callbackId, callbackArgs);
+                return;
+            }
+            if (dataIsUrl == false) {
+                view.addSource(new GeoJsonSource(id, sourceJson.getString("data")));
+            }
+        }
+
+        callbackArgs.pushString(null); // push null error message
+        fireCallback(callbackId, callbackArgs);
+    }
+
+    public void removeSource(ReactNativeMapboxGLView view, String id, int callbackId) {
+        WritableArray callbackArgs = Arguments.createArray();
+        try {
+          view.removeSource(id);
+        } catch (NoSuchSourceException e) {
+          callbackArgs.pushString(String.format("removeSource(): layer '%s' does not exist.", id));
+          fireCallback(callbackId, callbackArgs);
+          return;
         }
         callbackArgs.pushString(null); // push null error message
         fireCallback(callbackId, callbackArgs);
