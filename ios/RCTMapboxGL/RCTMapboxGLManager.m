@@ -629,7 +629,7 @@ RCT_EXPORT_METHOD(setLayerVisibility:(nonnull NSNumber *)reactTag
 
 RCT_EXPORT_METHOD(addLayer:(nonnull NSNumber *)reactTag
                   layerJson:(nonnull NSDictionary*)layerJson
-                  before:(nonnull NSString*)previousLayerId
+                  before:(NSString*)previousLayerId
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
@@ -637,6 +637,11 @@ RCT_EXPORT_METHOD(addLayer:(nonnull NSNumber *)reactTag
       RCTMapboxGL *mapView = viewRegistry[reactTag];
       if ([mapView isKindOfClass:[RCTMapboxGL class]]) {
           MGLStyleLayer *layer = [MGLStyleLayer fromJson:layerJson withMap:mapView];
+          if (!previousLayerId) {
+              [mapView addLayer:layer];
+              resolve(nil);
+              return;
+          }
           MGLStyleLayer *previousLayer = [mapView styleLayerWithIdentifier:previousLayerId];
           if (!previousLayer) {
               [mapView addLayer:layer];
