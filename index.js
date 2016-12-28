@@ -236,12 +236,46 @@ class MapView extends Component {
     return promise;
   }
   addLayer(layer, before, callback) {
+    // the Android bridge uses a callback, so wrap it in a promise
+    if (Platform.OS === 'android') {
+      const promise = new Promise((resolve, reject) => {
+        MapboxGLManager.addLayer(findNodeHandle(this), layer, before, (err) => {
+          // cast error string to Error like on iOS
+          const _err = err && new Error(err)
+          callback && callback(_err);
+          if (_err) {
+            reject(_err);
+          } else {
+            resolve();
+          }
+        });
+      })
+      return promise;
+    }
+
     // the iOS bridge returns a promise, so bind callback to it
     const promise = MapboxGLManager.addLayer(findNodeHandle(this), layer, before)
     bindCallbackToPromise(callback, promise);
     return promise;
   }
   removeLayer(id, callback) {
+    // the Android bridge uses a callback, so wrap it in a promise
+    if (Platform.OS === 'android') {
+      const promise = new Promise((resolve, reject) => {
+        MapboxGLManager.removeLayer(findNodeHandle(this), id, (err) => {
+          // cast error string to Error like on iOS
+          const _err = err && new Error(err)
+          callback && callback(_err);
+          if (_err) {
+            reject(_err);
+          } else {
+            resolve();
+          }
+        });
+      })
+      return promise;
+    }
+
     // the iOS bridge returns a promise, so bind callback to it
     const promise = MapboxGLManager.removeLayer(findNodeHandle(this), id)
     bindCallbackToPromise(callback, promise);
@@ -256,12 +290,46 @@ class MapView extends Component {
       dataIsUrl = false
     }
 
+    // the Android bridge uses a callback, so wrap it in a promise
+    if (Platform.OS === 'android') {
+      const promise = new Promise((resolve, reject) => {
+        MapboxGLManager.setSource(findNodeHandle(this), id, newSource, dataIsUrl, (err) => {
+          // cast error string to Error like on iOS
+          const _err = err && new Error(err)
+          callback && callback(_err);
+          if (_err) {
+            reject(_err);
+          } else {
+            resolve();
+          }
+        });
+      })
+      return promise;
+    }
+
     // the iOS bridge returns a promise, so bind callback to it
     const promise = MapboxGLManager.setSource(findNodeHandle(this), id, newSource, dataIsUrl)
     bindCallbackToPromise(callback, promise);
     return promise;
   }
   removeSource(id, callback) {
+    // the Android bridge uses a callback, so wrap it in a promise
+    if (Platform.OS === 'android') {
+      const promise = new Promise((resolve, reject) => {
+        MapboxGLManager.removeSource(findNodeHandle(this), id, (err) => {
+          // cast error string to Error like on iOS
+          const _err = err && new Error(err)
+          callback && callback(_err);
+          if (_err) {
+            reject(_err);
+          } else {
+            resolve();
+          }
+        });
+      })
+      return promise;
+    }
+
     // the iOS bridge returns a promise, so bind callback to it
     const promise = MapboxGLManager.removeSource(findNodeHandle(this), id)
     bindCallbackToPromise(callback, promise);
