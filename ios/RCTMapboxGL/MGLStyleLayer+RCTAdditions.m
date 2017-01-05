@@ -2003,10 +2003,10 @@
         return [NSPredicate predicateWithFormat:@"%K >= %@", filterJson[1], filterJson[2]];
     }
     if ([filterType isEqualToString:@"has"]) {
-        return [NSPredicate predicateWithFormat:@"%K == %@", filterJson[1], nil];
+        return [NSPredicate predicateWithFormat:@"%K != %@", filterJson[1], nil];
     }
     if ([filterType isEqualToString:@"!has"]) {
-        return [NSPredicate predicateWithFormat:@"%K != %@", filterJson[1], nil];
+        return [NSPredicate predicateWithFormat:@"%K == %@", filterJson[1], nil];
     }
     if ([filterType isEqualToString:@"in"]) {
         NSMutableArray *elementsArray = [NSMutableArray arrayWithArray:filterJson];
