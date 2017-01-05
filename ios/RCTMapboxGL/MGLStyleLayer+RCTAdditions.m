@@ -22,6 +22,11 @@
     NSString *idString = layerJson[@"id"];
     NSString *typeString = layerJson[@"type"];
 
+    NSString *ref = layerJson[@"ref"];
+    if(ref) {
+        [NSException raise:@"Unsupported layer format" format:@"cannot use property 'ref' in layer '%@'", idString];
+    }
+
     if([typeString isEqualToString:@"fill"]) {
         NSDictionary *paintProperties = layerJson[@"paint"];
         NSString *sourceString = layerJson[@"source"];

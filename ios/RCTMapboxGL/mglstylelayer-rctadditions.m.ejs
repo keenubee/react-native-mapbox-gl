@@ -36,6 +36,11 @@
     NSString *idString = layerJson[@"id"];
     NSString *typeString = layerJson[@"type"];
 
+    NSString *ref = layerJson[@"ref"];
+    if(ref) {
+        [NSException raise:@"Unsupported layer format" format:@"cannot use property 'ref' in layer '%@'", idString];
+    }
+
 <% for (const layer of layers) { -%>
     if([typeString isEqualToString:@"<%- layer.type %>"]) {
         NSDictionary *paintProperties = layerJson[@"paint"];
