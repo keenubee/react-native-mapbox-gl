@@ -37,25 +37,28 @@ public class RNMGLLayerFactory {
     }
 
     static Float[] ReadableArrToNumberArr(ReadableArray readArr, int startValue) {
-        Float[] arr = new Float[readArr.size()];
-        for (int i = startValue; i < readArr.size(); i++) {
-            arr[i] = (float)readArr.getDouble(i);
+        int arrSize = readArr.size() - startValue;
+        Float[] arr = new Float[arrSize];
+        for (int i = 0; i < arrSize; i++) {
+            arr[i] = (float)readArr.getDouble(i+startValue);
         }
         return arr;
     }
 
     static String[] ReadableArrToStringArr(ReadableArray readArr, int startValue) {
-        String[] arr = new String[readArr.size()];
-        for (int i = startValue; i < readArr.size(); i++) {
-            arr[i] = readArr.getString(i);
+        int arrSize = readArr.size() - startValue;
+        String[] arr = new String[arrSize];
+        for (int i = 0; i < arrSize; i++) {
+            arr[i] = readArr.getString(i+startValue);
         }
         return arr;
     }
 
     static Boolean[] ReadableArrToBooleanArr(ReadableArray readArr, int startValue) {
-        Boolean[] arr = new Boolean[readArr.size()];
-        for (int i = startValue; i < readArr.size(); i++) {
-            arr[i] = readArr.getBoolean(i);
+        int arrSize = readArr.size() - startValue;
+        Boolean[] arr = new Boolean[arrSize];
+        for (int i = 0; i < arrSize; i++) {
+            arr[i] = readArr.getBoolean(i+startValue);
         }
         return arr;
     }
@@ -63,23 +66,26 @@ public class RNMGLLayerFactory {
     static Filter.Statement filterJsonToFilter(ReadableArray filterJson) {
         String filterType = filterJson.getString(0);
         if (filterType.equals("all")) {
-            Filter.Statement[] filters = new Filter.Statement[filterJson.size() - 1];
-            for (int i = 1; i < filterJson.size(); i++) {
-                filters[i] = filterJsonToFilter(filterJson.getArray(i));
+            int arrSize = filterJson.size() - 1;
+            Filter.Statement[] filters = new Filter.Statement[arrSize];
+            for (int i = 0; i < arrSize; i++) {
+                filters[i] = filterJsonToFilter(filterJson.getArray(i+1));
             }
             return Filter.all(filters);
         }
         if (filterType.equals("any")) {
-            Filter.Statement[] filters = new Filter.Statement[filterJson.size() - 1];
-            for (int i = 1; i < filterJson.size(); i++) {
-                filters[i] = filterJsonToFilter(filterJson.getArray(i));
+            int arrSize = filterJson.size() - 1;
+            Filter.Statement[] filters = new Filter.Statement[arrSize];
+            for (int i = 0; i < arrSize; i++) {
+                filters[i] = filterJsonToFilter(filterJson.getArray(i+1));
             }
             return Filter.any(filters);
         }
         if (filterType.equals("none")) {
-            Filter.Statement[] filters = new Filter.Statement[filterJson.size() - 1];
-            for (int i = 1; i < filterJson.size(); i++) {
-                filters[i] = filterJsonToFilter(filterJson.getArray(i));
+            int arrSize = filterJson.size() - 1;
+            Filter.Statement[] filters = new Filter.Statement[arrSize];
+            for (int i = 0; i < arrSize; i++) {
+                filters[i] = filterJsonToFilter(filterJson.getArray(i+1));
             }
             return Filter.none(filters);
         }
