@@ -2013,7 +2013,7 @@
         NSMutableArray *elementsArray = [NSMutableArray arrayWithArray:filterJson];
         [elementsArray removeObjectAtIndex:0];
         [elementsArray removeObjectAtIndex:0];
-        return [NSPredicate predicateWithFormat:@"%K !IN %@", filterJson[1], elementsArray];
+        return [NSPredicate predicateWithFormat:@"!(%K IN %@)", filterJson[1], elementsArray];
     }
     if ([filterType isEqualToString:@"all"]) {
         NSMutableArray *filters = [NSMutableArray arrayWithArray:filterJson];
