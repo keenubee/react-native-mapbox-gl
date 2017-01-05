@@ -3,9 +3,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <math.h>
 #import "UIView+React.h"
 
 @interface UIColor (RCTAdditions)
 + (UIColor *)colorFromString:(NSString *)string;
-+ (UIColor *)colorFromHexString:(NSString *)hexString;
++ (UIColor *)colorWithRGBAString:(NSString *)rgbaString;
++ (UIColor *)colorWithHSLAString:(NSString *)hslaString;
++ (UIColor *)colorWithHexString:(NSString *)hexString;
 @end
