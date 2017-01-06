@@ -112,7 +112,6 @@
 <% if (layer.type !== 'background' && layer.type !== 'raster') { -%>
         NSString *sourceLayer = layerJson[@"source-layer"];
         NSArray *filter = layerJson[@"filter"];
-
         if (sourceLayer) {
             [layer setSourceLayerIdentifier:sourceLayer];
         }
@@ -120,6 +119,15 @@
             [layer setPredicate:[layer predicateFromJson:filter]];
         }
 <% } -%>
+
+        NSNumber *minzoom = layerJson[@"minzoom"];
+        NSNumber *maxzoom = layerJson[@"maxzoom"];
+        if (minzoom) {
+            [layer setMinimumZoomLevel:[minzoom floatValue]];
+        }
+        if (maxzoom) {
+            [layer setMaximumZoomLevel:[maxzoom floatValue]];
+        }
         return layer;
     }
 <% } -%>

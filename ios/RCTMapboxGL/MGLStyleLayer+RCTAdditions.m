@@ -185,12 +185,20 @@
         }
         NSString *sourceLayer = layerJson[@"source-layer"];
         NSArray *filter = layerJson[@"filter"];
-
         if (sourceLayer) {
             [layer setSourceLayerIdentifier:sourceLayer];
         }
         if (filter) {
             [layer setPredicate:[layer predicateFromJson:filter]];
+        }
+
+        NSNumber *minzoom = layerJson[@"minzoom"];
+        NSNumber *maxzoom = layerJson[@"maxzoom"];
+        if (minzoom) {
+            [layer setMinimumZoomLevel:[minzoom floatValue]];
+        }
+        if (maxzoom) {
+            [layer setMaximumZoomLevel:[maxzoom floatValue]];
         }
         return layer;
     }
@@ -510,12 +518,20 @@
         }
         NSString *sourceLayer = layerJson[@"source-layer"];
         NSArray *filter = layerJson[@"filter"];
-
         if (sourceLayer) {
             [layer setSourceLayerIdentifier:sourceLayer];
         }
         if (filter) {
             [layer setPredicate:[layer predicateFromJson:filter]];
+        }
+
+        NSNumber *minzoom = layerJson[@"minzoom"];
+        NSNumber *maxzoom = layerJson[@"maxzoom"];
+        if (minzoom) {
+            [layer setMinimumZoomLevel:[minzoom floatValue]];
+        }
+        if (maxzoom) {
+            [layer setMaximumZoomLevel:[maxzoom floatValue]];
         }
         return layer;
     }
@@ -1583,12 +1599,20 @@
         }
         NSString *sourceLayer = layerJson[@"source-layer"];
         NSArray *filter = layerJson[@"filter"];
-
         if (sourceLayer) {
             [layer setSourceLayerIdentifier:sourceLayer];
         }
         if (filter) {
             [layer setPredicate:[layer predicateFromJson:filter]];
+        }
+
+        NSNumber *minzoom = layerJson[@"minzoom"];
+        NSNumber *maxzoom = layerJson[@"maxzoom"];
+        if (minzoom) {
+            [layer setMinimumZoomLevel:[minzoom floatValue]];
+        }
+        if (maxzoom) {
+            [layer setMaximumZoomLevel:[maxzoom floatValue]];
         }
         return layer;
     }
@@ -1756,12 +1780,20 @@
         }
         NSString *sourceLayer = layerJson[@"source-layer"];
         NSArray *filter = layerJson[@"filter"];
-
         if (sourceLayer) {
             [layer setSourceLayerIdentifier:sourceLayer];
         }
         if (filter) {
             [layer setPredicate:[layer predicateFromJson:filter]];
+        }
+
+        NSNumber *minzoom = layerJson[@"minzoom"];
+        NSNumber *maxzoom = layerJson[@"maxzoom"];
+        if (minzoom) {
+            [layer setMinimumZoomLevel:[minzoom floatValue]];
+        }
+        if (maxzoom) {
+            [layer setMaximumZoomLevel:[maxzoom floatValue]];
         }
         return layer;
     }
@@ -1910,6 +1942,15 @@
                 [layer setRasterFadeDuration:rasterFadeDurationValue];
             }
         }
+
+        NSNumber *minzoom = layerJson[@"minzoom"];
+        NSNumber *maxzoom = layerJson[@"maxzoom"];
+        if (minzoom) {
+            [layer setMinimumZoomLevel:[minzoom floatValue]];
+        }
+        if (maxzoom) {
+            [layer setMaximumZoomLevel:[maxzoom floatValue]];
+        }
         return layer;
     }
     if([typeString isEqualToString:@"background"]) {
@@ -1975,6 +2016,15 @@
                 MGLStyleValue *backgroundOpacityValue = [MGLStyleValue valueWithRawValue:paintProperties[@"background-opacity"]];
                 [layer setBackgroundOpacity:backgroundOpacityValue];
             }
+        }
+
+        NSNumber *minzoom = layerJson[@"minzoom"];
+        NSNumber *maxzoom = layerJson[@"maxzoom"];
+        if (minzoom) {
+            [layer setMinimumZoomLevel:[minzoom floatValue]];
+        }
+        if (maxzoom) {
+            [layer setMaximumZoomLevel:[maxzoom floatValue]];
         }
         return layer;
     }
