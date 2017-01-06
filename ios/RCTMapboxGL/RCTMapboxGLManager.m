@@ -715,6 +715,31 @@ RCT_EXPORT_METHOD(setSource:(nonnull NSNumber *)reactTag
                   reject(@"invalid_arguments", @"setSource(): 'data' is required for type 'geojson'", nil);
                   return;
               }
+              NSNumber *cluster = sourceJson[@"cluster"];
+              NSNumber *clusterRadius = sourceJson[@"clusterRadius"];
+              NSNumber *clusterMaxZoom = sourceJson[@"clusterMaxZoom"];
+              NSNumber *maxzoom = sourceJson[@"maxzoom"];
+              NSNumber *buffer = sourceJson[@"buffer"];
+              NSNumber *tolerance = sourceJson[@"tolerance"];
+              NSMutableDictionary *options = [NSMutableDictionary dictionaryWithCapacity:6];
+              if (cluster) {
+                  [options setObject:cluster forKey:MGLShapeSourceOptionClustered];
+              }
+              if (clusterRadius) {
+                  [options setObject:clusterRadius forKey:MGLShapeSourceOptionClusterRadius];
+              }
+              if (clusterMaxZoom) {
+                  [options setObject:clusterMaxZoom forKey:MGLShapeSourceOptionMaximumZoomLevelForClustering];
+              }
+              if (maxzoom) {
+                  [options setObject:maxzoom forKey:MGLShapeSourceOptionMaximumZoomLevel];
+              }
+              if (buffer) {
+                  [options setObject:buffer forKey:MGLShapeSourceOptionBuffer];
+              }
+              if (tolerance) {
+                  [options setObject:tolerance forKey:MGLShapeSourceOptionSimplificationTolerance];
+              }
               if (!dataIsUrl) {
                   NSError *encodeError = nil;
                   NSData *data = [dataString dataUsingEncoding:NSUTF8StringEncoding];
@@ -723,7 +748,7 @@ RCT_EXPORT_METHOD(setSource:(nonnull NSNumber *)reactTag
                       reject(@"invalid_arguments", @"setSource(): invalid geoJson data", nil);
                   }
                   if (!sourceFromMap) {
-                      MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:id shape:sourceShape options:nil];
+                      MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:id shape:sourceShape options:options];
                       [mapView addSource:source];
                       resolve(nil);
                       return;
@@ -735,7 +760,7 @@ RCT_EXPORT_METHOD(setSource:(nonnull NSNumber *)reactTag
                   }
               } else {
                   if (!sourceFromMap) {
-                      MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:id URL:dataString options:nil];
+                      MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:id URL:dataString options:options];
                       [mapView addSource:source];
                       resolve(nil);
                       return;
