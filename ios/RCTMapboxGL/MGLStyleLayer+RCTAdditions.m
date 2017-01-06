@@ -13,18 +13,27 @@
 #import <Mapbox/MGLRasterStyleLayer.h>
 #import <Mapbox/MGLBackgroundStyleLayer.h>
 
+NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorDomain";
+
 
 @implementation MGLStyleLayer (RCTAdditions)
 
 + (MGLStyleLayer *)styleLayerWithJson:(nonnull NSDictionary *)layerJson
                    mapView:(RCTMapboxGL *)mapView
+                   error:(NSError **)errorPtr
 {
     NSString *idString = layerJson[@"id"];
     NSString *typeString = layerJson[@"type"];
 
     NSString *ref = layerJson[@"ref"];
-    if(ref) {
-        [NSException raise:@"Unsupported layer format" format:@"addLayer(): cannot use property 'ref' in layer '%@'", idString];
+    if (ref) {
+        if (errorPtr) {
+            *errorPtr = [NSError errorWithDomain:RCTMapboxGLErrorDomain
+                                 code:1002
+                                 userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"addLayer(): cannot use property 'ref' in layer '%@'", idString]}
+            ];
+        }
+        return nil;
     }
 
     if([typeString isEqualToString:@"fill"]) {
@@ -2032,7 +2041,12 @@
         }
         return layer;
     }
-    [NSException raise:@"Unsupported layer format" format:@"addLayer(): cannot add layer of type '%@'", typeString];
+    if (errorPtr) {
+        *errorPtr = [NSError errorWithDomain:RCTMapboxGLErrorDomain
+                             code:1001
+                             userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"addLayer(): cannot add layer of type '%@'", typeString]}
+        ];
+    }
     return nil;
 }
 

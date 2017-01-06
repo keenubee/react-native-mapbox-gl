@@ -651,7 +651,12 @@ RCT_EXPORT_METHOD(addLayer:(nonnull NSNumber *)reactTag
   [_bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *, RCTMapboxGL *> *viewRegistry) {
       RCTMapboxGL *mapView = viewRegistry[reactTag];
       if ([mapView isKindOfClass:[RCTMapboxGL class]]) {
-          MGLStyleLayer *layer = [MGLStyleLayer styleLayerWithJson:layerJson mapView:mapView];
+          NSError *error = nil;
+          MGLStyleLayer *layer = [MGLStyleLayer styleLayerWithJson:layerJson mapView:mapView error:&error];
+          if (!layer) {
+              reject(@"invalid_arguments", [error localizedDescription], nil);
+              return;
+          }
           if (!previousLayerId) {
               [mapView addLayer:layer];
               resolve(nil);
@@ -711,7 +716,7 @@ RCT_EXPORT_METHOD(setSource:(nonnull NSNumber *)reactTag
                   return;
               }
               if (!dataIsUrl) {
-                  NSError *encodeError;
+                  NSError *encodeError = nil;
                   NSData *data = [dataString dataUsingEncoding:NSUTF8StringEncoding];
                   MGLShape *sourceShape = [MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:&encodeError];
                   if (!sourceShape) {
