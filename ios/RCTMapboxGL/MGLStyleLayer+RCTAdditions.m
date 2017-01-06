@@ -24,7 +24,7 @@
 
     NSString *ref = layerJson[@"ref"];
     if(ref) {
-        [NSException raise:@"Unsupported layer format" format:@"cannot use property 'ref' in layer '%@'", idString];
+        [NSException raise:@"Unsupported layer format" format:@"addLayer(): cannot use property 'ref' in layer '%@'", idString];
     }
 
     if([typeString isEqualToString:@"fill"]) {
@@ -2032,6 +2032,7 @@
         }
         return layer;
     }
+    [NSException raise:@"Unsupported layer format" format:@"addLayer(): cannot add layer of type '%@'", typeString];
     return nil;
 }
 

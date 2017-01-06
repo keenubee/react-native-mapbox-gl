@@ -704,15 +704,19 @@ RCT_EXPORT_METHOD(setSource:(nonnull NSNumber *)reactTag
               return;
           }
           if([typeString isEqualToString:@"geojson"]) {
-              NSData *data = [sourceJson[@"data"] dataUsingEncoding:NSUTF8StringEncoding];
-              if (!data) {
+              MGLSource *sourceFromMap = [mapView styleSourceWithIdentifier:id];
+              NSString *dataString = sourceJson[@"data"];
+              if (!dataString) {
                   reject(@"invalid_arguments", @"setSource(): 'data' is required for type 'geojson'", nil);
                   return;
               }
               if (!dataIsUrl) {
                   NSError *encodeError;
+                  NSData *data = [dataString dataUsingEncoding:NSUTF8StringEncoding];
                   MGLShape *sourceShape = [MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:&encodeError];
-                  MGLSource *sourceFromMap = [mapView styleSourceWithIdentifier:id];
+                  if (!sourceShape) {
+                      reject(@"invalid_arguments", @"setSource(): invalid geoJson data", nil);
+                  }
                   if (!sourceFromMap) {
                       MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:id shape:sourceShape options:nil];
                       [mapView addSource:source];
@@ -724,7 +728,22 @@ RCT_EXPORT_METHOD(setSource:(nonnull NSNumber *)reactTag
                       resolve(nil);
                       return;
                   }
+              } else {
+                  if (!sourceFromMap) {
+                      MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:id URL:dataString options:nil];
+                      [mapView addSource:source];
+                      resolve(nil);
+                      return;
+                  }
+                  if ([sourceFromMap respondsToSelector:@selector(setURL:)]) {
+                      [sourceFromMap performSelector:@selector(setURL:) withObject:dataString];
+                      resolve(nil);
+                      return;
+                  }
               }
+          } else {
+              reject(@"invalid_arguments", @"setSource(): type 'geojson' is the only type currently supported", nil);
+              return;
           }
       }
   }];
