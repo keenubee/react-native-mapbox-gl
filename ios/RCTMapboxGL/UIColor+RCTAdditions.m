@@ -7,7 +7,7 @@
 
 @implementation UIColor (RCTAdditions)
 
-+ (UIColor *)colorFromString:(NSString *)string
++ (UIColor *)colorWithString:(NSString *)string
 {
     SEL colorLabel = NSSelectorFromString([string stringByAppendingString:@"Color"]);
     if ([UIColor respondsToSelector:colorLabel]) {

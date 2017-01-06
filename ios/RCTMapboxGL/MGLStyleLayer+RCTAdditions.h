@@ -7,6 +7,6 @@
 #import "RCTMapboxGL.h"
 
 @interface MGLStyleLayer (RCTAdditions)
-+ (MGLStyleLayer *)fromJson:(nonnull NSDictionary *)layerJson withMap:(RCTMapboxGL *)mapView;
-- (NSPredicate *)predicateFromJson:(nonnull NSArray *)filter;
++ (MGLStyleLayer *)styleLayerWithJson:(nonnull NSDictionary *)layerJson mapView:(RCTMapboxGL *)mapView;
+- (NSPredicate *)predicateWithJson:(nonnull NSArray *)filter;
 @end

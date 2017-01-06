@@ -651,7 +651,7 @@ RCT_EXPORT_METHOD(addLayer:(nonnull NSNumber *)reactTag
   [_bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *, RCTMapboxGL *> *viewRegistry) {
       RCTMapboxGL *mapView = viewRegistry[reactTag];
       if ([mapView isKindOfClass:[RCTMapboxGL class]]) {
-          MGLStyleLayer *layer = [MGLStyleLayer fromJson:layerJson withMap:mapView];
+          MGLStyleLayer *layer = [MGLStyleLayer styleLayerWithJson:layerJson mapView:mapView];
           if (!previousLayerId) {
               [mapView addLayer:layer];
               resolve(nil);

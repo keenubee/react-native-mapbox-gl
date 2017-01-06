@@ -30,8 +30,8 @@
 
 @implementation MGLStyleLayer (RCTAdditions)
 
-+ (MGLStyleLayer *)fromJson:(nonnull NSDictionary *)layerJson
-                   withMap:(RCTMapboxGL *)mapView
++ (MGLStyleLayer *)styleLayerWithJson:(nonnull NSDictionary *)layerJson
+                   mapView:(RCTMapboxGL *)mapView
 {
     NSString *idString = layerJson[@"id"];
     NSString *typeString = layerJson[@"type"];
@@ -70,7 +70,7 @@
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
 <% if (prop.type === 'color') { -%>
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorWithString:stop[1]]] forKey:stop[0]];
 <% } else if (prop.type === 'enum') { -%>
                     NSValue *value = [NSValue valueWithMGL<%- upperCamelize(prop.setterName || prop.name) %>:enumDictionary[<%- prop.propertyType %>Properties[@"<%- prop.name %>"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
@@ -96,7 +96,7 @@
             } else {
 <% } -%>
 <% if (prop.type === 'color') { -%>
-                UIColor *color = [UIColor colorFromString:<%- prop.propertyType %>Properties[@"<%- prop.name %>"]];
+                UIColor *color = [UIColor colorWithString:<%- prop.propertyType %>Properties[@"<%- prop.name %>"]];
                 MGLStyleValue *<%- camelize(prop.name) %>Value = [MGLStyleValue valueWithRawValue:color];
 <% } else if (prop.type === 'enum') { -%>
                 NSValue *value = [NSValue valueWithMGL<%- upperCamelize(prop.setterName || prop.name) %>:enumDictionary[<%- prop.propertyType %>Properties[@"<%- prop.name %>"]].integerValue];
@@ -124,7 +124,7 @@
             [layer setSourceLayerIdentifier:sourceLayer];
         }
         if (filter) {
-            [layer setPredicate:[layer predicateFromJson:filter]];
+            [layer setPredicate:[layer predicateWithJson:filter]];
         }
 <% } -%>
 
@@ -142,7 +142,7 @@
     return nil;
 }
 
-- (NSPredicate *)predicateFromJson:(nonnull NSArray *)filterJson
+- (NSPredicate *)predicateWithJson:(nonnull NSArray *)filterJson
 {
     NSString *filterType = filterJson[0];
 <% for (const filterName of compFilterNames) { -%>
@@ -173,7 +173,7 @@
         [filters removeObjectAtIndex:0];
         NSMutableArray *predicates = [NSMutableArray arrayWithCapacity:[filters count]];
         for (id filter in filters) {
-            [predicates addObject:[self predicateFromJson:filter]];
+            [predicates addObject:[self predicateWithJson:filter]];
         }
         return [NSCompoundPredicate andPredicateWithSubpredicates:predicates];
     }
@@ -182,7 +182,7 @@
         [filters removeObjectAtIndex:0];
         NSMutableArray *predicates = [NSMutableArray arrayWithCapacity:[filters count]];
         for (id filter in filters) {
-            [predicates addObject:[self predicateFromJson:filter]];
+            [predicates addObject:[self predicateWithJson:filter]];
         }
         return [NSCompoundPredicate orPredicateWithSubpredicates:predicates];
     }
@@ -191,7 +191,7 @@
         [filters removeObjectAtIndex:0];
         NSMutableArray *predicates = [NSMutableArray arrayWithCapacity:[filters count]];
         for (id filter in filters) {
-            [predicates addObject:[NSCompoundPredicate notPredicateWithSubpredicate:[self predicateFromJson:filter]]];
+            [predicates addObject:[NSCompoundPredicate notPredicateWithSubpredicate:[self predicateWithJson:filter]]];
         }
         return [NSCompoundPredicate andPredicateWithSubpredicates:predicates];
     }

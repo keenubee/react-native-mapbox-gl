@@ -16,8 +16,8 @@
 
 @implementation MGLStyleLayer (RCTAdditions)
 
-+ (MGLStyleLayer *)fromJson:(nonnull NSDictionary *)layerJson
-                   withMap:(RCTMapboxGL *)mapView
++ (MGLStyleLayer *)styleLayerWithJson:(nonnull NSDictionary *)layerJson
+                   mapView:(RCTMapboxGL *)mapView
 {
     NSString *idString = layerJson[@"id"];
     NSString *typeString = layerJson[@"type"];
@@ -77,7 +77,7 @@
                 NSArray *stops = paintProperties[@"fill-color"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorWithString:stop[1]]] forKey:stop[0]];
                 }
                 MGLStyleValue *fillColorValue;
                 NSNumber *baseNumber = paintProperties[@"fill-color"][@"base"];
@@ -88,7 +88,7 @@
                 }
                 [layer setFillColor:fillColorValue];
             } else {
-                UIColor *color = [UIColor colorFromString:paintProperties[@"fill-color"]];
+                UIColor *color = [UIColor colorWithString:paintProperties[@"fill-color"]];
                 MGLStyleValue *fillColorValue = [MGLStyleValue valueWithRawValue:color];
                 [layer setFillColor:fillColorValue];
             }
@@ -98,7 +98,7 @@
                 NSArray *stops = paintProperties[@"fill-outline-color"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorWithString:stop[1]]] forKey:stop[0]];
                 }
                 MGLStyleValue *fillOutlineColorValue;
                 NSNumber *baseNumber = paintProperties[@"fill-outline-color"][@"base"];
@@ -109,7 +109,7 @@
                 }
                 [layer setFillOutlineColor:fillOutlineColorValue];
             } else {
-                UIColor *color = [UIColor colorFromString:paintProperties[@"fill-outline-color"]];
+                UIColor *color = [UIColor colorWithString:paintProperties[@"fill-outline-color"]];
                 MGLStyleValue *fillOutlineColorValue = [MGLStyleValue valueWithRawValue:color];
                 [layer setFillOutlineColor:fillOutlineColorValue];
             }
@@ -189,7 +189,7 @@
             [layer setSourceLayerIdentifier:sourceLayer];
         }
         if (filter) {
-            [layer setPredicate:[layer predicateFromJson:filter]];
+            [layer setPredicate:[layer predicateWithJson:filter]];
         }
 
         NSNumber *minzoom = layerJson[@"minzoom"];
@@ -329,7 +329,7 @@
                 NSArray *stops = paintProperties[@"line-color"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorWithString:stop[1]]] forKey:stop[0]];
                 }
                 MGLStyleValue *lineColorValue;
                 NSNumber *baseNumber = paintProperties[@"line-color"][@"base"];
@@ -340,7 +340,7 @@
                 }
                 [layer setLineColor:lineColorValue];
             } else {
-                UIColor *color = [UIColor colorFromString:paintProperties[@"line-color"]];
+                UIColor *color = [UIColor colorWithString:paintProperties[@"line-color"]];
                 MGLStyleValue *lineColorValue = [MGLStyleValue valueWithRawValue:color];
                 [layer setLineColor:lineColorValue];
             }
@@ -522,7 +522,7 @@
             [layer setSourceLayerIdentifier:sourceLayer];
         }
         if (filter) {
-            [layer setPredicate:[layer predicateFromJson:filter]];
+            [layer setPredicate:[layer predicateWithJson:filter]];
         }
 
         NSNumber *minzoom = layerJson[@"minzoom"];
@@ -1324,7 +1324,7 @@
                 NSArray *stops = paintProperties[@"icon-color"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorWithString:stop[1]]] forKey:stop[0]];
                 }
                 MGLStyleValue *iconColorValue;
                 NSNumber *baseNumber = paintProperties[@"icon-color"][@"base"];
@@ -1335,7 +1335,7 @@
                 }
                 [layer setIconColor:iconColorValue];
             } else {
-                UIColor *color = [UIColor colorFromString:paintProperties[@"icon-color"]];
+                UIColor *color = [UIColor colorWithString:paintProperties[@"icon-color"]];
                 MGLStyleValue *iconColorValue = [MGLStyleValue valueWithRawValue:color];
                 [layer setIconColor:iconColorValue];
             }
@@ -1345,7 +1345,7 @@
                 NSArray *stops = paintProperties[@"icon-halo-color"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorWithString:stop[1]]] forKey:stop[0]];
                 }
                 MGLStyleValue *iconHaloColorValue;
                 NSNumber *baseNumber = paintProperties[@"icon-halo-color"][@"base"];
@@ -1356,7 +1356,7 @@
                 }
                 [layer setIconHaloColor:iconHaloColorValue];
             } else {
-                UIColor *color = [UIColor colorFromString:paintProperties[@"icon-halo-color"]];
+                UIColor *color = [UIColor colorWithString:paintProperties[@"icon-halo-color"]];
                 MGLStyleValue *iconHaloColorValue = [MGLStyleValue valueWithRawValue:color];
                 [layer setIconHaloColor:iconHaloColorValue];
             }
@@ -1475,7 +1475,7 @@
                 NSArray *stops = paintProperties[@"text-color"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorWithString:stop[1]]] forKey:stop[0]];
                 }
                 MGLStyleValue *textColorValue;
                 NSNumber *baseNumber = paintProperties[@"text-color"][@"base"];
@@ -1486,7 +1486,7 @@
                 }
                 [layer setTextColor:textColorValue];
             } else {
-                UIColor *color = [UIColor colorFromString:paintProperties[@"text-color"]];
+                UIColor *color = [UIColor colorWithString:paintProperties[@"text-color"]];
                 MGLStyleValue *textColorValue = [MGLStyleValue valueWithRawValue:color];
                 [layer setTextColor:textColorValue];
             }
@@ -1496,7 +1496,7 @@
                 NSArray *stops = paintProperties[@"text-halo-color"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorWithString:stop[1]]] forKey:stop[0]];
                 }
                 MGLStyleValue *textHaloColorValue;
                 NSNumber *baseNumber = paintProperties[@"text-halo-color"][@"base"];
@@ -1507,7 +1507,7 @@
                 }
                 [layer setTextHaloColor:textHaloColorValue];
             } else {
-                UIColor *color = [UIColor colorFromString:paintProperties[@"text-halo-color"]];
+                UIColor *color = [UIColor colorWithString:paintProperties[@"text-halo-color"]];
                 MGLStyleValue *textHaloColorValue = [MGLStyleValue valueWithRawValue:color];
                 [layer setTextHaloColor:textHaloColorValue];
             }
@@ -1607,7 +1607,7 @@
             [layer setSourceLayerIdentifier:sourceLayer];
         }
         if (filter) {
-            [layer setPredicate:[layer predicateFromJson:filter]];
+            [layer setPredicate:[layer predicateWithJson:filter]];
         }
 
         NSNumber *minzoom = layerJson[@"minzoom"];
@@ -1650,7 +1650,7 @@
                 NSArray *stops = paintProperties[@"circle-color"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorWithString:stop[1]]] forKey:stop[0]];
                 }
                 MGLStyleValue *circleColorValue;
                 NSNumber *baseNumber = paintProperties[@"circle-color"][@"base"];
@@ -1661,7 +1661,7 @@
                 }
                 [layer setCircleColor:circleColorValue];
             } else {
-                UIColor *color = [UIColor colorFromString:paintProperties[@"circle-color"]];
+                UIColor *color = [UIColor colorWithString:paintProperties[@"circle-color"]];
                 MGLStyleValue *circleColorValue = [MGLStyleValue valueWithRawValue:color];
                 [layer setCircleColor:circleColorValue];
             }
@@ -1788,7 +1788,7 @@
             [layer setSourceLayerIdentifier:sourceLayer];
         }
         if (filter) {
-            [layer setPredicate:[layer predicateFromJson:filter]];
+            [layer setPredicate:[layer predicateWithJson:filter]];
         }
 
         NSNumber *minzoom = layerJson[@"minzoom"];
@@ -1965,7 +1965,7 @@
                 NSArray *stops = paintProperties[@"background-color"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorFromString:stop[1]]] forKey:stop[0]];
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorWithString:stop[1]]] forKey:stop[0]];
                 }
                 MGLStyleValue *backgroundColorValue;
                 NSNumber *baseNumber = paintProperties[@"background-color"][@"base"];
@@ -1976,7 +1976,7 @@
                 }
                 [layer setBackgroundColor:backgroundColorValue];
             } else {
-                UIColor *color = [UIColor colorFromString:paintProperties[@"background-color"]];
+                UIColor *color = [UIColor colorWithString:paintProperties[@"background-color"]];
                 MGLStyleValue *backgroundColorValue = [MGLStyleValue valueWithRawValue:color];
                 [layer setBackgroundColor:backgroundColorValue];
             }
@@ -2035,7 +2035,7 @@
     return nil;
 }
 
-- (NSPredicate *)predicateFromJson:(nonnull NSArray *)filterJson
+- (NSPredicate *)predicateWithJson:(nonnull NSArray *)filterJson
 {
     NSString *filterType = filterJson[0];
     if ([filterType isEqualToString:@"=="]) {
@@ -2079,7 +2079,7 @@
         [filters removeObjectAtIndex:0];
         NSMutableArray *predicates = [NSMutableArray arrayWithCapacity:[filters count]];
         for (id filter in filters) {
-            [predicates addObject:[self predicateFromJson:filter]];
+            [predicates addObject:[self predicateWithJson:filter]];
         }
         return [NSCompoundPredicate andPredicateWithSubpredicates:predicates];
     }
@@ -2088,7 +2088,7 @@
         [filters removeObjectAtIndex:0];
         NSMutableArray *predicates = [NSMutableArray arrayWithCapacity:[filters count]];
         for (id filter in filters) {
-            [predicates addObject:[self predicateFromJson:filter]];
+            [predicates addObject:[self predicateWithJson:filter]];
         }
         return [NSCompoundPredicate orPredicateWithSubpredicates:predicates];
     }
@@ -2097,7 +2097,7 @@
         [filters removeObjectAtIndex:0];
         NSMutableArray *predicates = [NSMutableArray arrayWithCapacity:[filters count]];
         for (id filter in filters) {
-            [predicates addObject:[NSCompoundPredicate notPredicateWithSubpredicate:[self predicateFromJson:filter]]];
+            [predicates addObject:[NSCompoundPredicate notPredicateWithSubpredicate:[self predicateWithJson:filter]]];
         }
         return [NSCompoundPredicate andPredicateWithSubpredicates:predicates];
     }
