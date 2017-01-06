@@ -60,6 +60,15 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
         MGL<%- upperCamelize(layer.type) %>StyleLayer *layer = [[MGL<%- upperCamelize(layer.type) %>StyleLayer alloc] initWithIdentifier:idString];
 <% } else { -%>
         NSString *sourceString = layerJson[@"source"];
+        if (!sourceString) {
+            if (errorPtr) {
+                *errorPtr = [NSError errorWithDomain:RCTMapboxGLErrorDomain
+                                     code:1003
+                                     userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"addLayer(): layer of type '%@' must have a 'source' attribute", typeString]}
+                ];
+            }
+            return nil;
+        }
         MGLSource *source = [mapView styleSourceWithIdentifier:sourceString];
         MGL<%- upperCamelize(layer.type) %>StyleLayer *layer = [[MGL<%- upperCamelize(layer.type) %>StyleLayer alloc] initWithIdentifier:idString source:source];
 <% } -%>

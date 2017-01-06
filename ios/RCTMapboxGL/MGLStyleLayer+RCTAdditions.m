@@ -39,6 +39,15 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
     if([typeString isEqualToString:@"fill"]) {
         NSDictionary *paintProperties = layerJson[@"paint"];
         NSString *sourceString = layerJson[@"source"];
+        if (!sourceString) {
+            if (errorPtr) {
+                *errorPtr = [NSError errorWithDomain:RCTMapboxGLErrorDomain
+                                     code:1003
+                                     userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"addLayer(): layer of type '%@' must have a 'source' attribute", typeString]}
+                ];
+            }
+            return nil;
+        }
         MGLSource *source = [mapView styleSourceWithIdentifier:sourceString];
         MGLFillStyleLayer *layer = [[MGLFillStyleLayer alloc] initWithIdentifier:idString source:source];
         if ([paintProperties valueForKey:@"fill-antialias"]) {
@@ -215,6 +224,15 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
         NSDictionary *paintProperties = layerJson[@"paint"];
         NSDictionary *layoutProperties = layerJson[@"layout"];
         NSString *sourceString = layerJson[@"source"];
+        if (!sourceString) {
+            if (errorPtr) {
+                *errorPtr = [NSError errorWithDomain:RCTMapboxGLErrorDomain
+                                     code:1003
+                                     userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"addLayer(): layer of type '%@' must have a 'source' attribute", typeString]}
+                ];
+            }
+            return nil;
+        }
         MGLSource *source = [mapView styleSourceWithIdentifier:sourceString];
         MGLLineStyleLayer *layer = [[MGLLineStyleLayer alloc] initWithIdentifier:idString source:source];
         if ([layoutProperties valueForKey:@"line-cap"]) {
@@ -548,6 +566,15 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
         NSDictionary *paintProperties = layerJson[@"paint"];
         NSDictionary *layoutProperties = layerJson[@"layout"];
         NSString *sourceString = layerJson[@"source"];
+        if (!sourceString) {
+            if (errorPtr) {
+                *errorPtr = [NSError errorWithDomain:RCTMapboxGLErrorDomain
+                                     code:1003
+                                     userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"addLayer(): layer of type '%@' must have a 'source' attribute", typeString]}
+                ];
+            }
+            return nil;
+        }
         MGLSource *source = [mapView styleSourceWithIdentifier:sourceString];
         MGLSymbolStyleLayer *layer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:idString source:source];
         if ([layoutProperties valueForKey:@"symbol-placement"]) {
@@ -1632,6 +1659,15 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
     if([typeString isEqualToString:@"circle"]) {
         NSDictionary *paintProperties = layerJson[@"paint"];
         NSString *sourceString = layerJson[@"source"];
+        if (!sourceString) {
+            if (errorPtr) {
+                *errorPtr = [NSError errorWithDomain:RCTMapboxGLErrorDomain
+                                     code:1003
+                                     userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"addLayer(): layer of type '%@' must have a 'source' attribute", typeString]}
+                ];
+            }
+            return nil;
+        }
         MGLSource *source = [mapView styleSourceWithIdentifier:sourceString];
         MGLCircleStyleLayer *layer = [[MGLCircleStyleLayer alloc] initWithIdentifier:idString source:source];
         if ([paintProperties valueForKey:@"circle-radius"]) {
@@ -1813,6 +1849,15 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
     if([typeString isEqualToString:@"raster"]) {
         NSDictionary *paintProperties = layerJson[@"paint"];
         NSString *sourceString = layerJson[@"source"];
+        if (!sourceString) {
+            if (errorPtr) {
+                *errorPtr = [NSError errorWithDomain:RCTMapboxGLErrorDomain
+                                     code:1003
+                                     userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"addLayer(): layer of type '%@' must have a 'source' attribute", typeString]}
+                ];
+            }
+            return nil;
+        }
         MGLSource *source = [mapView styleSourceWithIdentifier:sourceString];
         MGLRasterStyleLayer *layer = [[MGLRasterStyleLayer alloc] initWithIdentifier:idString source:source];
         if ([paintProperties valueForKey:@"raster-opacity"]) {
