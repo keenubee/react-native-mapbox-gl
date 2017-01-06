@@ -75,7 +75,14 @@ import java.util.ArrayList;
 
 public class RNMGLLayerFactory {
 
-    public static Layer layerFromJson(ReadableMap layerJson) {
+    public static Layer layerFromJson(ReadableMap layerJson) throws InvalidLayerException {
+        if (layerJson.hasKey("ref")) {
+            throw new InvalidLayerException(String.format("addLayer(): cannot add layer '%s' with 'ref' attribute", layerJson.getString("id")));
+        }
+        if (!layerJson.hasKey("type")) {
+            throw new InvalidLayerException(String.format("addLayer(): layer '%s' must have a valid 'type' attribute", layerJson.getString("id")));
+        }
+
         String layerType = layerJson.getString("type");
 
 <% for (const layer of layers) { -%>
@@ -83,7 +90,7 @@ public class RNMGLLayerFactory {
             return <%- camelize(layer.type) %>LayerFromJson(layerJson);
         }
 <% } -%>
-        return null;
+        throw new InvalidLayerException(String.format("addLayer(): invalid type '%s' on layer '%s'", layerType, layerJson.getString("id")));
     }
 
     static Float[] ReadableArrToNumberArr(ReadableArray readArr, int startValue) {
@@ -222,6 +229,9 @@ public class RNMGLLayerFactory {
         <%- upperCamelize(layer.type) %>Layer layer = new <%- upperCamelize(layer.type) %>Layer(layerJson.getString("id"))
             .withProperties(properties.toArray(new Property[0]));
 <% } else { -%>
+        if (!layerJson.hasKey("source")) {
+            throw new InvalidLayerException(String.format("addLayer(): layer '%s' must have a valid 'source' attribute", layerJson.getString("id")));
+        }
         <%- upperCamelize(layer.type) %>Layer layer = new <%- upperCamelize(layer.type) %>Layer(layerJson.getString("id"), layerJson.getString("source"))
             .withProperties(properties.toArray(new Property[0]));
 

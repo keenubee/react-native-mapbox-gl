@@ -12,7 +12,14 @@ import java.util.ArrayList;
 
 public class RNMGLLayerFactory {
 
-    public static Layer layerFromJson(ReadableMap layerJson) {
+    public static Layer layerFromJson(ReadableMap layerJson) throws InvalidLayerException {
+        if (layerJson.hasKey("ref")) {
+            throw new InvalidLayerException(String.format("addLayer(): cannot add layer '%s' with 'ref' attribute", layerJson.getString("id")));
+        }
+        if (!layerJson.hasKey("type")) {
+            throw new InvalidLayerException(String.format("addLayer(): layer '%s' must have a valid 'type' attribute", layerJson.getString("id")));
+        }
+
         String layerType = layerJson.getString("type");
 
         if (layerType.equals("fill")) {
@@ -33,7 +40,7 @@ public class RNMGLLayerFactory {
         if (layerType.equals("background")) {
             return backgroundLayerFromJson(layerJson);
         }
-        return null;
+        throw new InvalidLayerException(String.format("addLayer(): invalid type '%s' on layer '%s'", layerType, layerJson.getString("id")));
     }
 
     static Float[] ReadableArrToNumberArr(ReadableArray readArr, int startValue) {
@@ -375,6 +382,9 @@ public class RNMGLLayerFactory {
             }
         }
 
+        if (!layerJson.hasKey("source")) {
+            throw new InvalidLayerException(String.format("addLayer(): layer '%s' must have a valid 'source' attribute", layerJson.getString("id")));
+        }
         FillLayer layer = new FillLayer(layerJson.getString("id"), layerJson.getString("source"))
             .withProperties(properties.toArray(new Property[0]));
 
@@ -769,6 +779,9 @@ public class RNMGLLayerFactory {
             }
         }
 
+        if (!layerJson.hasKey("source")) {
+            throw new InvalidLayerException(String.format("addLayer(): layer '%s' must have a valid 'source' attribute", layerJson.getString("id")));
+        }
         LineLayer layer = new LineLayer(layerJson.getString("id"), layerJson.getString("source"))
             .withProperties(properties.toArray(new Property[0]));
 
@@ -2047,6 +2060,9 @@ public class RNMGLLayerFactory {
             }
         }
 
+        if (!layerJson.hasKey("source")) {
+            throw new InvalidLayerException(String.format("addLayer(): layer '%s' must have a valid 'source' attribute", layerJson.getString("id")));
+        }
         SymbolLayer layer = new SymbolLayer(layerJson.getString("id"), layerJson.getString("source"))
             .withProperties(properties.toArray(new Property[0]));
 
@@ -2256,6 +2272,9 @@ public class RNMGLLayerFactory {
             }
         }
 
+        if (!layerJson.hasKey("source")) {
+            throw new InvalidLayerException(String.format("addLayer(): layer '%s' must have a valid 'source' attribute", layerJson.getString("id")));
+        }
         CircleLayer layer = new CircleLayer(layerJson.getString("id"), layerJson.getString("source"))
             .withProperties(properties.toArray(new Property[0]));
 
@@ -2465,6 +2484,9 @@ public class RNMGLLayerFactory {
             }
         }
 
+        if (!layerJson.hasKey("source")) {
+            throw new InvalidLayerException(String.format("addLayer(): layer '%s' must have a valid 'source' attribute", layerJson.getString("id")));
+        }
         RasterLayer layer = new RasterLayer(layerJson.getString("id"), layerJson.getString("source"))
             .withProperties(properties.toArray(new Property[0]));
 

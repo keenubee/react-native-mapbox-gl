@@ -457,15 +457,20 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
 
     public void addLayer(ReactNativeMapboxGLView view, ReadableMap layerJson, String before, int callbackId) {
         WritableArray callbackArgs = Arguments.createArray();
-        if (!layerJson.hasKey("type") || !layerJson.hasKey("id")) {
-            callbackArgs.pushString("addLayer(): layer must have valid 'id' and 'type' attributes.");
+        if (!layerJson.hasKey("id")) {
+            callbackArgs.pushString("addLayer(): layer must have valid 'id' attribute.");
             fireCallback(callbackId, callbackArgs);
             return;
         }
 
-        // TODO: more validation - e.g. check that all layers besides background have a valid source attribute
-        Layer layer = RNMGLLayerFactory.layerFromJson(layerJson);
-        view.addLayer(layer, before);
+        try {
+            Layer layer = RNMGLLayerFactory.layerFromJson(layerJson);
+            view.addLayer(layer, before);
+        } catch (InvalidLayerException e) {
+            callbackArgs.pushString(e.getMessage());
+            fireCallback(callbackId, callbackArgs);
+            return;
+        }
 
         callbackArgs.pushString(null); // push null error message
         fireCallback(callbackId, callbackArgs);
