@@ -26,6 +26,8 @@ import com.mapbox.mapboxsdk.style.sources.*;
 import com.mapbox.services.commons.geojson.Feature;
 
 import java.lang.Float;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -504,6 +506,27 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
                 fireCallback(callbackId, callbackArgs);
                 return;
             }
+
+            GeoJsonOptions options = new GeoJsonOptions();
+            if (sourceJson.hasKey("buffer")) {
+                options = options.withBuffer(sourceJson.getInt("buffer"));
+            }
+            if (sourceJson.hasKey("cluster")) {
+                options = options.withCluster(sourceJson.getBoolean("cluster"));
+            }
+            if (sourceJson.hasKey("clusterMaxZoom")) {
+                options = options.withClusterMaxZoom(sourceJson.getInt("clusterMaxZoom"));
+            }
+            if (sourceJson.hasKey("clusterRadius")) {
+                options = options.withClusterRadius(sourceJson.getInt("clusterRadius"));
+            }
+            if (sourceJson.hasKey("maxzoom")) {
+                options = options.withMaxZoom(sourceJson.getInt("maxzoom"));
+            }
+            if (sourceJson.hasKey("tolerance")) {
+                options = options.withTolerance((float)sourceJson.getDouble("tolerance"));
+            }
+
             if (dataIsUrl == false) {
                 String data = sourceJson.getString("data");
                 try {
@@ -515,11 +538,36 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
                     try {
                         view.removeSource(id);
                     } catch (NoSuchSourceException e) {}
-                    view.addSource(new GeoJsonSource(id, data));
+                    view.addSource(new GeoJsonSource(id, data, options));
                 } catch (NoSuchSourceException exception) {
-                    view.addSource(new GeoJsonSource(id, data));
+                    view.addSource(new GeoJsonSource(id, data, options));
+                }
+            } else {
+                try {
+                    URL url = new URL(sourceJson.getString("data"));
+                    try {
+                        Source sourceFromMap = view.getSource(id);
+                        if (sourceFromMap == null) throw new NoSuchSourceException("setSource(): source does not exist");
+                        GeoJsonSource typecastSource = (GeoJsonSource) sourceFromMap;
+                        typecastSource.setUrl(url);
+                    } catch (ClassCastException exception) {
+                        try {
+                            view.removeSource(id);
+                        } catch (NoSuchSourceException e) {}
+                        view.addSource(new GeoJsonSource(id, url, options));
+                    } catch (NoSuchSourceException exception) {
+                        view.addSource(new GeoJsonSource(id, url, options));
+                    }
+                } catch (MalformedURLException exception) {
+                    callbackArgs.pushString("setSource(): bad url");
+                    fireCallback(callbackId, callbackArgs);
+                    return;
                 }
             }
+        } else {
+            callbackArgs.pushString("setSource(): only sources of type 'geojson' are current supported");
+            fireCallback(callbackId, callbackArgs);
+            return;
         }
 
         callbackArgs.pushString(null); // push null error message
