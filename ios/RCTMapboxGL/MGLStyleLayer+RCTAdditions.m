@@ -750,7 +750,9 @@
                 NSArray *stops = layoutProperties[@"icon-text-fit-padding"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
+                    NSArray *iconTextFitPaddingArray = stop[1];
+                    UIEdgeInsets insets = UIEdgeInsetsMake([iconTextFitPaddingArray[0] floatValue], [iconTextFitPaddingArray[3] floatValue], [iconTextFitPaddingArray[2] floatValue], [iconTextFitPaddingArray[1] floatValue]);
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithUIEdgeInsets:insets]] forKey:stop[0]];
                 }
                 MGLStyleValue *iconTextFitPaddingValue;
                 NSNumber *baseNumber = layoutProperties[@"icon-text-fit-padding"][@"base"];
@@ -761,7 +763,9 @@
                 }
                 [layer setIconTextFitPadding:iconTextFitPaddingValue];
             } else {
-                MGLStyleValue *iconTextFitPaddingValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"icon-text-fit-padding"]];
+                NSArray *iconTextFitPaddingArray = layoutProperties[@"icon-text-fit-padding"];
+                UIEdgeInsets insets = UIEdgeInsetsMake([iconTextFitPaddingArray[0] floatValue], [iconTextFitPaddingArray[3] floatValue], [iconTextFitPaddingArray[2] floatValue], [iconTextFitPaddingArray[1] floatValue]);
+                MGLStyleValue *iconTextFitPaddingValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithUIEdgeInsets:insets]];
                 [layer setIconTextFitPadding:iconTextFitPaddingValue];
             }
         }

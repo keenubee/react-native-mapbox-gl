@@ -74,6 +74,10 @@
 <% } else if (prop.type === 'enum') { -%>
                     NSValue *value = [NSValue valueWithMGL<%- upperCamelize(prop.setterName || prop.name) %>:enumDictionary[<%- prop.propertyType %>Properties[@"<%- prop.name %>"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
+<% } else if (prop.name.includes('icon-text-fit-padding')) { -%>
+                    NSArray *<%- camelize(prop.name) %>Array = stop[1];
+                    UIEdgeInsets insets = UIEdgeInsetsMake([<%- camelize(prop.name) %>Array[0] floatValue], [<%- camelize(prop.name) %>Array[3] floatValue], [<%- camelize(prop.name) %>Array[2] floatValue], [<%- camelize(prop.name) %>Array[1] floatValue]);
+                    [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithUIEdgeInsets:insets]] forKey:stop[0]];
 <% } else if (prop.name.includes('offset') || prop.name.includes('translate')) { -%>
                     CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
@@ -97,6 +101,10 @@
 <% } else if (prop.type === 'enum') { -%>
                 NSValue *value = [NSValue valueWithMGL<%- upperCamelize(prop.setterName || prop.name) %>:enumDictionary[<%- prop.propertyType %>Properties[@"<%- prop.name %>"]].integerValue];
                 MGLStyleValue *<%- camelize(prop.name) %>Value = [MGLStyleValue valueWithRawValue:value];
+<% } else if (prop.name.includes('icon-text-fit-padding')) { -%>
+                NSArray *<%- camelize(prop.name) %>Array = layoutProperties[@"<%- prop.name %>"];
+                UIEdgeInsets insets = UIEdgeInsetsMake([<%- camelize(prop.name) %>Array[0] floatValue], [<%- camelize(prop.name) %>Array[3] floatValue], [<%- camelize(prop.name) %>Array[2] floatValue], [<%- camelize(prop.name) %>Array[1] floatValue]);
+                MGLStyleValue *<%- camelize(prop.name) %>Value = [MGLStyleValue valueWithRawValue:[NSValue valueWithUIEdgeInsets:insets]];
 <% } else if (prop.name.includes('offset') || prop.name.includes('translate')) { -%>
                 CGVector vector = CGVectorMake([<%- prop.propertyType %>Properties[@"<%- prop.name %>"][0] floatValue], [<%- prop.propertyType %>Properties[@"<%- prop.name %>"][1] floatValue]);
                 MGLStyleValue *<%- camelize(prop.name) %>Value = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
