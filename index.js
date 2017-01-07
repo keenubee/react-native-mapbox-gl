@@ -10,10 +10,12 @@ import {
   Platform
 } from 'react-native';
 
+import * as Immutable from 'immutable';
 import cloneDeep from 'lodash/cloneDeep';
 import clone from 'lodash/clone';
 import isEqual from 'lodash/isEqual';
 import Annotation from './Annotation';
+import { diffSources, diffLayers } from './utils/diff-styles'
 
 const { MapboxGLManager } = NativeModules;
 const { mapStyles, userTrackingMode, userLocationVerticalAlignment, unknownResourceCount } = MapboxGLManager;
@@ -164,6 +166,8 @@ class MapView extends Component {
   constructor(props) {
     super(props);
 
+    this.state = { mapFinishedLoading: false }
+
     this._onRegionDidChange = this._onRegionDidChange.bind(this);
     this._onRegionWillChange = this._onRegionWillChange.bind(this);
     this._onOpenAnnotation = this._onOpenAnnotation.bind(this);
@@ -227,7 +231,7 @@ class MapView extends Component {
   }
 
   // Others
-  setLayerVisibility(id, visibility, callback) {
+  setLayerVisibility = (id, visibility, callback) => {
     const value = visibility && visibility !== 'none'
 
     // the Android bridge uses a callback, so wrap it in a promise
@@ -253,7 +257,7 @@ class MapView extends Component {
     bindCallbackToPromise(callback, promise);
     return promise;
   }
-  addLayer(layer, before, callback) {
+  addLayer = (layer, before, callback) => {
     // the Android bridge uses a callback, so wrap it in a promise
     if (Platform.OS === 'android') {
       const promise = new Promise((resolve, reject) => {
@@ -276,7 +280,7 @@ class MapView extends Component {
     bindCallbackToPromise(callback, promise);
     return promise;
   }
-  removeLayer(id, callback) {
+  removeLayer = (id, callback) => {
     // the Android bridge uses a callback, so wrap it in a promise
     if (Platform.OS === 'android') {
       const promise = new Promise((resolve, reject) => {
@@ -299,7 +303,7 @@ class MapView extends Component {
     bindCallbackToPromise(callback, promise);
     return promise;
   }
-  setSource(id, source, callback) {
+  setSource = (id, source, callback) => {
     let newSource = source
     let dataIsUrl = true
     if (source.type && source.type === 'geojson' && typeof source.data !== 'string') {
@@ -330,7 +334,7 @@ class MapView extends Component {
     bindCallbackToPromise(callback, promise);
     return promise;
   }
-  removeSource(id, callback) {
+  removeSource = (id, callback) => {
     // the Android bridge uses a callback, so wrap it in a promise
     if (Platform.OS === 'android') {
       const promise = new Promise((resolve, reject) => {
@@ -414,9 +418,17 @@ class MapView extends Component {
     if (this.props.onTap) this.props.onTap(event.nativeEvent.src);
   }
   _onFinishLoadingMap(event: Event) {
+    this.props.dynamicSources.forEach((source, id) => {
+      this.setSource(id, source.toJS());
+    })
+    this.props.dynamicLayers.forEach((layer) => {
+      this.addLayer(layer.toJS());
+    })
+    this.setState({mapFinishedLoading: true});
     if (this.props.onFinishLoadingMap) this.props.onFinishLoadingMap(event.nativeEvent.src);
   }
   _onStartLoadingMap(event: Event) {
+    this.setState({mapFinishedLoading: false});
     if (this.props.onStartLoadingMap) this.props.onStartLoadingMap(event.nativeEvent.src);
   }
   _onLocateUserFailed(event: Event) {
@@ -449,6 +461,8 @@ class MapView extends Component {
     compassIsHidden: PropTypes.bool,
     userLocationVerticalAlignment: PropTypes.number,
     contentInset: PropTypes.arrayOf(PropTypes.number),
+    dynamicLayers: PropTypes.instanceOf(Immutable.List),
+    dynamicSources: PropTypes.instanceOf(Immutable.Map),
 
     annotations: PropTypes.arrayOf(PropTypes.shape({
       coordinates: PropTypes.array.isRequired,
@@ -515,6 +529,31 @@ class MapView extends Component {
   };
 
   componentWillReceiveProps(newProps) {
+    if (this.state.mapFinishedLoading) {
+      const { update, exit } = diffSources(this.props.dynamicSources, newProps.dynamicSources);
+
+      // add/update sources before adding their corresponding layers
+      for (const src of update) {
+        this.setSource(src.id, src.source.toJS());
+      }
+
+      const { updates, exiting } = diffLayers(this.props.dynamicLayers, newProps.dynamicLayers)
+      for (const lyr of exiting) {
+        this.removeLayer(lyr.id);
+      }
+      for (const lyr of updates) {
+        if (!lyr.enter) {
+          this.removeLayer(lyr.id);
+        }
+        this.addLayer(lyr.layer.toJS(), lyr.before);
+      }
+
+      // remove sources after their corresponding layers have been removed
+      for (const src of exit) {
+        this.removeSource(src.id);
+      }
+    }
+
     const oldKeys = clone(this._annotations);
     const itemsToAdd = [];
     const itemsToRemove = [];
