@@ -525,7 +525,9 @@ class MapView extends Component {
     compassIsHidden: false,
     annotationsAreImmutable: false,
     annotations: [],
-    contentInset: [0, 0, 0, 0]
+    contentInset: [0, 0, 0, 0],
+    dynamicSources: Immutable.Map({}),
+    dynamicLayers: Immutable.List([])
   };
 
   componentWillReceiveProps(newProps) {
