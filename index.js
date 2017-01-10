@@ -418,10 +418,10 @@ class MapView extends Component {
     if (this.props.onTap) this.props.onTap(event.nativeEvent.src);
   }
   _onFinishLoadingMap(event: Event) {
-    this.props.dynamicSources.forEach((source, id) => {
+    this.props.dynamicSources && this.props.dynamicSources.forEach((source, id) => {
       this.setSource(id, source.toJS());
     })
-    this.props.dynamicLayers.forEach((layer) => {
+    this.props.dynamicLayers && this.props.dynamicLayers.forEach((layer) => {
       this.addLayer(layer.toJS());
     })
     this.setState({mapFinishedLoading: true});
