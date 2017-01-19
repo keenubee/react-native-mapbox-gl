@@ -10,6 +10,7 @@
 #import "RCTView.h"
 #import "RCTEventDispatcher.h"
 #import "RCTBridgeModule.h"
+#import "RCTMapboxGLErrorDomain.h"
 
 @interface RCTMapboxGL : RCTView <MGLMapViewDelegate>
 
@@ -40,14 +41,14 @@
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)padding animated:(BOOL)animated;
 - (void)selectAnnotation:(NSString*)selectedId animated:(BOOL)animated;
 - (void)deselectAnnotation;
-- (BOOL)setLayerVisibility:(NSString *)layerId visibility:(BOOL)value;
+- (BOOL)setLayerVisibility:(NSString *)layerId visibility:(BOOL)value error:(NSError **)errorPtr;
 - (MGLSource*)styleSourceWithIdentifier:(nonnull NSString*)id;
 - (MGLStyleLayer*)styleLayerWithIdentifier:(nonnull NSString*)id;
-- (void)addLayer:(nonnull MGLStyleLayer *)layer;
-- (void)insertLayer:(nonnull MGLStyleLayer *)layer belowLayer:(nonnull MGLStyleLayer *)belowLayer;
-- (void)removeLayer:(nonnull NSString *)layer;
-- (void)addSource:(nonnull MGLSource *)source;
-- (void)removeSource:(nonnull MGLSource *)source;
+- (BOOL)addLayer:(nonnull MGLStyleLayer *)layer;
+- (BOOL)insertLayer:(nonnull MGLStyleLayer *)layer belowLayer:(nonnull MGLStyleLayer *)belowLayer;
+- (BOOL)removeLayer:(nonnull NSString *)layer;
+- (BOOL)addSource:(nonnull MGLSource *)source;
+- (BOOL)removeSource:(nonnull MGLSource *)source;
 - (nonnull NSArray<id<MGLFeature>> *)visibleFeaturesAtPoint:(CGPoint)point inStyleLayersWithIdentifiers:(nullable NSSet<NSString *> *)styleLayerIdentifiers;
 - (nonnull NSArray<id<MGLFeature>> *)visibleFeaturesInRect:(CGRect)rect inStyleLayersWithIdentifiers:(nullable NSSet<NSString *> *)identifiers;
 

@@ -13,8 +13,6 @@
 #import <Mapbox/MGLRasterStyleLayer.h>
 #import <Mapbox/MGLBackgroundStyleLayer.h>
 
-NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorDomain";
-
 
 @implementation MGLStyleLayer (RCTAdditions)
 
@@ -147,24 +145,24 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
                 } else {
                     fillTranslateValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
-                [layer setFillTranslate:fillTranslateValue];
+                [layer setFillTranslation:fillTranslateValue];
             } else {
                 CGVector vector = CGVectorMake([paintProperties[@"fill-translate"][0] floatValue], [paintProperties[@"fill-translate"][1] floatValue]);
                 MGLStyleValue *fillTranslateValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
-                [layer setFillTranslate:fillTranslateValue];
+                [layer setFillTranslation:fillTranslateValue];
             }
         }
         if ([paintProperties valueForKey:@"fill-translate-anchor"]) {
             // create the NSString -> enum dictionary for later use
             NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
-                @"map": @(MGLFillTranslateAnchorMap),
-                @"viewport": @(MGLFillTranslateAnchorViewport),
+                @"map": @(MGLFillTranslationAnchorMap),
+                @"viewport": @(MGLFillTranslationAnchorViewport),
             };
             if ([[paintProperties valueForKey:@"fill-translate-anchor"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = paintProperties[@"fill-translate-anchor"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    NSValue *value = [NSValue valueWithMGLFillTranslateAnchor:enumDictionary[paintProperties[@"fill-translate-anchor"]].integerValue];
+                    NSValue *value = [NSValue valueWithMGLFillTranslationAnchor:enumDictionary[paintProperties[@"fill-translate-anchor"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *fillTranslateAnchorValue;
@@ -174,11 +172,11 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
                 } else {
                     fillTranslateAnchorValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
-                [layer setFillTranslateAnchor:fillTranslateAnchorValue];
+                [layer setFillTranslationAnchor:fillTranslateAnchorValue];
             } else {
-                NSValue *value = [NSValue valueWithMGLFillTranslateAnchor:enumDictionary[paintProperties[@"fill-translate-anchor"]].integerValue];
+                NSValue *value = [NSValue valueWithMGLFillTranslationAnchor:enumDictionary[paintProperties[@"fill-translate-anchor"]].integerValue];
                 MGLStyleValue *fillTranslateAnchorValue = [MGLStyleValue valueWithRawValue:value];
-                [layer setFillTranslateAnchor:fillTranslateAnchorValue];
+                [layer setFillTranslationAnchor:fillTranslateAnchorValue];
             }
         }
         if ([paintProperties valueForKey:@"fill-pattern"]) {
@@ -387,24 +385,24 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
                 } else {
                     lineTranslateValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
-                [layer setLineTranslate:lineTranslateValue];
+                [layer setLineTranslation:lineTranslateValue];
             } else {
                 CGVector vector = CGVectorMake([paintProperties[@"line-translate"][0] floatValue], [paintProperties[@"line-translate"][1] floatValue]);
                 MGLStyleValue *lineTranslateValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
-                [layer setLineTranslate:lineTranslateValue];
+                [layer setLineTranslation:lineTranslateValue];
             }
         }
         if ([paintProperties valueForKey:@"line-translate-anchor"]) {
             // create the NSString -> enum dictionary for later use
             NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
-                @"map": @(MGLLineTranslateAnchorMap),
-                @"viewport": @(MGLLineTranslateAnchorViewport),
+                @"map": @(MGLLineTranslationAnchorMap),
+                @"viewport": @(MGLLineTranslationAnchorViewport),
             };
             if ([[paintProperties valueForKey:@"line-translate-anchor"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = paintProperties[@"line-translate-anchor"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    NSValue *value = [NSValue valueWithMGLLineTranslateAnchor:enumDictionary[paintProperties[@"line-translate-anchor"]].integerValue];
+                    NSValue *value = [NSValue valueWithMGLLineTranslationAnchor:enumDictionary[paintProperties[@"line-translate-anchor"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *lineTranslateAnchorValue;
@@ -414,11 +412,11 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
                 } else {
                     lineTranslateAnchorValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
-                [layer setLineTranslateAnchor:lineTranslateAnchorValue];
+                [layer setLineTranslationAnchor:lineTranslateAnchorValue];
             } else {
-                NSValue *value = [NSValue valueWithMGLLineTranslateAnchor:enumDictionary[paintProperties[@"line-translate-anchor"]].integerValue];
+                NSValue *value = [NSValue valueWithMGLLineTranslationAnchor:enumDictionary[paintProperties[@"line-translate-anchor"]].integerValue];
                 MGLStyleValue *lineTranslateAnchorValue = [MGLStyleValue valueWithRawValue:value];
-                [layer setLineTranslateAnchor:lineTranslateAnchorValue];
+                [layer setLineTranslationAnchor:lineTranslateAnchorValue];
             }
         }
         if ([paintProperties valueForKey:@"line-width"]) {
@@ -977,10 +975,10 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
                 } else {
                     textFieldValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
-                [layer setTextField:textFieldValue];
+                [layer setText:textFieldValue];
             } else {
                 MGLStyleValue *textFieldValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-field"]];
-                [layer setTextField:textFieldValue];
+                [layer setText:textFieldValue];
             }
         }
         if ([layoutProperties valueForKey:@"text-font"]) {
@@ -997,10 +995,10 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
                 } else {
                     textFontValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
-                [layer setTextFont:textFontValue];
+                [layer setTextFontNames:textFontValue];
             } else {
                 MGLStyleValue *textFontValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-font"]];
-                [layer setTextFont:textFontValue];
+                [layer setTextFontNames:textFontValue];
             }
         }
         if ([layoutProperties valueForKey:@"text-size"]) {
@@ -1017,10 +1015,10 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
                 } else {
                     textSizeValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
-                [layer setTextSize:textSizeValue];
+                [layer setTextFontSize:textSizeValue];
             } else {
                 MGLStyleValue *textSizeValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-size"]];
-                [layer setTextSize:textSizeValue];
+                [layer setTextFontSize:textSizeValue];
             }
         }
         if ([layoutProperties valueForKey:@"text-max-width"]) {
@@ -1452,24 +1450,24 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
                 } else {
                     iconTranslateValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
-                [layer setIconTranslate:iconTranslateValue];
+                [layer setIconTranslation:iconTranslateValue];
             } else {
                 CGVector vector = CGVectorMake([paintProperties[@"icon-translate"][0] floatValue], [paintProperties[@"icon-translate"][1] floatValue]);
                 MGLStyleValue *iconTranslateValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
-                [layer setIconTranslate:iconTranslateValue];
+                [layer setIconTranslation:iconTranslateValue];
             }
         }
         if ([paintProperties valueForKey:@"icon-translate-anchor"]) {
             // create the NSString -> enum dictionary for later use
             NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
-                @"map": @(MGLIconTranslateAnchorMap),
-                @"viewport": @(MGLIconTranslateAnchorViewport),
+                @"map": @(MGLIconTranslationAnchorMap),
+                @"viewport": @(MGLIconTranslationAnchorViewport),
             };
             if ([[paintProperties valueForKey:@"icon-translate-anchor"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = paintProperties[@"icon-translate-anchor"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    NSValue *value = [NSValue valueWithMGLIconTranslateAnchor:enumDictionary[paintProperties[@"icon-translate-anchor"]].integerValue];
+                    NSValue *value = [NSValue valueWithMGLIconTranslationAnchor:enumDictionary[paintProperties[@"icon-translate-anchor"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *iconTranslateAnchorValue;
@@ -1479,11 +1477,11 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
                 } else {
                     iconTranslateAnchorValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
-                [layer setIconTranslateAnchor:iconTranslateAnchorValue];
+                [layer setIconTranslationAnchor:iconTranslateAnchorValue];
             } else {
-                NSValue *value = [NSValue valueWithMGLIconTranslateAnchor:enumDictionary[paintProperties[@"icon-translate-anchor"]].integerValue];
+                NSValue *value = [NSValue valueWithMGLIconTranslationAnchor:enumDictionary[paintProperties[@"icon-translate-anchor"]].integerValue];
                 MGLStyleValue *iconTranslateAnchorValue = [MGLStyleValue valueWithRawValue:value];
-                [layer setIconTranslateAnchor:iconTranslateAnchorValue];
+                [layer setIconTranslationAnchor:iconTranslateAnchorValue];
             }
         }
         if ([paintProperties valueForKey:@"text-opacity"]) {
@@ -1603,24 +1601,24 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
                 } else {
                     textTranslateValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
-                [layer setTextTranslate:textTranslateValue];
+                [layer setTextTranslation:textTranslateValue];
             } else {
                 CGVector vector = CGVectorMake([paintProperties[@"text-translate"][0] floatValue], [paintProperties[@"text-translate"][1] floatValue]);
                 MGLStyleValue *textTranslateValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
-                [layer setTextTranslate:textTranslateValue];
+                [layer setTextTranslation:textTranslateValue];
             }
         }
         if ([paintProperties valueForKey:@"text-translate-anchor"]) {
             // create the NSString -> enum dictionary for later use
             NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
-                @"map": @(MGLTextTranslateAnchorMap),
-                @"viewport": @(MGLTextTranslateAnchorViewport),
+                @"map": @(MGLTextTranslationAnchorMap),
+                @"viewport": @(MGLTextTranslationAnchorViewport),
             };
             if ([[paintProperties valueForKey:@"text-translate-anchor"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = paintProperties[@"text-translate-anchor"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    NSValue *value = [NSValue valueWithMGLTextTranslateAnchor:enumDictionary[paintProperties[@"text-translate-anchor"]].integerValue];
+                    NSValue *value = [NSValue valueWithMGLTextTranslationAnchor:enumDictionary[paintProperties[@"text-translate-anchor"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *textTranslateAnchorValue;
@@ -1630,11 +1628,11 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
                 } else {
                     textTranslateAnchorValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
-                [layer setTextTranslateAnchor:textTranslateAnchorValue];
+                [layer setTextTranslationAnchor:textTranslateAnchorValue];
             } else {
-                NSValue *value = [NSValue valueWithMGLTextTranslateAnchor:enumDictionary[paintProperties[@"text-translate-anchor"]].integerValue];
+                NSValue *value = [NSValue valueWithMGLTextTranslationAnchor:enumDictionary[paintProperties[@"text-translate-anchor"]].integerValue];
                 MGLStyleValue *textTranslateAnchorValue = [MGLStyleValue valueWithRawValue:value];
-                [layer setTextTranslateAnchor:textTranslateAnchorValue];
+                [layer setTextTranslationAnchor:textTranslateAnchorValue];
             }
         }
         NSString *sourceLayer = layerJson[@"source-layer"];
@@ -1766,24 +1764,24 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
                 } else {
                     circleTranslateValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
-                [layer setCircleTranslate:circleTranslateValue];
+                [layer setCircleTranslation:circleTranslateValue];
             } else {
                 CGVector vector = CGVectorMake([paintProperties[@"circle-translate"][0] floatValue], [paintProperties[@"circle-translate"][1] floatValue]);
                 MGLStyleValue *circleTranslateValue = [MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]];
-                [layer setCircleTranslate:circleTranslateValue];
+                [layer setCircleTranslation:circleTranslateValue];
             }
         }
         if ([paintProperties valueForKey:@"circle-translate-anchor"]) {
             // create the NSString -> enum dictionary for later use
             NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
-                @"map": @(MGLCircleTranslateAnchorMap),
-                @"viewport": @(MGLCircleTranslateAnchorViewport),
+                @"map": @(MGLCircleTranslationAnchorMap),
+                @"viewport": @(MGLCircleTranslationAnchorViewport),
             };
             if ([[paintProperties valueForKey:@"circle-translate-anchor"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = paintProperties[@"circle-translate-anchor"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    NSValue *value = [NSValue valueWithMGLCircleTranslateAnchor:enumDictionary[paintProperties[@"circle-translate-anchor"]].integerValue];
+                    NSValue *value = [NSValue valueWithMGLCircleTranslationAnchor:enumDictionary[paintProperties[@"circle-translate-anchor"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *circleTranslateAnchorValue;
@@ -1793,24 +1791,24 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
                 } else {
                     circleTranslateAnchorValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
-                [layer setCircleTranslateAnchor:circleTranslateAnchorValue];
+                [layer setCircleTranslationAnchor:circleTranslateAnchorValue];
             } else {
-                NSValue *value = [NSValue valueWithMGLCircleTranslateAnchor:enumDictionary[paintProperties[@"circle-translate-anchor"]].integerValue];
+                NSValue *value = [NSValue valueWithMGLCircleTranslationAnchor:enumDictionary[paintProperties[@"circle-translate-anchor"]].integerValue];
                 MGLStyleValue *circleTranslateAnchorValue = [MGLStyleValue valueWithRawValue:value];
-                [layer setCircleTranslateAnchor:circleTranslateAnchorValue];
+                [layer setCircleTranslationAnchor:circleTranslateAnchorValue];
             }
         }
         if ([paintProperties valueForKey:@"circle-pitch-scale"]) {
             // create the NSString -> enum dictionary for later use
             NSDictionary<NSString*, NSNumber *> *enumDictionary = @{
-                @"map": @(MGLCirclePitchScaleMap),
-                @"viewport": @(MGLCirclePitchScaleViewport),
+                @"map": @(MGLCircleScaleAlignmentMap),
+                @"viewport": @(MGLCircleScaleAlignmentViewport),
             };
             if ([[paintProperties valueForKey:@"circle-pitch-scale"] isKindOfClass:[NSDictionary class]]) {
                 NSArray *stops = paintProperties[@"circle-pitch-scale"][@"stops"];
                 NSMutableDictionary *stopsDict = [[NSMutableDictionary alloc] init];
                 for (id stop in stops) {
-                    NSValue *value = [NSValue valueWithMGLCirclePitchScale:enumDictionary[paintProperties[@"circle-pitch-scale"]].integerValue];
+                    NSValue *value = [NSValue valueWithMGLCircleScaleAlignment:enumDictionary[paintProperties[@"circle-pitch-scale"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
                 MGLStyleValue *circlePitchScaleValue;
@@ -1820,11 +1818,11 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
                 } else {
                     circlePitchScaleValue = [MGLStyleValue valueWithStops:stopsDict];
                 }
-                [layer setCirclePitchScale:circlePitchScaleValue];
+                [layer setCircleScaleAlignment:circlePitchScaleValue];
             } else {
-                NSValue *value = [NSValue valueWithMGLCirclePitchScale:enumDictionary[paintProperties[@"circle-pitch-scale"]].integerValue];
+                NSValue *value = [NSValue valueWithMGLCircleScaleAlignment:enumDictionary[paintProperties[@"circle-pitch-scale"]].integerValue];
                 MGLStyleValue *circlePitchScaleValue = [MGLStyleValue valueWithRawValue:value];
-                [layer setCirclePitchScale:circlePitchScaleValue];
+                [layer setCircleScaleAlignment:circlePitchScaleValue];
             }
         }
         NSString *sourceLayer = layerJson[@"source-layer"];

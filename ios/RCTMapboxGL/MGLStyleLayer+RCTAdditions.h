@@ -5,6 +5,7 @@
 #import <Foundation/Foundation.h>
 #import <Mapbox/Mapbox.h>
 #import "RCTMapboxGL.h"
+#import "RCTMapboxGLErrorDomain.h"
 
 @interface MGLStyleLayer (RCTAdditions)
 + (MGLStyleLayer *)styleLayerWithJson:(nonnull NSDictionary *)layerJson mapView:(RCTMapboxGL *)mapView error:(NSError **)errorPtr;

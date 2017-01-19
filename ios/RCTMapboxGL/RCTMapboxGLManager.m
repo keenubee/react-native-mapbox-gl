@@ -632,9 +632,10 @@ RCT_EXPORT_METHOD(setLayerVisibility:(nonnull NSNumber *)reactTag
     [_bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *, RCTMapboxGL *> *viewRegistry) {
         RCTMapboxGL *mapView = viewRegistry[reactTag];
         if ([mapView isKindOfClass:[RCTMapboxGL class]]) {
-            BOOL visibilityIsSet = [mapView setLayerVisibility:layerId visibility:value];
+            NSError *error = nil;
+            BOOL visibilityIsSet = [mapView setLayerVisibility:layerId visibility:value error:&error];
             if (!visibilityIsSet) {
-                reject(@"invalid_arguments", @"setLayerVisibility(): layer does not exist.", nil);
+                reject(@"invalid_arguments", [error localizedDescription], nil);
                 return;
             }
             resolve(nil);
@@ -664,11 +665,17 @@ RCT_EXPORT_METHOD(addLayer:(nonnull NSNumber *)reactTag
           }
           MGLStyleLayer *previousLayer = [mapView styleLayerWithIdentifier:previousLayerId];
           if (!previousLayer) {
-              [mapView addLayer:layer];
+              if (![mapView addLayer:layer]) {
+                  reject(@"map_style_not_loaded", @"addLayer(): style has not finished loading", nil);
+                  return;
+              }
               resolve(nil);
               return;
           }
-          [mapView insertLayer:layer belowLayer:previousLayer];
+          if (![mapView insertLayer:layer belowLayer:previousLayer]) {
+              reject(@"map_style_not_loaded", @"addLayer(): style has not finished loading", nil);
+              return;
+          }
           resolve(nil);
       }
   }];
@@ -687,7 +694,10 @@ RCT_EXPORT_METHOD(removeLayer:(nonnull NSNumber *)reactTag
               reject(@"invalid_arguments", @"removeLayer(): cannot remove a layer that does not exist", nil);
               return;
           }
-          [mapView removeLayer:layer];
+          if (![mapView removeLayer:layer]) {
+              reject(@"map_style_not_loaded", @"removeLayer(): style has not finished loading", nil);
+              return;
+          }
           resolve(nil);
       }
   }];
@@ -749,7 +759,10 @@ RCT_EXPORT_METHOD(setSource:(nonnull NSNumber *)reactTag
                   }
                   if (!sourceFromMap) {
                       MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:id shape:sourceShape options:options];
-                      [mapView addSource:source];
+                      if (![mapView addSource:source]) {
+                           reject(@"map_style_not_loaded", @"setSource(): style has not finished loading", nil);
+                           return;
+                      }
                       resolve(nil);
                       return;
                   }
@@ -761,7 +774,10 @@ RCT_EXPORT_METHOD(setSource:(nonnull NSNumber *)reactTag
               } else {
                   if (!sourceFromMap) {
                       MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:id URL:dataString options:options];
-                      [mapView addSource:source];
+                      if (![mapView addSource:source]) {
+                          reject(@"map_style_not_loaded", @"setSource(): style has not finished loading", nil);
+                          return;
+                      }
                       resolve(nil);
                       return;
                   }
@@ -792,7 +808,10 @@ RCT_EXPORT_METHOD(removeSource:(nonnull NSNumber *)reactTag
               reject(@"invalid_arguments", @"removeSource(): cannot remove a source that does not exist", nil);
               return;
           }
-          [mapView removeSource:source];
+          if (![mapView removeSource:source]) {
+              reject(@"map_style_not_loaded", @"removeSource(): style has not finished loading", nil);
+              return;
+          }
           resolve(nil);
       }
   }];

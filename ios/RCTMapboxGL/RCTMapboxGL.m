@@ -113,7 +113,7 @@
     for (NSString *key in [_reactSubviews allKeys]) {
         [_map addAnnotation:_reactSubviews[key]];
     }
-    
+
     [self layoutSubviews];
 }
 
@@ -627,49 +627,86 @@
                                @"screenCoordX": @(screenCoord.x) } });
 }
 
-- (BOOL)setLayerVisibility:(NSString *)layerId visibility:(BOOL)value
+- (BOOL)setLayerVisibility:(NSString *)layerId visibility:(BOOL)value error:(NSError **)errorPtr
 {
+    if ([_map style] == nil) {
+      *errorPtr = [NSError errorWithDomain:RCTMapboxGLErrorDomain
+                           code:1003
+                           userInfo:@{NSLocalizedDescriptionKey:@"setLayerVisibility(): style has not finished loading"}
+      ];
+      return NO;
+    }
     MGLStyleLayer *layer = [[_map style] layerWithIdentifier:layerId];
     if (!layer) {
-        return nil;
+        *errorPtr = [NSError errorWithDomain:RCTMapboxGLErrorDomain
+                             code:1003
+                             userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"setLayerVisibility(): layer '%@' does not exist", layerId]}
+        ];
+        return NO;
     }
     [layer setVisible:value];
-    return true;
+    return YES;
 }
 
 - (MGLSource*)styleSourceWithIdentifier:(NSString*)id
 {
+    if ([_map style] == nil) {
+      return nil;
+    }
     return [[_map style] sourceWithIdentifier:id];
 }
 
 - (MGLStyleLayer*)styleLayerWithIdentifier:(NSString*)id
 {
+    if ([_map style] == nil) {
+      return nil;
+    }
     return [[_map style] layerWithIdentifier:id];
 }
 
-- (void)addLayer:(nonnull MGLStyleLayer *)layer
+- (BOOL)addLayer:(nonnull MGLStyleLayer *)layer
 {
+    if ([_map style] == nil) {
+      return NO;
+    }
     [[_map style] addLayer:layer];
+    return YES;
 }
 
-- (void)insertLayer:(nonnull MGLStyleLayer *)layer belowLayer:(nonnull MGLStyleLayer *)belowLayer
+- (BOOL)insertLayer:(nonnull MGLStyleLayer *)layer belowLayer:(nonnull MGLStyleLayer *)belowLayer
 {
+    if ([_map style] == nil) {
+      return NO;
+    }
     [[_map style] insertLayer:layer belowLayer:belowLayer];
+    return YES;
 }
 
-- (void)removeLayer:(nonnull MGLStyleLayer *)layer
+- (BOOL)removeLayer:(nonnull MGLStyleLayer *)layer
 {
+    if ([_map style] == nil) {
+      return NO;
+    }
     [[_map style] removeLayer:layer];
+    return YES;
 }
 
-- (void)addSource:(nonnull MGLSource *)source
+- (BOOL)addSource:(nonnull MGLSource *)source
 {
+    if ([_map style] == nil) {
+      return NO;
+    }
     [[_map style] addSource:source];
+    return YES;
 }
 
-- (void)removeSource:(nonnull MGLSource *)source
+- (BOOL)removeSource:(nonnull MGLSource *)source
 {
+    if ([_map style] == nil) {
+      return NO;
+    }
     [[_map style] removeSource:source];
+    return YES;
 }
 
 - (nonnull NSArray<id<MGLFeature>> *)visibleFeaturesAtPoint:(CGPoint)point
