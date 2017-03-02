@@ -1,10 +1,10 @@
 #import "RCTMapboxAnnotation.h"
 
-#import <MapBox/MapBox.h>
+#import <Mapbox/Mapbox.h>
 #import <UIKit/UIKit.h>
 
-#import "RCTConvert+MapKit.h"
-#import "RCTComponent.h"
+#import <React/RCTConvert+MapKit.h>
+#import <React/RCTComponent.h>
 #import "RCTMapboxGL.h"
 
 @class RCTBridge;
