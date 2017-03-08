@@ -166,7 +166,7 @@ class MapView extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { mapFinishedLoading: false }
+    this.state = { mapStyleFinishedLoading: false }
 
     this._onRegionDidChange = this._onRegionDidChange.bind(this);
     this._onRegionWillChange = this._onRegionWillChange.bind(this);
@@ -181,6 +181,7 @@ class MapView extends Component {
     this._onStartLoadingMap = this._onStartLoadingMap.bind(this);
     this._onLocateUserFailed = this._onLocateUserFailed.bind(this);
     this._onNativeComponentMount = this._onNativeComponentMount.bind(this);
+    this._onFinishLoadingStyle = this._onFinishLoadingStyle.bind(this);
   }
 
   // Viewport setters
@@ -417,18 +418,21 @@ class MapView extends Component {
   _onTap(event: Event) {
     if (this.props.onTap) this.props.onTap(event.nativeEvent.src);
   }
-  _onFinishLoadingMap(event: Event) {
+  _onFinishLoadingStyle(event: Event) {
     this.props.dynamicSources && this.props.dynamicSources.forEach((source, id) => {
       this.setSource(id, source.toJS());
     })
     this.props.dynamicLayers && this.props.dynamicLayers.forEach((layer) => {
       this.addLayer(layer.toJS());
     })
-    this.setState({mapFinishedLoading: true});
+    this.setState({mapStyleFinishedLoading: true});
+    if (this.props.onFinishLoadingStyle) this.props.onFinishLoadingStyle(event.nativeEvent.src);
+  }
+  _onFinishLoadingMap(event: Event) {
     if (this.props.onFinishLoadingMap) this.props.onFinishLoadingMap(event.nativeEvent.src);
   }
   _onStartLoadingMap(event: Event) {
-    this.setState({mapFinishedLoading: false});
+    this.setState({mapStyleFinishedLoading: false});
     if (this.props.onStartLoadingMap) this.props.onStartLoadingMap(event.nativeEvent.src);
   }
   _onLocateUserFailed(event: Event) {
@@ -500,6 +504,7 @@ class MapView extends Component {
     onLongPress: PropTypes.func,
     onTap: PropTypes.func,
     onChangeUserTrackingMode: PropTypes.func,
+    onFinishLoadingStyle: PropTypes.func,
   };
 
   static defaultProps = {
@@ -531,7 +536,7 @@ class MapView extends Component {
   };
 
   componentWillReceiveProps(newProps) {
-    if (this.state.mapFinishedLoading) {
+    if (this.state.mapStyleFinishedLoading) {
       const { update, exit } = diffSources(this.props.dynamicSources, newProps.dynamicSources);
 
       // add/update sources before adding their corresponding layers
@@ -627,6 +632,7 @@ class MapView extends Component {
         onStartLoadingMap={this._onStartLoadingMap}
         onLocateUserFailed={this._onLocateUserFailed}
         onChangeUserTrackingMode={this._onChangeUserTrackingMode}
+        onFinishLoadingStyle={this._onFinishLoadingStyle}
       />
     );
   }

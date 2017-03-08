@@ -70,6 +70,7 @@ RCT_EXPORT_VIEW_PROPERTY(onLongPress, RCTDirectEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onFinishLoadingMap, RCTDirectEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onStartLoadingMap, RCTDirectEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onLocateUserFailed, RCTDirectEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onFinishLoadingStyle, RCTDirectEventBlock);
 
 RCT_CUSTOM_VIEW_PROPERTY(contentInset, UIEdgeInsetsMake, RCTMapboxGL)
 {
@@ -756,6 +757,7 @@ RCT_EXPORT_METHOD(setSource:(nonnull NSNumber *)reactTag
                   MGLShape *sourceShape = [MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:&encodeError];
                   if (!sourceShape) {
                       reject(@"invalid_arguments", @"setSource(): invalid geoJson data", nil);
+                      return;
                   }
                   if (!sourceFromMap) {
                       MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:id shape:sourceShape options:options];

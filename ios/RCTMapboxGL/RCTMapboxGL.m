@@ -732,6 +732,13 @@
     _onStartLoadingMap(@{ @"target": self.reactTag });
 }
 
+- (void)mapView:(MGLMapView *)mapView
+    didFinishLoadingStyle:(MGLStyle *)style
+{
+    if (!_onFinishLoadingStyle) { return; }
+    _onFinishLoadingStyle(@{ @"target": self.reactTag });
+}
+
 // Utils
 
 - (unsigned int)intFromHexString:(NSString *)hexStr
