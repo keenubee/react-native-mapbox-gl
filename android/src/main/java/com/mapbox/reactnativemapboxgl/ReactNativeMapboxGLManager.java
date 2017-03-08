@@ -90,6 +90,7 @@ public class ReactNativeMapboxGLManager extends SimpleViewManager<ReactNativeMap
                 .put("onFinishLoadingMap", MapBuilder.of("registrationName", "onFinishLoadingMap"))
                 .put("onStartLoadingMap", MapBuilder.of("registrationName", "onStartLoadingMap"))
                 .put("onLocateUserFailed", MapBuilder.of("registrationName", "onLocateUserFailed"))
+                .put("onFinishLoadingStyle", MapBuilder.of("registrationName", "onFinishLoadingStyle"))
                 .build();
     }
 

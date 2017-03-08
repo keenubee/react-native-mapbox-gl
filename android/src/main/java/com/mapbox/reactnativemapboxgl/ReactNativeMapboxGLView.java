@@ -562,6 +562,9 @@ public class ReactNativeMapboxGLView extends RelativeLayout implements
             case MapView.DID_FINISH_LOADING_MAP:
                 emitEvent("onFinishLoadingMap", null);
                 break;
+            case MapView.DID_FINISH_LOADING_STYLE:
+                emitEvent("onFinishLoadingStyle", null);
+                break;
         }
     }
 
