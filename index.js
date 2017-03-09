@@ -419,13 +419,14 @@ class MapView extends Component {
     if (this.props.onTap) this.props.onTap(event.nativeEvent.src);
   }
   _onFinishLoadingStyle(event: Event) {
-    this.props.dynamicSources && this.props.dynamicSources.forEach((source, id) => {
-      this.setSource(id, source.toJS());
+    this.props.dynamicSources && Promise.all(this.props.dynamicSources.map((source, id) => {
+      return this.setSource(id, source.toJS());
+    }).toList().toArray()).then(() => {
+      this.props.dynamicLayers && this.props.dynamicLayers.forEach((layer) => {
+        this.addLayer(layer.toJS());
+      })
+      this.setState({mapStyleFinishedLoading: true});
     })
-    this.props.dynamicLayers && this.props.dynamicLayers.forEach((layer) => {
-      this.addLayer(layer.toJS());
-    })
-    this.setState({mapStyleFinishedLoading: true});
     if (this.props.onFinishLoadingStyle) this.props.onFinishLoadingStyle(event.nativeEvent.src);
   }
   _onFinishLoadingMap(event: Event) {
@@ -538,27 +539,27 @@ class MapView extends Component {
   componentWillReceiveProps(newProps) {
     if (this.state.mapStyleFinishedLoading) {
       const { update, exit } = diffSources(this.props.dynamicSources, newProps.dynamicSources);
+      const { updates, exiting } = diffLayers(this.props.dynamicLayers, newProps.dynamicLayers)
 
       // add/update sources before adding their corresponding layers
-      for (const src of update) {
-        this.setSource(src.id, src.source.toJS());
-      }
-
-      const { updates, exiting } = diffLayers(this.props.dynamicLayers, newProps.dynamicLayers)
-      for (const lyr of exiting) {
-        this.removeLayer(lyr.id);
-      }
-      for (const lyr of updates) {
-        if (!lyr.enter) {
+      Promise.all(update.map(src => {
+        return this.setSource(src.id, src.source.toJS());
+      })).then(() => {
+        for (const lyr of exiting) {
           this.removeLayer(lyr.id);
         }
-        this.addLayer(lyr.layer.toJS(), lyr.before);
-      }
+        for (const lyr of updates) {
+          if (!lyr.enter) {
+            this.removeLayer(lyr.id);
+          }
+          this.addLayer(lyr.layer.toJS(), lyr.before);
+        }
 
-      // remove sources after their corresponding layers have been removed
-      for (const src of exit) {
-        this.removeSource(src.id);
-      }
+        // remove sources after their corresponding layers have been removed
+        for (const src of exit) {
+          this.removeSource(src.id);
+        }
+      })
     }
 
     const oldKeys = clone(this._annotations);
