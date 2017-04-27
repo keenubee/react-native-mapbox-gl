@@ -37,13 +37,9 @@ dependencies {
 ```
 
 ```java
-// file: android/app/src/main/java/com/yourcompany/yourapp/MainActivity.java
+// file: android/app/src/main/java/com/yourcompany/yourapp/MainApplication.java
 import com.mapbox.reactnativemapboxgl.ReactNativeMapboxGLPackage; // <-- import
 ...
-/**
-   * A list of packages used by the app. If the app uses additional views
-   * or modules besides the default ones, add more packages here.
-   */
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
@@ -66,6 +62,7 @@ Add the following permissions to the `<manifest>` root node of your `AndroidMani
 Also, add the Mapbox analytics service to the `<application>` node:
 
 ```xml
+
 <service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService"/>
 ```
 
