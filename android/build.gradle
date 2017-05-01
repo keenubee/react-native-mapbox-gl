@@ -31,7 +31,9 @@ repositories {
 
 dependencies {
     compile 'com.facebook.react:react-native:+'
-    compile('com.mapbox.mapboxsdk:mapbox-android-sdk:4.2.2@aar') {
-        transitive = true
+    compile 'com.google.guava:guava:20.0'
+    compile 'com.mapbox.mapboxsdk:mapbox-android-telemetry:2.1.0@aar'
+    compile('com.mapbox.mapboxsdk:mapbox-android-sdk:5.0.2@aar') {
+        exclude group: 'com.squareup.okhttp', module: 'okhttp'
     }
 }
