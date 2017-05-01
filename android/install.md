@@ -37,9 +37,13 @@ dependencies {
 ```
 
 ```java
-// file: android/app/src/main/java/com/yourcompany/yourapp/MainApplication.java
+// file: android/app/src/main/java/com/yourcompany/yourapp/MainActivity.java
 import com.mapbox.reactnativemapboxgl.ReactNativeMapboxGLPackage; // <-- import
 ...
+/**
+   * A list of packages used by the app. If the app uses additional views
+   * or modules besides the default ones, add more packages here.
+   */
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
