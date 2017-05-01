@@ -3,10 +3,12 @@ package com.mapbox.reactnativemapboxgl;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableArray;
@@ -124,7 +126,14 @@ public class RNMGLAnnotationOptionsFactory {
         if ((drawable instanceof BitmapDrawable) && width == intrinsicWidth && height == intrinsicHeight) {
             icon = iconFactory.fromBitmap(((BitmapDrawable)drawable).getBitmap());
         } else {
-            icon = iconFactory.fromDrawable(drawable, width, height);
+            // Conversion taken from mapbox-gl-native/issues/7897#issuecomment-277302450
+            Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+                    drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            //DrawableCompat.setTint(drawable, colorRes);
+            drawable.draw(canvas);
+            icon = iconFactory.fromBitmap(bitmap);
         }
 
         iconCache.put(cacheKey, icon);

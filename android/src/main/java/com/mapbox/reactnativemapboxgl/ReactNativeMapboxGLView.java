@@ -159,8 +159,8 @@ public class ReactNativeMapboxGLView extends RelativeLayout implements
         _map.getTrackingSettings().setMyLocationTrackingMode(_locationTrackingMode);
         _map.getTrackingSettings().setMyBearingTrackingMode(_bearingTrackingMode);
         _map.setPadding(_paddingLeft, _paddingTop, _paddingRight, _paddingBottom);
-        _map.setMinZoom(_minimumZoomLevel);
-        _map.setMaxZoom(_maximumZoomLevel);
+        _map.setMinZoomPreference(_minimumZoomLevel);
+        _map.setMaxZoomPreference(_maximumZoomLevel);
 
         UiSettings uiSettings = _map.getUiSettings();
         uiSettings.setZoomGesturesEnabled(_zoomEnabled);
@@ -346,7 +346,7 @@ public class ReactNativeMapboxGLView extends RelativeLayout implements
         if (_minimumZoomLevel == value) { return; }
         _minimumZoomLevel = value;
         if (_map != null) {
-            _map.setMinZoom(value);
+            _map.setMinZoomPreference(value);
         }
     }
 
@@ -354,7 +354,7 @@ public class ReactNativeMapboxGLView extends RelativeLayout implements
         if (_maximumZoomLevel == value) { return; }
         _maximumZoomLevel = value;
         if (_map != null) {
-            _map.setMaxZoom(value);
+            _map.setMaxZoomPreference(value);
         }
     }
 

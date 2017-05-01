@@ -35,7 +35,7 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.modules.core.RCTNativeAppEventEmitter;
 import com.facebook.react.uimanager.annotations.ReactProp;
-import com.mapbox.mapboxsdk.MapboxAccountManager;
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.Style;
@@ -47,7 +47,7 @@ import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
 import com.mapbox.mapboxsdk.offline.OfflineRegionError;
 import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
 import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
-import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
+import com.mapbox.services.android.telemetry.MapboxTelemetry;
 
 import javax.annotation.Nullable;
 
@@ -115,7 +115,7 @@ public class ReactNativeMapboxGLModule extends ReactContextBaseJavaModule {
         mapStyles.put("light", Style.LIGHT);
         mapStyles.put("dark", Style.DARK);
         mapStyles.put("streets", Style.MAPBOX_STREETS);
-        mapStyles.put("emerald", Style.EMERALD);
+        mapStyles.put("outdoors", Style.OUTDOORS);
         mapStyles.put("satellite", Style.SATELLITE);
         mapStyles.put("hybrid", Style.SATELLITE_STREETS);
 
@@ -126,7 +126,7 @@ public class ReactNativeMapboxGLModule extends ReactContextBaseJavaModule {
 
         // Other constants
         constants.put("unknownResourceCount", Long.MAX_VALUE);
-        constants.put("metricsEnabled", MapboxEventManager.getMapboxEventManager().isTelemetryEnabled());
+        constants.put("metricsEnabled", MapboxTelemetry.getInstance().isTelemetryEnabled());
 
         constants.put("userTrackingMode", userTrackingMode);
         constants.put("mapStyles", mapStyles);
@@ -143,7 +143,7 @@ public class ReactNativeMapboxGLModule extends ReactContextBaseJavaModule {
             throw new JSApplicationIllegalArgumentException("Invalid access token. Register to mapbox.com and request an access token, then pass it to setAccessToken()");
         }
         if (initialized) {
-            String oldToken = MapboxAccountManager.getInstance().getAccessToken();
+            String oldToken = Mapbox.getAccessToken();
             if (!oldToken.equals(accessToken)) {
                 throw new JSApplicationIllegalArgumentException("Mapbox access token cannot be initialized twice with different values");
             }
@@ -153,7 +153,7 @@ public class ReactNativeMapboxGLModule extends ReactContextBaseJavaModule {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                MapboxAccountManager.start(context.getApplicationContext(), accessToken);
+                Mapbox.getInstance(context.getApplicationContext(), accessToken);
             }
         });
         initializeOfflinePacks();
@@ -163,7 +163,7 @@ public class ReactNativeMapboxGLModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void setMetricsEnabled(boolean value) {
-        MapboxEventManager.getMapboxEventManager().setTelemetryEnabled(value);
+        MapboxTelemetry.getInstance().setTelemetryEnabled(value);
     }
 
     // Offline packs
