@@ -37,13 +37,9 @@ dependencies {
 ```
 
 ```java
-// file: android/app/src/main/java/com/yourcompany/yourapp/MainActivity.java
+// file: android/app/src/main/java/com/yourcompany/yourapp/MainApplication.java
 import com.mapbox.reactnativemapboxgl.ReactNativeMapboxGLPackage; // <-- import
 ...
-/**
-   * A list of packages used by the app. If the app uses additional views
-   * or modules besides the default ones, add more packages here.
-   */
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
@@ -57,17 +53,18 @@ import com.mapbox.reactnativemapboxgl.ReactNativeMapboxGLPackage; // <-- import
 Add the following permissions to the `<manifest>` root node of your `AndroidManifest.xml`:
 
 ```xml
+<uses-permission android:name="android.permission.INTERNET" />
+...
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-<uses-permission android:name="android.permission.INTERNET" />
 ```
 
 Also, add the Mapbox analytics service to the `<application>` node:
 
 ```xml
 
-<service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService"/>
+<service android:name="com.mapbox.services.android.telemetry.service.TelemetryService"/>
 ```
 
 #### Step 4 - Add to project, [see example](../example.js)
