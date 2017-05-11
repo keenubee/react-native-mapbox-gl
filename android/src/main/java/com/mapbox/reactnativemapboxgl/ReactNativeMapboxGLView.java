@@ -736,6 +736,9 @@ public class ReactNativeMapboxGLView extends RelativeLayout implements
 
     public void removeLayer(String id) throws NoSuchLayerException {
         if (_map == null) { return; }
+        if (_map.getLayer(id) == null) {
+          throw new NoSuchLayerException(String.format("Layer '%s' does not exist", id));
+        }
         _map.removeLayer(id);
     }
 
