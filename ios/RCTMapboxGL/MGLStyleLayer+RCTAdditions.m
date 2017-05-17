@@ -13,6 +13,8 @@
 #import <Mapbox/MGLRasterStyleLayer.h>
 #import <Mapbox/MGLBackgroundStyleLayer.h>
 
+NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorDomain";
+
 
 @implementation MGLStyleLayer (RCTAdditions)
 
@@ -55,13 +57,7 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *fillAntialiasValue;
-                NSNumber *baseNumber = paintProperties[@"fill-antialias"][@"base"];
-                if (baseNumber) {
-                    fillAntialiasValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    fillAntialiasValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *fillAntialiasValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setFillAntialiased:fillAntialiasValue];
             } else {
                 MGLStyleValue *fillAntialiasValue = [MGLStyleValue valueWithRawValue:paintProperties[@"fill-antialias"]];
@@ -75,13 +71,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *fillOpacityValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"fill-opacity"][@"base"];
                 if (baseNumber) {
-                    fillOpacityValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    fillOpacityValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *fillOpacityValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setFillOpacity:fillOpacityValue];
             } else {
                 MGLStyleValue *fillOpacityValue = [MGLStyleValue valueWithRawValue:paintProperties[@"fill-opacity"]];
@@ -95,13 +92,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorWithString:stop[1]]] forKey:stop[0]];
                 }
-                MGLStyleValue *fillColorValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"fill-color"][@"base"];
                 if (baseNumber) {
-                    fillColorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    fillColorValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *fillColorValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setFillColor:fillColorValue];
             } else {
                 UIColor *color = [UIColor colorWithString:paintProperties[@"fill-color"]];
@@ -116,13 +114,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorWithString:stop[1]]] forKey:stop[0]];
                 }
-                MGLStyleValue *fillOutlineColorValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"fill-outline-color"][@"base"];
                 if (baseNumber) {
-                    fillOutlineColorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    fillOutlineColorValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *fillOutlineColorValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setFillOutlineColor:fillOutlineColorValue];
             } else {
                 UIColor *color = [UIColor colorWithString:paintProperties[@"fill-outline-color"]];
@@ -138,13 +137,14 @@
                     CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
-                MGLStyleValue *fillTranslateValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"fill-translate"][@"base"];
                 if (baseNumber) {
-                    fillTranslateValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    fillTranslateValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *fillTranslateValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setFillTranslation:fillTranslateValue];
             } else {
                 CGVector vector = CGVectorMake([paintProperties[@"fill-translate"][0] floatValue], [paintProperties[@"fill-translate"][1] floatValue]);
@@ -165,13 +165,7 @@
                     NSValue *value = [NSValue valueWithMGLFillTranslationAnchor:enumDictionary[paintProperties[@"fill-translate-anchor"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
-                MGLStyleValue *fillTranslateAnchorValue;
-                NSNumber *baseNumber = paintProperties[@"fill-translate-anchor"][@"base"];
-                if (baseNumber) {
-                    fillTranslateAnchorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    fillTranslateAnchorValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *fillTranslateAnchorValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setFillTranslationAnchor:fillTranslateAnchorValue];
             } else {
                 NSValue *value = [NSValue valueWithMGLFillTranslationAnchor:enumDictionary[paintProperties[@"fill-translate-anchor"]].integerValue];
@@ -186,13 +180,7 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *fillPatternValue;
-                NSNumber *baseNumber = paintProperties[@"fill-pattern"][@"base"];
-                if (baseNumber) {
-                    fillPatternValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    fillPatternValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *fillPatternValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setFillPattern:fillPatternValue];
             } else {
                 MGLStyleValue *fillPatternValue = [MGLStyleValue valueWithRawValue:paintProperties[@"fill-pattern"]];
@@ -247,13 +235,7 @@
                     NSValue *value = [NSValue valueWithMGLLineCap:enumDictionary[layoutProperties[@"line-cap"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
-                MGLStyleValue *lineCapValue;
-                NSNumber *baseNumber = layoutProperties[@"line-cap"][@"base"];
-                if (baseNumber) {
-                    lineCapValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    lineCapValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *lineCapValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setLineCap:lineCapValue];
             } else {
                 NSValue *value = [NSValue valueWithMGLLineCap:enumDictionary[layoutProperties[@"line-cap"]].integerValue];
@@ -275,13 +257,7 @@
                     NSValue *value = [NSValue valueWithMGLLineJoin:enumDictionary[layoutProperties[@"line-join"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
-                MGLStyleValue *lineJoinValue;
-                NSNumber *baseNumber = layoutProperties[@"line-join"][@"base"];
-                if (baseNumber) {
-                    lineJoinValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    lineJoinValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *lineJoinValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setLineJoin:lineJoinValue];
             } else {
                 NSValue *value = [NSValue valueWithMGLLineJoin:enumDictionary[layoutProperties[@"line-join"]].integerValue];
@@ -296,13 +272,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *lineMiterLimitValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = layoutProperties[@"line-miter-limit"][@"base"];
                 if (baseNumber) {
-                    lineMiterLimitValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    lineMiterLimitValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *lineMiterLimitValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setLineMiterLimit:lineMiterLimitValue];
             } else {
                 MGLStyleValue *lineMiterLimitValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"line-miter-limit"]];
@@ -316,13 +293,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *lineRoundLimitValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = layoutProperties[@"line-round-limit"][@"base"];
                 if (baseNumber) {
-                    lineRoundLimitValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    lineRoundLimitValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *lineRoundLimitValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setLineRoundLimit:lineRoundLimitValue];
             } else {
                 MGLStyleValue *lineRoundLimitValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"line-round-limit"]];
@@ -336,13 +314,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *lineOpacityValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"line-opacity"][@"base"];
                 if (baseNumber) {
-                    lineOpacityValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    lineOpacityValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *lineOpacityValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setLineOpacity:lineOpacityValue];
             } else {
                 MGLStyleValue *lineOpacityValue = [MGLStyleValue valueWithRawValue:paintProperties[@"line-opacity"]];
@@ -356,13 +335,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorWithString:stop[1]]] forKey:stop[0]];
                 }
-                MGLStyleValue *lineColorValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"line-color"][@"base"];
                 if (baseNumber) {
-                    lineColorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    lineColorValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *lineColorValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setLineColor:lineColorValue];
             } else {
                 UIColor *color = [UIColor colorWithString:paintProperties[@"line-color"]];
@@ -378,13 +358,14 @@
                     CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
-                MGLStyleValue *lineTranslateValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"line-translate"][@"base"];
                 if (baseNumber) {
-                    lineTranslateValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    lineTranslateValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *lineTranslateValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setLineTranslation:lineTranslateValue];
             } else {
                 CGVector vector = CGVectorMake([paintProperties[@"line-translate"][0] floatValue], [paintProperties[@"line-translate"][1] floatValue]);
@@ -405,13 +386,7 @@
                     NSValue *value = [NSValue valueWithMGLLineTranslationAnchor:enumDictionary[paintProperties[@"line-translate-anchor"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
-                MGLStyleValue *lineTranslateAnchorValue;
-                NSNumber *baseNumber = paintProperties[@"line-translate-anchor"][@"base"];
-                if (baseNumber) {
-                    lineTranslateAnchorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    lineTranslateAnchorValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *lineTranslateAnchorValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setLineTranslationAnchor:lineTranslateAnchorValue];
             } else {
                 NSValue *value = [NSValue valueWithMGLLineTranslationAnchor:enumDictionary[paintProperties[@"line-translate-anchor"]].integerValue];
@@ -426,13 +401,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *lineWidthValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"line-width"][@"base"];
                 if (baseNumber) {
-                    lineWidthValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    lineWidthValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *lineWidthValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setLineWidth:lineWidthValue];
             } else {
                 MGLStyleValue *lineWidthValue = [MGLStyleValue valueWithRawValue:paintProperties[@"line-width"]];
@@ -446,13 +422,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *lineGapWidthValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"line-gap-width"][@"base"];
                 if (baseNumber) {
-                    lineGapWidthValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    lineGapWidthValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *lineGapWidthValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setLineGapWidth:lineGapWidthValue];
             } else {
                 MGLStyleValue *lineGapWidthValue = [MGLStyleValue valueWithRawValue:paintProperties[@"line-gap-width"]];
@@ -467,13 +444,14 @@
                     CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
-                MGLStyleValue *lineOffsetValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"line-offset"][@"base"];
                 if (baseNumber) {
-                    lineOffsetValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    lineOffsetValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *lineOffsetValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setLineOffset:lineOffsetValue];
             } else {
                 CGVector vector = CGVectorMake([paintProperties[@"line-offset"][0] floatValue], [paintProperties[@"line-offset"][1] floatValue]);
@@ -488,13 +466,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *lineBlurValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"line-blur"][@"base"];
                 if (baseNumber) {
-                    lineBlurValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    lineBlurValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *lineBlurValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setLineBlur:lineBlurValue];
             } else {
                 MGLStyleValue *lineBlurValue = [MGLStyleValue valueWithRawValue:paintProperties[@"line-blur"]];
@@ -508,13 +487,7 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *lineDasharrayValue;
-                NSNumber *baseNumber = paintProperties[@"line-dasharray"][@"base"];
-                if (baseNumber) {
-                    lineDasharrayValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    lineDasharrayValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *lineDasharrayValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setLineDashPattern:lineDasharrayValue];
             } else {
                 MGLStyleValue *lineDasharrayValue = [MGLStyleValue valueWithRawValue:paintProperties[@"line-dasharray"]];
@@ -528,13 +501,7 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *linePatternValue;
-                NSNumber *baseNumber = paintProperties[@"line-pattern"][@"base"];
-                if (baseNumber) {
-                    linePatternValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    linePatternValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *linePatternValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setLinePattern:linePatternValue];
             } else {
                 MGLStyleValue *linePatternValue = [MGLStyleValue valueWithRawValue:paintProperties[@"line-pattern"]];
@@ -588,13 +555,7 @@
                     NSValue *value = [NSValue valueWithMGLSymbolPlacement:enumDictionary[layoutProperties[@"symbol-placement"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
-                MGLStyleValue *symbolPlacementValue;
-                NSNumber *baseNumber = layoutProperties[@"symbol-placement"][@"base"];
-                if (baseNumber) {
-                    symbolPlacementValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    symbolPlacementValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *symbolPlacementValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setSymbolPlacement:symbolPlacementValue];
             } else {
                 NSValue *value = [NSValue valueWithMGLSymbolPlacement:enumDictionary[layoutProperties[@"symbol-placement"]].integerValue];
@@ -609,13 +570,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *symbolSpacingValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = layoutProperties[@"symbol-spacing"][@"base"];
                 if (baseNumber) {
-                    symbolSpacingValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    symbolSpacingValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *symbolSpacingValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setSymbolSpacing:symbolSpacingValue];
             } else {
                 MGLStyleValue *symbolSpacingValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"symbol-spacing"]];
@@ -629,13 +591,7 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *symbolAvoidEdgesValue;
-                NSNumber *baseNumber = layoutProperties[@"symbol-avoid-edges"][@"base"];
-                if (baseNumber) {
-                    symbolAvoidEdgesValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    symbolAvoidEdgesValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *symbolAvoidEdgesValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setSymbolAvoidsEdges:symbolAvoidEdgesValue];
             } else {
                 MGLStyleValue *symbolAvoidEdgesValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"symbol-avoid-edges"]];
@@ -649,13 +605,7 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *iconAllowOverlapValue;
-                NSNumber *baseNumber = layoutProperties[@"icon-allow-overlap"][@"base"];
-                if (baseNumber) {
-                    iconAllowOverlapValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    iconAllowOverlapValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *iconAllowOverlapValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setIconAllowsOverlap:iconAllowOverlapValue];
             } else {
                 MGLStyleValue *iconAllowOverlapValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"icon-allow-overlap"]];
@@ -669,13 +619,7 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *iconIgnorePlacementValue;
-                NSNumber *baseNumber = layoutProperties[@"icon-ignore-placement"][@"base"];
-                if (baseNumber) {
-                    iconIgnorePlacementValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    iconIgnorePlacementValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *iconIgnorePlacementValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setIconIgnoresPlacement:iconIgnorePlacementValue];
             } else {
                 MGLStyleValue *iconIgnorePlacementValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"icon-ignore-placement"]];
@@ -689,13 +633,7 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *iconOptionalValue;
-                NSNumber *baseNumber = layoutProperties[@"icon-optional"][@"base"];
-                if (baseNumber) {
-                    iconOptionalValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    iconOptionalValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *iconOptionalValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setIconOptional:iconOptionalValue];
             } else {
                 MGLStyleValue *iconOptionalValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"icon-optional"]];
@@ -716,13 +654,7 @@
                     NSValue *value = [NSValue valueWithMGLIconRotationAlignment:enumDictionary[layoutProperties[@"icon-rotation-alignment"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
-                MGLStyleValue *iconRotationAlignmentValue;
-                NSNumber *baseNumber = layoutProperties[@"icon-rotation-alignment"][@"base"];
-                if (baseNumber) {
-                    iconRotationAlignmentValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    iconRotationAlignmentValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *iconRotationAlignmentValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setIconRotationAlignment:iconRotationAlignmentValue];
             } else {
                 NSValue *value = [NSValue valueWithMGLIconRotationAlignment:enumDictionary[layoutProperties[@"icon-rotation-alignment"]].integerValue];
@@ -737,13 +669,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *iconSizeValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = layoutProperties[@"icon-size"][@"base"];
                 if (baseNumber) {
-                    iconSizeValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    iconSizeValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *iconSizeValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setIconScale:iconSizeValue];
             } else {
                 MGLStyleValue *iconSizeValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"icon-size"]];
@@ -765,13 +698,7 @@
                     NSValue *value = [NSValue valueWithMGLIconTextFit:enumDictionary[layoutProperties[@"icon-text-fit"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
-                MGLStyleValue *iconTextFitValue;
-                NSNumber *baseNumber = layoutProperties[@"icon-text-fit"][@"base"];
-                if (baseNumber) {
-                    iconTextFitValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    iconTextFitValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *iconTextFitValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setIconTextFit:iconTextFitValue];
             } else {
                 NSValue *value = [NSValue valueWithMGLIconTextFit:enumDictionary[layoutProperties[@"icon-text-fit"]].integerValue];
@@ -788,13 +715,14 @@
                     UIEdgeInsets insets = UIEdgeInsetsMake([iconTextFitPaddingArray[0] floatValue], [iconTextFitPaddingArray[3] floatValue], [iconTextFitPaddingArray[2] floatValue], [iconTextFitPaddingArray[1] floatValue]);
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithUIEdgeInsets:insets]] forKey:stop[0]];
                 }
-                MGLStyleValue *iconTextFitPaddingValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = layoutProperties[@"icon-text-fit-padding"][@"base"];
                 if (baseNumber) {
-                    iconTextFitPaddingValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    iconTextFitPaddingValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *iconTextFitPaddingValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setIconTextFitPadding:iconTextFitPaddingValue];
             } else {
                 NSArray *iconTextFitPaddingArray = layoutProperties[@"icon-text-fit-padding"];
@@ -810,13 +738,7 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *iconImageValue;
-                NSNumber *baseNumber = layoutProperties[@"icon-image"][@"base"];
-                if (baseNumber) {
-                    iconImageValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    iconImageValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *iconImageValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setIconImageName:iconImageValue];
             } else {
                 MGLStyleValue *iconImageValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"icon-image"]];
@@ -830,13 +752,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *iconRotateValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = layoutProperties[@"icon-rotate"][@"base"];
                 if (baseNumber) {
-                    iconRotateValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    iconRotateValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *iconRotateValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setIconRotation:iconRotateValue];
             } else {
                 MGLStyleValue *iconRotateValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"icon-rotate"]];
@@ -850,13 +773,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *iconPaddingValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = layoutProperties[@"icon-padding"][@"base"];
                 if (baseNumber) {
-                    iconPaddingValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    iconPaddingValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *iconPaddingValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setIconPadding:iconPaddingValue];
             } else {
                 MGLStyleValue *iconPaddingValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"icon-padding"]];
@@ -870,13 +794,7 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *iconKeepUprightValue;
-                NSNumber *baseNumber = layoutProperties[@"icon-keep-upright"][@"base"];
-                if (baseNumber) {
-                    iconKeepUprightValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    iconKeepUprightValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *iconKeepUprightValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setKeepsIconUpright:iconKeepUprightValue];
             } else {
                 MGLStyleValue *iconKeepUprightValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"icon-keep-upright"]];
@@ -891,13 +809,14 @@
                     CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
-                MGLStyleValue *iconOffsetValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = layoutProperties[@"icon-offset"][@"base"];
                 if (baseNumber) {
-                    iconOffsetValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    iconOffsetValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *iconOffsetValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setIconOffset:iconOffsetValue];
             } else {
                 CGVector vector = CGVectorMake([layoutProperties[@"icon-offset"][0] floatValue], [layoutProperties[@"icon-offset"][1] floatValue]);
@@ -919,13 +838,7 @@
                     NSValue *value = [NSValue valueWithMGLTextPitchAlignment:enumDictionary[layoutProperties[@"text-pitch-alignment"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
-                MGLStyleValue *textPitchAlignmentValue;
-                NSNumber *baseNumber = layoutProperties[@"text-pitch-alignment"][@"base"];
-                if (baseNumber) {
-                    textPitchAlignmentValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    textPitchAlignmentValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *textPitchAlignmentValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setTextPitchAlignment:textPitchAlignmentValue];
             } else {
                 NSValue *value = [NSValue valueWithMGLTextPitchAlignment:enumDictionary[layoutProperties[@"text-pitch-alignment"]].integerValue];
@@ -947,13 +860,7 @@
                     NSValue *value = [NSValue valueWithMGLTextRotationAlignment:enumDictionary[layoutProperties[@"text-rotation-alignment"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
-                MGLStyleValue *textRotationAlignmentValue;
-                NSNumber *baseNumber = layoutProperties[@"text-rotation-alignment"][@"base"];
-                if (baseNumber) {
-                    textRotationAlignmentValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    textRotationAlignmentValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *textRotationAlignmentValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setTextRotationAlignment:textRotationAlignmentValue];
             } else {
                 NSValue *value = [NSValue valueWithMGLTextRotationAlignment:enumDictionary[layoutProperties[@"text-rotation-alignment"]].integerValue];
@@ -968,13 +875,7 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *textFieldValue;
-                NSNumber *baseNumber = layoutProperties[@"text-field"][@"base"];
-                if (baseNumber) {
-                    textFieldValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    textFieldValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *textFieldValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setText:textFieldValue];
             } else {
                 MGLStyleValue *textFieldValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-field"]];
@@ -988,13 +889,7 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *textFontValue;
-                NSNumber *baseNumber = layoutProperties[@"text-font"][@"base"];
-                if (baseNumber) {
-                    textFontValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    textFontValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *textFontValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setTextFontNames:textFontValue];
             } else {
                 MGLStyleValue *textFontValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-font"]];
@@ -1008,13 +903,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *textSizeValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = layoutProperties[@"text-size"][@"base"];
                 if (baseNumber) {
-                    textSizeValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    textSizeValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *textSizeValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setTextFontSize:textSizeValue];
             } else {
                 MGLStyleValue *textSizeValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-size"]];
@@ -1028,13 +924,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *textMaxWidthValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = layoutProperties[@"text-max-width"][@"base"];
                 if (baseNumber) {
-                    textMaxWidthValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    textMaxWidthValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *textMaxWidthValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setMaximumTextWidth:textMaxWidthValue];
             } else {
                 MGLStyleValue *textMaxWidthValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-max-width"]];
@@ -1048,13 +945,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *textLineHeightValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = layoutProperties[@"text-line-height"][@"base"];
                 if (baseNumber) {
-                    textLineHeightValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    textLineHeightValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *textLineHeightValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setTextLineHeight:textLineHeightValue];
             } else {
                 MGLStyleValue *textLineHeightValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-line-height"]];
@@ -1068,13 +966,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *textLetterSpacingValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = layoutProperties[@"text-letter-spacing"][@"base"];
                 if (baseNumber) {
-                    textLetterSpacingValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    textLetterSpacingValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *textLetterSpacingValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setTextLetterSpacing:textLetterSpacingValue];
             } else {
                 MGLStyleValue *textLetterSpacingValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-letter-spacing"]];
@@ -1095,13 +994,7 @@
                     NSValue *value = [NSValue valueWithMGLTextJustification:enumDictionary[layoutProperties[@"text-justify"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
-                MGLStyleValue *textJustifyValue;
-                NSNumber *baseNumber = layoutProperties[@"text-justify"][@"base"];
-                if (baseNumber) {
-                    textJustifyValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    textJustifyValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *textJustifyValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setTextJustification:textJustifyValue];
             } else {
                 NSValue *value = [NSValue valueWithMGLTextJustification:enumDictionary[layoutProperties[@"text-justify"]].integerValue];
@@ -1129,13 +1022,7 @@
                     NSValue *value = [NSValue valueWithMGLTextAnchor:enumDictionary[layoutProperties[@"text-anchor"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
-                MGLStyleValue *textAnchorValue;
-                NSNumber *baseNumber = layoutProperties[@"text-anchor"][@"base"];
-                if (baseNumber) {
-                    textAnchorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    textAnchorValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *textAnchorValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setTextAnchor:textAnchorValue];
             } else {
                 NSValue *value = [NSValue valueWithMGLTextAnchor:enumDictionary[layoutProperties[@"text-anchor"]].integerValue];
@@ -1150,13 +1037,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *textMaxAngleValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = layoutProperties[@"text-max-angle"][@"base"];
                 if (baseNumber) {
-                    textMaxAngleValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    textMaxAngleValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *textMaxAngleValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setMaximumTextAngle:textMaxAngleValue];
             } else {
                 MGLStyleValue *textMaxAngleValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-max-angle"]];
@@ -1170,13 +1058,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *textRotateValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = layoutProperties[@"text-rotate"][@"base"];
                 if (baseNumber) {
-                    textRotateValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    textRotateValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *textRotateValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setTextRotation:textRotateValue];
             } else {
                 MGLStyleValue *textRotateValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-rotate"]];
@@ -1190,13 +1079,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *textPaddingValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = layoutProperties[@"text-padding"][@"base"];
                 if (baseNumber) {
-                    textPaddingValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    textPaddingValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *textPaddingValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setTextPadding:textPaddingValue];
             } else {
                 MGLStyleValue *textPaddingValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-padding"]];
@@ -1210,13 +1100,7 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *textKeepUprightValue;
-                NSNumber *baseNumber = layoutProperties[@"text-keep-upright"][@"base"];
-                if (baseNumber) {
-                    textKeepUprightValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    textKeepUprightValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *textKeepUprightValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setKeepsTextUpright:textKeepUprightValue];
             } else {
                 MGLStyleValue *textKeepUprightValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-keep-upright"]];
@@ -1237,13 +1121,7 @@
                     NSValue *value = [NSValue valueWithMGLTextTransform:enumDictionary[layoutProperties[@"text-transform"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
-                MGLStyleValue *textTransformValue;
-                NSNumber *baseNumber = layoutProperties[@"text-transform"][@"base"];
-                if (baseNumber) {
-                    textTransformValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    textTransformValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *textTransformValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setTextTransform:textTransformValue];
             } else {
                 NSValue *value = [NSValue valueWithMGLTextTransform:enumDictionary[layoutProperties[@"text-transform"]].integerValue];
@@ -1259,13 +1137,14 @@
                     CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
-                MGLStyleValue *textOffsetValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = layoutProperties[@"text-offset"][@"base"];
                 if (baseNumber) {
-                    textOffsetValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    textOffsetValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *textOffsetValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setTextOffset:textOffsetValue];
             } else {
                 CGVector vector = CGVectorMake([layoutProperties[@"text-offset"][0] floatValue], [layoutProperties[@"text-offset"][1] floatValue]);
@@ -1280,13 +1159,7 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *textAllowOverlapValue;
-                NSNumber *baseNumber = layoutProperties[@"text-allow-overlap"][@"base"];
-                if (baseNumber) {
-                    textAllowOverlapValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    textAllowOverlapValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *textAllowOverlapValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setTextAllowsOverlap:textAllowOverlapValue];
             } else {
                 MGLStyleValue *textAllowOverlapValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-allow-overlap"]];
@@ -1300,13 +1173,7 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *textIgnorePlacementValue;
-                NSNumber *baseNumber = layoutProperties[@"text-ignore-placement"][@"base"];
-                if (baseNumber) {
-                    textIgnorePlacementValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    textIgnorePlacementValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *textIgnorePlacementValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setTextIgnoresPlacement:textIgnorePlacementValue];
             } else {
                 MGLStyleValue *textIgnorePlacementValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-ignore-placement"]];
@@ -1320,13 +1187,7 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *textOptionalValue;
-                NSNumber *baseNumber = layoutProperties[@"text-optional"][@"base"];
-                if (baseNumber) {
-                    textOptionalValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    textOptionalValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *textOptionalValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setTextOptional:textOptionalValue];
             } else {
                 MGLStyleValue *textOptionalValue = [MGLStyleValue valueWithRawValue:layoutProperties[@"text-optional"]];
@@ -1340,13 +1201,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *iconOpacityValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"icon-opacity"][@"base"];
                 if (baseNumber) {
-                    iconOpacityValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    iconOpacityValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *iconOpacityValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setIconOpacity:iconOpacityValue];
             } else {
                 MGLStyleValue *iconOpacityValue = [MGLStyleValue valueWithRawValue:paintProperties[@"icon-opacity"]];
@@ -1360,13 +1222,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorWithString:stop[1]]] forKey:stop[0]];
                 }
-                MGLStyleValue *iconColorValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"icon-color"][@"base"];
                 if (baseNumber) {
-                    iconColorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    iconColorValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *iconColorValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setIconColor:iconColorValue];
             } else {
                 UIColor *color = [UIColor colorWithString:paintProperties[@"icon-color"]];
@@ -1381,13 +1244,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorWithString:stop[1]]] forKey:stop[0]];
                 }
-                MGLStyleValue *iconHaloColorValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"icon-halo-color"][@"base"];
                 if (baseNumber) {
-                    iconHaloColorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    iconHaloColorValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *iconHaloColorValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setIconHaloColor:iconHaloColorValue];
             } else {
                 UIColor *color = [UIColor colorWithString:paintProperties[@"icon-halo-color"]];
@@ -1402,13 +1266,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *iconHaloWidthValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"icon-halo-width"][@"base"];
                 if (baseNumber) {
-                    iconHaloWidthValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    iconHaloWidthValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *iconHaloWidthValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setIconHaloWidth:iconHaloWidthValue];
             } else {
                 MGLStyleValue *iconHaloWidthValue = [MGLStyleValue valueWithRawValue:paintProperties[@"icon-halo-width"]];
@@ -1422,13 +1287,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *iconHaloBlurValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"icon-halo-blur"][@"base"];
                 if (baseNumber) {
-                    iconHaloBlurValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    iconHaloBlurValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *iconHaloBlurValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setIconHaloBlur:iconHaloBlurValue];
             } else {
                 MGLStyleValue *iconHaloBlurValue = [MGLStyleValue valueWithRawValue:paintProperties[@"icon-halo-blur"]];
@@ -1443,13 +1309,14 @@
                     CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
-                MGLStyleValue *iconTranslateValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"icon-translate"][@"base"];
                 if (baseNumber) {
-                    iconTranslateValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    iconTranslateValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *iconTranslateValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setIconTranslation:iconTranslateValue];
             } else {
                 CGVector vector = CGVectorMake([paintProperties[@"icon-translate"][0] floatValue], [paintProperties[@"icon-translate"][1] floatValue]);
@@ -1470,13 +1337,7 @@
                     NSValue *value = [NSValue valueWithMGLIconTranslationAnchor:enumDictionary[paintProperties[@"icon-translate-anchor"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
-                MGLStyleValue *iconTranslateAnchorValue;
-                NSNumber *baseNumber = paintProperties[@"icon-translate-anchor"][@"base"];
-                if (baseNumber) {
-                    iconTranslateAnchorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    iconTranslateAnchorValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *iconTranslateAnchorValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setIconTranslationAnchor:iconTranslateAnchorValue];
             } else {
                 NSValue *value = [NSValue valueWithMGLIconTranslationAnchor:enumDictionary[paintProperties[@"icon-translate-anchor"]].integerValue];
@@ -1491,13 +1352,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *textOpacityValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"text-opacity"][@"base"];
                 if (baseNumber) {
-                    textOpacityValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    textOpacityValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *textOpacityValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setTextOpacity:textOpacityValue];
             } else {
                 MGLStyleValue *textOpacityValue = [MGLStyleValue valueWithRawValue:paintProperties[@"text-opacity"]];
@@ -1511,13 +1373,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorWithString:stop[1]]] forKey:stop[0]];
                 }
-                MGLStyleValue *textColorValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"text-color"][@"base"];
                 if (baseNumber) {
-                    textColorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    textColorValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *textColorValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setTextColor:textColorValue];
             } else {
                 UIColor *color = [UIColor colorWithString:paintProperties[@"text-color"]];
@@ -1532,13 +1395,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorWithString:stop[1]]] forKey:stop[0]];
                 }
-                MGLStyleValue *textHaloColorValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"text-halo-color"][@"base"];
                 if (baseNumber) {
-                    textHaloColorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    textHaloColorValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *textHaloColorValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setTextHaloColor:textHaloColorValue];
             } else {
                 UIColor *color = [UIColor colorWithString:paintProperties[@"text-halo-color"]];
@@ -1553,13 +1417,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *textHaloWidthValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"text-halo-width"][@"base"];
                 if (baseNumber) {
-                    textHaloWidthValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    textHaloWidthValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *textHaloWidthValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setTextHaloWidth:textHaloWidthValue];
             } else {
                 MGLStyleValue *textHaloWidthValue = [MGLStyleValue valueWithRawValue:paintProperties[@"text-halo-width"]];
@@ -1573,13 +1438,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *textHaloBlurValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"text-halo-blur"][@"base"];
                 if (baseNumber) {
-                    textHaloBlurValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    textHaloBlurValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *textHaloBlurValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setTextHaloBlur:textHaloBlurValue];
             } else {
                 MGLStyleValue *textHaloBlurValue = [MGLStyleValue valueWithRawValue:paintProperties[@"text-halo-blur"]];
@@ -1594,13 +1460,14 @@
                     CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
-                MGLStyleValue *textTranslateValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"text-translate"][@"base"];
                 if (baseNumber) {
-                    textTranslateValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    textTranslateValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *textTranslateValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setTextTranslation:textTranslateValue];
             } else {
                 CGVector vector = CGVectorMake([paintProperties[@"text-translate"][0] floatValue], [paintProperties[@"text-translate"][1] floatValue]);
@@ -1621,13 +1488,7 @@
                     NSValue *value = [NSValue valueWithMGLTextTranslationAnchor:enumDictionary[paintProperties[@"text-translate-anchor"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
-                MGLStyleValue *textTranslateAnchorValue;
-                NSNumber *baseNumber = paintProperties[@"text-translate-anchor"][@"base"];
-                if (baseNumber) {
-                    textTranslateAnchorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    textTranslateAnchorValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *textTranslateAnchorValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setTextTranslationAnchor:textTranslateAnchorValue];
             } else {
                 NSValue *value = [NSValue valueWithMGLTextTranslationAnchor:enumDictionary[paintProperties[@"text-translate-anchor"]].integerValue];
@@ -1675,13 +1536,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *circleRadiusValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"circle-radius"][@"base"];
                 if (baseNumber) {
-                    circleRadiusValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    circleRadiusValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *circleRadiusValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setCircleRadius:circleRadiusValue];
             } else {
                 MGLStyleValue *circleRadiusValue = [MGLStyleValue valueWithRawValue:paintProperties[@"circle-radius"]];
@@ -1695,13 +1557,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorWithString:stop[1]]] forKey:stop[0]];
                 }
-                MGLStyleValue *circleColorValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"circle-color"][@"base"];
                 if (baseNumber) {
-                    circleColorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    circleColorValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *circleColorValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setCircleColor:circleColorValue];
             } else {
                 UIColor *color = [UIColor colorWithString:paintProperties[@"circle-color"]];
@@ -1716,13 +1579,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *circleBlurValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"circle-blur"][@"base"];
                 if (baseNumber) {
-                    circleBlurValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    circleBlurValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *circleBlurValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setCircleBlur:circleBlurValue];
             } else {
                 MGLStyleValue *circleBlurValue = [MGLStyleValue valueWithRawValue:paintProperties[@"circle-blur"]];
@@ -1736,13 +1600,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *circleOpacityValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"circle-opacity"][@"base"];
                 if (baseNumber) {
-                    circleOpacityValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    circleOpacityValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *circleOpacityValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setCircleOpacity:circleOpacityValue];
             } else {
                 MGLStyleValue *circleOpacityValue = [MGLStyleValue valueWithRawValue:paintProperties[@"circle-opacity"]];
@@ -1757,13 +1622,14 @@
                     CGVector vector = CGVectorMake([stop[1][0] floatValue], [stop[1][1] floatValue]);
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[NSValue valueWithCGVector:vector]] forKey:stop[0]];
                 }
-                MGLStyleValue *circleTranslateValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"circle-translate"][@"base"];
                 if (baseNumber) {
-                    circleTranslateValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    circleTranslateValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *circleTranslateValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setCircleTranslation:circleTranslateValue];
             } else {
                 CGVector vector = CGVectorMake([paintProperties[@"circle-translate"][0] floatValue], [paintProperties[@"circle-translate"][1] floatValue]);
@@ -1784,13 +1650,7 @@
                     NSValue *value = [NSValue valueWithMGLCircleTranslationAnchor:enumDictionary[paintProperties[@"circle-translate-anchor"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
-                MGLStyleValue *circleTranslateAnchorValue;
-                NSNumber *baseNumber = paintProperties[@"circle-translate-anchor"][@"base"];
-                if (baseNumber) {
-                    circleTranslateAnchorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    circleTranslateAnchorValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *circleTranslateAnchorValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setCircleTranslationAnchor:circleTranslateAnchorValue];
             } else {
                 NSValue *value = [NSValue valueWithMGLCircleTranslationAnchor:enumDictionary[paintProperties[@"circle-translate-anchor"]].integerValue];
@@ -1811,13 +1671,7 @@
                     NSValue *value = [NSValue valueWithMGLCircleScaleAlignment:enumDictionary[paintProperties[@"circle-pitch-scale"]].integerValue];
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:value] forKey:stop[0]];
                 }
-                MGLStyleValue *circlePitchScaleValue;
-                NSNumber *baseNumber = paintProperties[@"circle-pitch-scale"][@"base"];
-                if (baseNumber) {
-                    circlePitchScaleValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    circlePitchScaleValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *circlePitchScaleValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setCircleScaleAlignment:circlePitchScaleValue];
             } else {
                 NSValue *value = [NSValue valueWithMGLCircleScaleAlignment:enumDictionary[paintProperties[@"circle-pitch-scale"]].integerValue];
@@ -1865,13 +1719,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *rasterOpacityValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"raster-opacity"][@"base"];
                 if (baseNumber) {
-                    rasterOpacityValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    rasterOpacityValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *rasterOpacityValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setRasterOpacity:rasterOpacityValue];
             } else {
                 MGLStyleValue *rasterOpacityValue = [MGLStyleValue valueWithRawValue:paintProperties[@"raster-opacity"]];
@@ -1885,13 +1740,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *rasterHueRotateValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"raster-hue-rotate"][@"base"];
                 if (baseNumber) {
-                    rasterHueRotateValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    rasterHueRotateValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *rasterHueRotateValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setRasterHueRotation:rasterHueRotateValue];
             } else {
                 MGLStyleValue *rasterHueRotateValue = [MGLStyleValue valueWithRawValue:paintProperties[@"raster-hue-rotate"]];
@@ -1905,13 +1761,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *rasterBrightnessMinValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"raster-brightness-min"][@"base"];
                 if (baseNumber) {
-                    rasterBrightnessMinValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    rasterBrightnessMinValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *rasterBrightnessMinValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setMinimumRasterBrightness:rasterBrightnessMinValue];
             } else {
                 MGLStyleValue *rasterBrightnessMinValue = [MGLStyleValue valueWithRawValue:paintProperties[@"raster-brightness-min"]];
@@ -1925,13 +1782,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *rasterBrightnessMaxValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"raster-brightness-max"][@"base"];
                 if (baseNumber) {
-                    rasterBrightnessMaxValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    rasterBrightnessMaxValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *rasterBrightnessMaxValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setMaximumRasterBrightness:rasterBrightnessMaxValue];
             } else {
                 MGLStyleValue *rasterBrightnessMaxValue = [MGLStyleValue valueWithRawValue:paintProperties[@"raster-brightness-max"]];
@@ -1945,13 +1803,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *rasterSaturationValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"raster-saturation"][@"base"];
                 if (baseNumber) {
-                    rasterSaturationValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    rasterSaturationValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *rasterSaturationValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setRasterSaturation:rasterSaturationValue];
             } else {
                 MGLStyleValue *rasterSaturationValue = [MGLStyleValue valueWithRawValue:paintProperties[@"raster-saturation"]];
@@ -1965,13 +1824,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *rasterContrastValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"raster-contrast"][@"base"];
                 if (baseNumber) {
-                    rasterContrastValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    rasterContrastValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *rasterContrastValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setRasterContrast:rasterContrastValue];
             } else {
                 MGLStyleValue *rasterContrastValue = [MGLStyleValue valueWithRawValue:paintProperties[@"raster-contrast"]];
@@ -1985,13 +1845,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *rasterFadeDurationValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"raster-fade-duration"][@"base"];
                 if (baseNumber) {
-                    rasterFadeDurationValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    rasterFadeDurationValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *rasterFadeDurationValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setRasterFadeDuration:rasterFadeDurationValue];
             } else {
                 MGLStyleValue *rasterFadeDurationValue = [MGLStyleValue valueWithRawValue:paintProperties[@"raster-fade-duration"]];
@@ -2019,13 +1880,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:[UIColor colorWithString:stop[1]]] forKey:stop[0]];
                 }
-                MGLStyleValue *backgroundColorValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"background-color"][@"base"];
                 if (baseNumber) {
-                    backgroundColorValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    backgroundColorValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *backgroundColorValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setBackgroundColor:backgroundColorValue];
             } else {
                 UIColor *color = [UIColor colorWithString:paintProperties[@"background-color"]];
@@ -2040,13 +1902,7 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *backgroundPatternValue;
-                NSNumber *baseNumber = paintProperties[@"background-pattern"][@"base"];
-                if (baseNumber) {
-                    backgroundPatternValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
-                } else {
-                    backgroundPatternValue = [MGLStyleValue valueWithStops:stopsDict];
-                }
+                MGLStyleValue *backgroundPatternValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
                 [layer setBackgroundPattern:backgroundPatternValue];
             } else {
                 MGLStyleValue *backgroundPatternValue = [MGLStyleValue valueWithRawValue:paintProperties[@"background-pattern"]];
@@ -2060,13 +1916,14 @@
                 for (id stop in stops) {
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
                 }
-                MGLStyleValue *backgroundOpacityValue;
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = paintProperties[@"background-opacity"][@"base"];
                 if (baseNumber) {
-                    backgroundOpacityValue = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    backgroundOpacityValue = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *backgroundOpacityValue = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
                 [layer setBackgroundOpacity:backgroundOpacityValue];
             } else {
                 MGLStyleValue *backgroundOpacityValue = [MGLStyleValue valueWithRawValue:paintProperties[@"background-opacity"]];

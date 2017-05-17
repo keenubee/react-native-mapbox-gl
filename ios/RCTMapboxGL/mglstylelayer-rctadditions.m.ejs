@@ -103,13 +103,18 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
                     [stopsDict setObject:[MGLStyleValue valueWithRawValue:stop[1]] forKey:stop[0]];
 <% } -%>
                 }
-                MGLStyleValue *<%- camelize(prop.name) %>Value;
+<% if (prop.function === 'interpolated') { -%>
+                NSMutableDictionary *optionsDict = [[NSMutableDictionary alloc] init];
                 NSNumber *baseNumber = <%- prop.propertyType %>Properties[@"<%- prop.name %>"][@"base"];
                 if (baseNumber) {
-                    <%- camelize(prop.name) %>Value = [MGLStyleValue valueWithInterpolationBase:[baseNumber floatValue] stops:stopsDict];
+                    [optionsDict setObject:baseNumber forKey:MGLStyleFunctionOptionInterpolationBase];
                 } else {
-                    <%- camelize(prop.name) %>Value = [MGLStyleValue valueWithStops:stopsDict];
+                    [optionsDict setObject:[NSNumber numberWithInt:1] forKey:MGLStyleFunctionOptionInterpolationBase];
                 }
+                MGLStyleValue *<%- camelize(prop.name) %>Value = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:stopsDict options:optionsDict];
+<% } else { -%>
+                MGLStyleValue *<%- camelize(prop.name) %>Value = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:stopsDict options:nil];
+<% } -%>
                 [layer set<%- upperCamelize(prop.setterName || prop.name) %>:<%- camelize(prop.name) %>Value];
             } else {
 <% } -%>
