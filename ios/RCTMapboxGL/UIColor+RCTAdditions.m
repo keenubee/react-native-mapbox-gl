@@ -72,7 +72,10 @@
     // convert from HSL to HSB
     float lNormalized = lightness/100.0;
     float bNormalized = (2.0*lNormalized + (saturationL/100.0)*(1 - fabsf(2.0*lNormalized - 1)))/2.0;
-    float saturationB = 2.0 * (bNormalized - lNormalized)/bNormalized;
+    float saturationB = 0;
+    if (bNormalized != 0) {
+        saturationB = 2.0 * (bNormalized - lNormalized)/bNormalized;
+    }
 
     return [UIColor colorWithHue:hue/360.0
                     saturation:saturationB
