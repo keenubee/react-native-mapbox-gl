@@ -537,7 +537,11 @@ class MapView extends Component {
   };
 
   componentWillReceiveProps(newProps) {
-    if (this.state.mapStyleFinishedLoading) {
+    if (this.props.styleURL !== newProps.styleURL) {
+      this.setState({mapStyleFinishedLoading: false})
+      // use an else if here since setState is async and we want to make sure
+      // the following code is not called in this case
+    } else if (this.state.mapStyleFinishedLoading) {
       const { update, exit } = diffSources(this.props.dynamicSources, newProps.dynamicSources);
       const { updates, exiting } = diffLayers(this.props.dynamicLayers, newProps.dynamicLayers)
 
