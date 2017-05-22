@@ -166,7 +166,7 @@ class MapView extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { mapStyleFinishedLoading: false }
+    this.state = { mapFinishedLoading: false }
 
     this._onRegionDidChange = this._onRegionDidChange.bind(this);
     this._onRegionWillChange = this._onRegionWillChange.bind(this);
@@ -419,21 +419,21 @@ class MapView extends Component {
     if (this.props.onTap) this.props.onTap(event.nativeEvent.src);
   }
   _onFinishLoadingStyle(event: Event) {
+    if (this.props.onFinishLoadingStyle) this.props.onFinishLoadingStyle(event.nativeEvent.src);
+  }
+  _onFinishLoadingMap(event: Event) {
     this.props.dynamicSources && Promise.all(this.props.dynamicSources.map((source, id) => {
       return this.setSource(id, source.toJS());
     }).toList().toArray()).then(() => {
       this.props.dynamicLayers && this.props.dynamicLayers.forEach((layer) => {
         this.addLayer(layer.toJS());
       })
-      this.setState({mapStyleFinishedLoading: true});
+      this.setState({mapFinishedLoading: true});
     })
-    if (this.props.onFinishLoadingStyle) this.props.onFinishLoadingStyle(event.nativeEvent.src);
-  }
-  _onFinishLoadingMap(event: Event) {
     if (this.props.onFinishLoadingMap) this.props.onFinishLoadingMap(event.nativeEvent.src);
   }
   _onStartLoadingMap(event: Event) {
-    this.setState({mapStyleFinishedLoading: false});
+    this.setState({mapFinishedLoading: false});
     if (this.props.onStartLoadingMap) this.props.onStartLoadingMap(event.nativeEvent.src);
   }
   _onLocateUserFailed(event: Event) {
@@ -538,10 +538,10 @@ class MapView extends Component {
 
   componentWillReceiveProps(newProps) {
     if (this.props.styleURL !== newProps.styleURL) {
-      this.setState({mapStyleFinishedLoading: false})
+      this.setState({mapFinishedLoading: false})
       // use an else if here since setState is async and we want to make sure
       // the following code is not called in this case
-    } else if (this.state.mapStyleFinishedLoading) {
+    } else if (this.state.mapFinishedLoading) {
       const { update, exit } = diffSources(this.props.dynamicSources, newProps.dynamicSources);
       const { updates, exiting } = diffLayers(this.props.dynamicLayers, newProps.dynamicLayers)
 
