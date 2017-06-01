@@ -119,6 +119,9 @@ public class ReactNativeMapboxGLView extends RelativeLayout implements
 
     @Override
     public void onHostResume() {
+        if (_mapView == null) {
+            setupMapView();
+        }
         _paused = false;
         _mapView.onResume();
     }
