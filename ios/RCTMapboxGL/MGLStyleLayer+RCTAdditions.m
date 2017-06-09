@@ -49,6 +49,15 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
             return nil;
         }
         MGLSource *source = [mapView styleSourceWithIdentifier:sourceString];
+        if (!source) {
+            if (errorPtr) {
+                *errorPtr = [NSError errorWithDomain:RCTMapboxGLErrorDomain
+                                     code:1004
+                                     userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"addLayer(): source '%@' for layer '%@' is nil", sourceString, idString]}
+                ];
+            }
+            return nil;
+        }
         MGLFillStyleLayer *layer = [[MGLFillStyleLayer alloc] initWithIdentifier:idString source:source];
         if ([paintProperties valueForKey:@"fill-antialias"]) {
             if ([[paintProperties valueForKey:@"fill-antialias"] isKindOfClass:[NSDictionary class]]) {
@@ -220,6 +229,15 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
             return nil;
         }
         MGLSource *source = [mapView styleSourceWithIdentifier:sourceString];
+        if (!source) {
+            if (errorPtr) {
+                *errorPtr = [NSError errorWithDomain:RCTMapboxGLErrorDomain
+                                     code:1004
+                                     userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"addLayer(): source '%@' for layer '%@' is nil", sourceString, idString]}
+                ];
+            }
+            return nil;
+        }
         MGLLineStyleLayer *layer = [[MGLLineStyleLayer alloc] initWithIdentifier:idString source:source];
         if ([layoutProperties valueForKey:@"line-cap"]) {
             // create the NSString -> enum dictionary for later use
@@ -541,6 +559,15 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
             return nil;
         }
         MGLSource *source = [mapView styleSourceWithIdentifier:sourceString];
+        if (!source) {
+            if (errorPtr) {
+                *errorPtr = [NSError errorWithDomain:RCTMapboxGLErrorDomain
+                                     code:1004
+                                     userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"addLayer(): source '%@' for layer '%@' is nil", sourceString, idString]}
+                ];
+            }
+            return nil;
+        }
         MGLSymbolStyleLayer *layer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:idString source:source];
         if ([layoutProperties valueForKey:@"symbol-placement"]) {
             // create the NSString -> enum dictionary for later use
@@ -1528,6 +1555,15 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
             return nil;
         }
         MGLSource *source = [mapView styleSourceWithIdentifier:sourceString];
+        if (!source) {
+            if (errorPtr) {
+                *errorPtr = [NSError errorWithDomain:RCTMapboxGLErrorDomain
+                                     code:1004
+                                     userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"addLayer(): source '%@' for layer '%@' is nil", sourceString, idString]}
+                ];
+            }
+            return nil;
+        }
         MGLCircleStyleLayer *layer = [[MGLCircleStyleLayer alloc] initWithIdentifier:idString source:source];
         if ([paintProperties valueForKey:@"circle-radius"]) {
             if ([[paintProperties valueForKey:@"circle-radius"] isKindOfClass:[NSDictionary class]]) {
@@ -1711,6 +1747,15 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
             return nil;
         }
         MGLSource *source = [mapView styleSourceWithIdentifier:sourceString];
+        if (!source) {
+            if (errorPtr) {
+                *errorPtr = [NSError errorWithDomain:RCTMapboxGLErrorDomain
+                                     code:1004
+                                     userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"addLayer(): source '%@' for layer '%@' is nil", sourceString, idString]}
+                ];
+            }
+            return nil;
+        }
         MGLRasterStyleLayer *layer = [[MGLRasterStyleLayer alloc] initWithIdentifier:idString source:source];
         if ([paintProperties valueForKey:@"raster-opacity"]) {
             if ([[paintProperties valueForKey:@"raster-opacity"] isKindOfClass:[NSDictionary class]]) {

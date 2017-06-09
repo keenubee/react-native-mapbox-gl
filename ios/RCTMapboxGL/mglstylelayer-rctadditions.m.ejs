@@ -70,6 +70,15 @@ NSString *const RCTMapboxGLErrorDomain = @"com.mapbox.reactnativemapboxgl.ErrorD
             return nil;
         }
         MGLSource *source = [mapView styleSourceWithIdentifier:sourceString];
+        if (!source) {
+            if (errorPtr) {
+                *errorPtr = [NSError errorWithDomain:RCTMapboxGLErrorDomain
+                                     code:1004
+                                     userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"addLayer(): source '%@' for layer '%@' is nil", sourceString, idString]}
+                ];
+            }
+            return nil;
+        }
         MGL<%- upperCamelize(layer.type) %>StyleLayer *layer = [[MGL<%- upperCamelize(layer.type) %>StyleLayer alloc] initWithIdentifier:idString source:source];
 <% } -%>
 <% for (const prop of layer.properties) { -%>
