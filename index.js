@@ -1,8 +1,9 @@
 'use strict';
 
-import React, { Component, PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React, { Component } from 'react';
 import {
-  View,
+  ViewPropTypes,
   NativeModules,
   NativeAppEventEmitter,
   requireNativeComponent,
@@ -16,7 +17,7 @@ import isEqual from 'lodash/isEqual';
 import Annotation from './Annotation';
 
 const { MapboxGLManager } = NativeModules;
-const { mapStyles, userTrackingMode, userLocationVerticalAlignment, unknownResourceCount } = MapboxGLManager;
+const { mapStyles, userTrackingMode, userLocationVerticalAlignment, offlinePackState, unknownResourceCount } = MapboxGLManager;
 
 // Deprecation
 
@@ -85,8 +86,15 @@ function getMetricsEnabled() {
 
 // Access token
 function setAccessToken(token: string) {
-  MapboxGLManager.setAccessToken(token);
+  const promise = MapboxGLManager.setAccessToken(token);
+  return promise;
 }
+
+// Connected
+function setConnected(connected: boolean) {
+  MapboxGLManager.setConnected(connected);
+}
+
 
 // Offline
 function bindCallbackToPromise(callback, promise) {
@@ -99,6 +107,15 @@ function bindCallbackToPromise(callback, promise) {
   }
 }
 
+function initializeOfflinePacks() {
+  return new Promise((resolve) => {
+    NativeAppEventEmitter.addListener('MapboxOfflinePacksLoaded', () => {
+      resolve();
+    });
+    MapboxGLManager.initializeOfflinePacks();
+  });
+}
+
 function addOfflinePack(options, callback) {
   let _options = options;
   // Workaround the fact that RN Android can't serialize JSON correctly
@@ -109,6 +126,18 @@ function addOfflinePack(options, callback) {
     };
   }
   const promise = MapboxGLManager.addOfflinePack(_options);
+  bindCallbackToPromise(callback, promise);
+  return promise;
+}
+
+function suspendOfflinePack(packName, callback) {
+  const promise = MapboxGLManager.suspendOfflinePack(packName);
+  bindCallbackToPromise(callback, promise);
+  return promise;
+}
+
+function resumeOfflinePack(packName, callback) {
+  const promise = MapboxGLManager.resumeOfflinePack(packName);
   bindCallbackToPromise(callback, promise);
   return promise;
 }
@@ -143,7 +172,7 @@ function addOfflinePackProgressListener(handler) {
   let _handler = handler;
   if (Platform.OS === 'android') {
     _handler = (progress) => {
-      if (progress.metadata) {
+      if (progress.metadata && typeof progress.metadata !== 'object') {
         progress.metadata = JSON.parse(progress.metadata).v;
       }
       handler(progress);
@@ -283,7 +312,7 @@ class MapView extends Component {
   }
 
   static propTypes = {
-    ...View.propTypes,
+    ...ViewPropTypes,
 
     initialZoomLevel: PropTypes.number,
     initialDirection: PropTypes.number,
@@ -461,10 +490,16 @@ const MapboxGLView = requireNativeComponent('RCTMapboxGL', MapView, {
 const Mapbox = {
   MapView,
   Annotation,
-  mapStyles, userTrackingMode, userLocationVerticalAlignment, unknownResourceCount,
+  mapStyles, userTrackingMode, userLocationVerticalAlignment, offlinePackState, unknownResourceCount,
   getMetricsEnabled, setMetricsEnabled,
   setAccessToken,
-  addOfflinePack, getOfflinePacks, removeOfflinePack,
+  setConnected,
+  initializeOfflinePacks,
+  addOfflinePack,
+  getOfflinePacks,
+  removeOfflinePack,
+  resumeOfflinePack, 
+  suspendOfflinePack,
   addOfflinePackProgressListener,
   addOfflineMaxAllowedTilesListener,
   addOfflineErrorListener,

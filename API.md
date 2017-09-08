@@ -255,15 +255,16 @@ mapbox://styles/bobbysud/cigtw1pzy0000aam2346f7ex0
 
 ```javascript
 [{
-  coordinates, // required. For type polyline and polygon must be an array of arrays. For type point, single array with 2 coordinates
+  coordinates, // required. For type polyline and polygon must be an array of arrays. For type point, array as [latitude longitude]
   type, // required. One of 'point', 'polyline' or 'polygon'
   title, // optional. Title string. Appears when marker pressed
   subtitle, // optional. Subtitle string. Appears when marker pressed
-  fillAlpha, // optional. number. Only for type=polygon. Controls the opacity of the polygon
+  fillAlpha, // optional. number. Only for type=polygon. iOS only. Controls the opacity of the polygon fill color
   fillColor, // optional. string. Only for type=polygon. CSS color (#rrggbb). Controls the fill color of the polygon
-  strokeAlpha, // optional. number. Only for type=polygon or type=polyline. Controls the opacity of the line
+  strokeAlpha, // optional. number. Only for type=polygon or type=polyline. iOS only. Controls the opacity of the line
   strokeColor, // optional. string. Only for type=polygon or type=polyline. CSS color (#rrggbb). Controls line color.
   strokeWidth, // optional. number. Only for type=polygon or type=polyline. Controls line width.
+  alpha, // optional. number. Android only. Controls the opacity of the annotation, including fill and stroke.
   id, // required. string. Unique identifier used for adding or selecting an annotation.
   annotationImage: { // optional. Marker image for type=point
     source: {
@@ -348,13 +349,13 @@ See [the example](./example.js#L116) for an illustration of this.
 If the default annotations do not offer enough options, you can embed react native
 view directly onto the map as a custom marker view.
 
-The children of the `MapView` must be `Annotation` views: `import {Annotation} from 'mapbox-react-native-gl'`.
+The children of the `MapView` must be `Annotation` views: `import {Annotation} from 'react-native-mapbox-gl'`.
 The `Annotation` view has the following required props:
 
 | Prop | Type | Description |
-|---|---|---|---|---|
-| `id`| `string` | Unique identifier for the annotation. |
-| `coordinate` | ```{latitude: number, longitude: number}``` | Location of the annotation. |
+| --- | --- | --- |
+| `id` | `string` | Unique identifier for the annotation. |
+| `coordinate` | `{latitude: number, longitude: number}` | Location of the annotation. |
 
 ###### Known Bugs
 
@@ -404,12 +405,15 @@ To enable or disable metrics, use `Mapbox.setMetricsEnabled(enabled: boolean)`.
 
 ## Offline
 
-There are 3 main methods for interacting with the offline API:
-* `Mapbox.addOfflinePackForRegion`: Creates an offline pack
+There are 6 main methods for interacting with the offline API:
+* `Mapbox.initializeOfflinePacks()`: Initializes the offline packs handlers.
+* `Mapbox.addOfflinePack`: Creates an offline pack
 * `Mapbox.getOfflinePacks`: Returns an array of all offline packs on the device
 * `Mapbox.removeOfflinePack`: Removes a single pack
+* `Mapbox.suspendOfflinePack`: Pauses a single pack's download
+* `Mapbox.resumeOfflinePack`: Resumes download of a single pack
 
-Before using them, don't forget to set an access token with `Mapbox.setAccessToken(accessToken)`
+Before using offline packs, you must call `Mapbox.initializeOfflinePacks()`.
 
 These methods return a promise, but they also accept a callback as the last
 argument with the signature `(err, value) => {}`.
@@ -473,11 +477,56 @@ A progress object has the following shape:
 {
   name: 'test', // The name this pack was registered with
   metadata, // The value that was previously passed as metadata
+  state: 0, // The current state of the offline pack. 0 = Unknown, 1 = Inactive, 2 = Active, 3 = Complete, 4 = Invalid (iOS Only)
   countOfBytesCompleted: 0, // The number of bytes downloaded for this pack
   countOfResourcesCompleted: 0, // The number of tiles that have been downloaded for this pack
   countOfResourcesExpected: 0, // The estimated minimum number of total tiles in this pack
   maximumResourcesExpected: 0 // The estimated maximum number of total tiles in this pack
 }
+```
+
+The offline pack progress object's `state` property can be compared against the following constants:
+
+* `Mapbox.offlinePackState.unknown`
+* `Mapbox.offlinePackState.inactive`
+* `Mapbox.offlinePackState.active`
+* `Mapbox.offlinePackState.complete`
+* `Mapbox.offlinePackState.invalid`
+
+#### Suspending a pack's download
+
+To suspend or pause a pack's download, provide the `name` of the pack to suspend.
+
+```javascript
+Mapbox.suspendOfflinePack('test')
+  .then(info => {
+    if (info.suspended) {
+      console.log(`Suspended pack named ${info.suspended}`); // The pack has been suspended successfully
+    } else {
+      console.log('No packs to suspend'); // There are no packs named 'test'
+    }
+  })
+  .catch(err => {
+    console.error(err); // Handle error
+  });
+```
+
+#### Resuming a pack's download
+
+To resume a pack's download, provide the `name` of the pack to resume.
+
+```javascript
+Mapbox.resumeOfflinePack('test')
+  .then(info => {
+    if (info.resumed) {
+      console.log(`Resumed pack named ${info.resumed}`); // The pack has been resumed successfully
+    } else {
+      console.log('No packs to resume'); // There are no packs named 'test'
+    }
+  })
+  .catch(err => {
+    console.error(err); // Handle error
+  });
 ```
 
 #### Subscribing to progress notifications

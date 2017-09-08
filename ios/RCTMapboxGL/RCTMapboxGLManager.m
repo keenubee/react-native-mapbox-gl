@@ -10,7 +10,7 @@
 #import "RCTMapboxGL.h"
 #import <Mapbox/Mapbox.h>
 #import <React/RCTConvert+CoreLocation.h>
-#import <React/RCTConvert+MapKit.h>
+#import <React/RCTConvert.h>
 #import <React/RCTBridge.h>
 #import <React/RCTEventDispatcher.h>
 #import <React/UIView+React.h>
@@ -104,6 +104,13 @@ RCT_CUSTOM_VIEW_PROPERTY(contentInset, UIEdgeInsetsMake, RCTMapboxGL)
                      @"center": @(MGLAnnotationVerticalAlignmentCenter),
                      @"bottom": @(MGLAnnotationVerticalAlignmentBottom)
                      },
+             @"offlinePackState": @{
+                     @"unknown": [NSNumber numberWithUnsignedInt:MGLOfflinePackStateUnknown],
+                     @"inactive": [NSNumber numberWithUnsignedInt:MGLOfflinePackStateInactive],
+                     @"active": [NSNumber numberWithUnsignedInt:MGLOfflinePackStateActive],
+                     @"complete": [NSNumber numberWithUnsignedInt:MGLOfflinePackStateComplete],
+                     @"invalid": [NSNumber numberWithUnsignedInt:MGLOfflinePackStateInvalid]
+                     },
              @"unknownResourceCount": @(UINT64_MAX),
              @"metricsEnabled": @([RCTMapboxGLManager metricsEnabled])
              };
@@ -128,13 +135,17 @@ RCT_EXPORT_METHOD(setMetricsEnabled:(BOOL)enabled)
 
 // Access token
 
-RCT_EXPORT_METHOD(setAccessToken:(nonnull NSString *)accessToken)
+RCT_EXPORT_METHOD(setAccessToken:(nonnull NSString *)accessToken
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (!accessToken || ![accessToken length] || [accessToken isEqual:@"your-mapbox.com-access-token"]) {
+            reject(nil, @"Mapbox api token is not valid.", nil);
             return;
         }
         [MGLAccountManager setAccessToken:accessToken];
+        resolve(nil);
     });
 }
 
@@ -143,23 +154,6 @@ RCT_EXPORT_METHOD(setAccessToken:(nonnull NSString *)accessToken)
 - (id)init
 {
     if (!(self = [super init])) { return nil; }
-    
-    _recentPacks = [NSMutableSet new];
-    _throttledPacks = [NSMutableSet new];
-    _removedPacks = [NSMutableSet new];
-    _throttleInterval = 300;
-    
-    _loadingPacks = [NSMutableSet new];
-    _loadedPacks = NO;
-    
-    // Setup pack array loading notifications
-    [[MGLOfflineStorage sharedOfflineStorage] addObserver:self forKeyPath:@"packs" options:NSKeyValueObservingOptionInitial context:NULL];
-    _packRequests = [NSMutableArray new];
-    
-    // Setup offline pack notification handlers.
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(offlinePackProgressDidChange:) name:MGLOfflinePackProgressChangedNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(offlinePackDidReceiveError:) name:MGLOfflinePackErrorNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(offlinePackDidReceiveMaximumAllowedMapboxTiles:) name:MGLOfflinePackMaximumMapboxTilesReachedNotification object:nil];
     
     return self;
 }
@@ -185,8 +179,11 @@ RCT_EXPORT_METHOD(setAccessToken:(nonnull NSString *)accessToken)
     }
     
     for (MGLOfflinePack * pack in packs) {
-        [pack resume];
+        if (pack.state != MGLOfflinePackStateComplete) {
+            [pack resume];
+        }
     }
+    [_bridge.eventDispatcher sendAppEventWithName:@"MapboxOfflinePacksLoaded" body:@{}];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -215,11 +212,15 @@ RCT_EXPORT_METHOD(setAccessToken:(nonnull NSString *)accessToken)
 }
 
 - (void)firePackProgress:(MGLOfflinePack*)pack {
+    if (pack.state == MGLOfflinePackStateInvalid) {
+        return;
+    }
     NSDictionary *userInfo = [NSKeyedUnarchiver unarchiveObjectWithData:pack.context];
     MGLOfflinePackProgress progress = pack.progress;
     
     NSDictionary *event = @{ @"name": userInfo[@"name"],
                              @"metadata": userInfo[@"metadata"],
+                             @"state": @(pack.state),
                              @"countOfResourcesCompleted": @(progress.countOfResourcesCompleted),
                              @"countOfResourcesExpected": @(progress.countOfResourcesExpected),
                              @"countOfBytesCompleted": @(progress.countOfBytesCompleted),
@@ -297,6 +298,26 @@ RCT_EXPORT_METHOD(setAccessToken:(nonnull NSString *)accessToken)
     [_bridge.eventDispatcher sendAppEventWithName:@"MapboxOfflineError" body:event];
 }
 
+RCT_EXPORT_METHOD(initializeOfflinePacks)
+{
+    _recentPacks = [NSMutableSet new];
+    _throttledPacks = [NSMutableSet new];
+    _removedPacks = [NSMutableSet new];
+    _throttleInterval = 300;
+
+    _loadingPacks = [NSMutableSet new];
+    _loadedPacks = NO;
+
+    // Setup pack array loading notifications
+    [[MGLOfflineStorage sharedOfflineStorage] addObserver:self forKeyPath:@"packs" options:NSKeyValueObservingOptionInitial context:NULL];
+    _packRequests = [NSMutableArray new];
+
+    // Setup offline pack notification handlers.
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(offlinePackProgressDidChange:) name:MGLOfflinePackProgressChangedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(offlinePackDidReceiveError:) name:MGLOfflinePackErrorNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(offlinePackDidReceiveMaximumAllowedMapboxTiles:) name:MGLOfflinePackMaximumMapboxTilesReachedNotification object:nil];
+}
+
 RCT_REMAP_METHOD(addOfflinePack,
                  pack:(NSDictionary*)options
                  resolver:(RCTPromiseResolveBlock)resolve
@@ -365,6 +386,7 @@ RCT_REMAP_METHOD(addOfflinePack,
         NSMutableDictionary *userInfo = [NSKeyedUnarchiver unarchiveObjectWithData:pack.context];
         [callbackArray addObject:@{ @"name": userInfo[@"name"],
                                     @"metadata": userInfo[@"metadata"],
+                                    @"state": @(pack.state),
                                     @"countOfBytesCompleted": @(pack.progress.countOfBytesCompleted),
                                     @"countOfResourcesCompleted": @(pack.progress.countOfResourcesCompleted),
                                     @"countOfResourcesExpected": @(pack.progress.countOfResourcesExpected),
@@ -372,6 +394,62 @@ RCT_REMAP_METHOD(addOfflinePack,
     }
     
     return callbackArray;
+}
+
+RCT_REMAP_METHOD(suspendOfflinePack,
+                 suspendName:(NSString*)packName
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        MGLOfflinePack *packs = [MGLOfflineStorage sharedOfflineStorage].packs;
+        MGLOfflinePack *tempPack;
+        
+        for (MGLOfflinePack *pack in packs) {
+            NSDictionary *userInfo = [NSKeyedUnarchiver unarchiveObjectWithData:pack.context];
+            if ([packName isEqualToString:userInfo[@"name"]]) {
+                tempPack = pack;
+                break;
+            }
+        }
+        
+        if (tempPack == nil) {
+            return resolve(@{});
+        }
+        
+        NSDictionary *userInfo = [NSKeyedUnarchiver unarchiveObjectWithData:tempPack.context];
+        [tempPack suspend];
+        
+        resolve(@{ @"suspended": userInfo[@"name"] });
+    });
+}
+
+RCT_REMAP_METHOD(resumeOfflinePack,
+                 resumeName:(NSString*)packName
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        MGLOfflinePack *packs = [MGLOfflineStorage sharedOfflineStorage].packs;
+        MGLOfflinePack *tempPack;
+        
+        for (MGLOfflinePack *pack in packs) {
+            NSDictionary *userInfo = [NSKeyedUnarchiver unarchiveObjectWithData:pack.context];
+            if ([packName isEqualToString:userInfo[@"name"]]) {
+                tempPack = pack;
+                break;
+            }
+        }
+        
+        if (tempPack == nil) {
+            return resolve(@{});
+        }
+        
+        NSDictionary *userInfo = [NSKeyedUnarchiver unarchiveObjectWithData:tempPack.context];
+        [tempPack resume];
+        
+        resolve(@{ @"resumed": userInfo[@"name"] });
+    });
 }
 
 RCT_REMAP_METHOD(getOfflinePacks,
