@@ -30,7 +30,7 @@ node_modules/
 npm-debug.log
 
 # project specific
-ios/Mapbox.framework
+# ios/Mapbox.framework
 android/build/
 android/.gradle/
 android/.idea/
